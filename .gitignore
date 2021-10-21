@@ -1,3 +1,8 @@
+.clang-format
+lsh
+cube
+cluster
+
 # Prerequisites
 *.d
 
