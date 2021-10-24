@@ -19,13 +19,13 @@ cube: create_directories bin/cube.o bin/metrics.o
 cluster: create_directories bin/cluster.o bin/metrics.o
 	$(CPP) bin/cluster.o bin/metrics.o -o $(BUILD)/$@
 
-bin/lsh.o: lsh/lsh.cpp lsh/lsh.hpp
+bin/lsh.o: lsh/lsh.cpp
 	$(CPP) $(CFLAGS) $< -o $@
 
-bin/cube.o: cube/cube.cpp cube/cube.hpp
+bin/cube.o: cube/cube.cpp
 	$(CPP) $(CFLAGS) $< -o $@
 
-bin/cluster.o: cluster/cluster.cpp cluster/cluster.hpp
+bin/cluster.o: cluster/cluster.cpp
 	$(CPP) $(CFLAGS) $< -o $@
 
 bin/metrics.o: utilities/metrics.cpp utilities/metrics.hpp 
