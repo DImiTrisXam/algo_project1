@@ -2,11 +2,10 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
-#include <string>
 
 //================================================================================
 //================================== PARSE ARGS =======================================
-static bool tryParseArgInt(int &arg, char *str, const char *name) {
+static bool tryParseArgInt(int &arg, const char *str, const char *name) {
   if (arg != -1) {
     std::cout << name << " passed more than once" << std::endl;
     return false;
@@ -29,7 +28,7 @@ static bool tryParseArgInt(int &arg, char *str, const char *name) {
   return true;
 }
 
-bool parseLSHArgs(int argc, char **argv, std::string &input_file, std::string &query_file, std::string &output_file, int &k, int &L, int &N, int &R) {
+bool parseLSHArgs(int argc, const char **argv, std::string &input_file, std::string &query_file, std::string &output_file, int &k, int &L, int &N, int &R) {
   bool validArgs = true;
   int i;
 
@@ -46,17 +45,17 @@ bool parseLSHArgs(int argc, char **argv, std::string &input_file, std::string &q
         i--;
       }
     } else if (!strcmp(argv[i], "-L")) {
-      if (tryParseArgInt(k, argv[++i], "-L") == false) {
+      if (tryParseArgInt(L, argv[++i], "-L") == false) {
         validArgs = false;
         i--;
       }
     } else if (!strcmp(argv[i], "-N")) {
-      if (tryParseArgInt(k, argv[++i], "-N") == false) {
+      if (tryParseArgInt(N, argv[++i], "-N") == false) {
         validArgs = false;
         i--;
       }
     } else if (!strcmp(argv[i], "-R")) {
-      if (tryParseArgInt(k, argv[++i], "-R") == false) {
+      if (tryParseArgInt(R, argv[++i], "-R") == false) {
         validArgs = false;
         i--;
       }
@@ -98,7 +97,7 @@ bool parseLSHArgs(int argc, char **argv, std::string &input_file, std::string &q
   return true;
 }
 
-bool parseCubeArgs(int argc, char **argv, std::string &input_file, std::string &query_file, std::string &output_file, int &k, int &N, int &R, int &M, int &probes) {
+bool parseCubeArgs(int argc, const char **argv, std::string &input_file, std::string &query_file, std::string &output_file, int &k, int &N, int &R, int &M, int &probes) {
   bool validArgs = true;
   int i;
 
@@ -115,22 +114,22 @@ bool parseCubeArgs(int argc, char **argv, std::string &input_file, std::string &
         i--;
       }
     } else if (!strcmp(argv[i], "-M")) {
-      if (tryParseArgInt(k, argv[++i], "-M") == false) {
+      if (tryParseArgInt(M, argv[++i], "-M") == false) {
         validArgs = false;
         i--;
       }
     } else if (!strcmp(argv[i], "-N")) {
-      if (tryParseArgInt(k, argv[++i], "-N") == false) {
+      if (tryParseArgInt(N, argv[++i], "-N") == false) {
         validArgs = false;
         i--;
       }
     } else if (!strcmp(argv[i], "-R")) {
-      if (tryParseArgInt(k, argv[++i], "-R") == false) {
+      if (tryParseArgInt(R, argv[++i], "-R") == false) {
         validArgs = false;
         i--;
       }
     } else if (!strcmp(argv[i], "-probes")) {
-      if (tryParseArgInt(k, argv[++i], "-probes") == false) {
+      if (tryParseArgInt(probes, argv[++i], "-probes") == false) {
         validArgs = false;
         i--;
       }
@@ -139,6 +138,7 @@ bool parseCubeArgs(int argc, char **argv, std::string &input_file, std::string &
       validArgs = false;
     }
   }
+
   if (i != argc) {
     std::cout << "Unexpected parameter " << argv[i] << std::endl;
     validArgs = false;
@@ -174,7 +174,7 @@ bool parseCubeArgs(int argc, char **argv, std::string &input_file, std::string &
   return true;
 }
 
-bool parseClusterArgs(int argc, char **argv, std::string &input_file, std::string &output_file, std::string &config_file, bool &complete, std::string &method) {
+bool parseClusterArgs(int argc, const char **argv, std::string &input_file, std::string &output_file, std::string &config_file, bool &complete, std::string &method) {
   bool validArgs = true;
   int i;
 
@@ -194,6 +194,7 @@ bool parseClusterArgs(int argc, char **argv, std::string &input_file, std::strin
       validArgs = false;
     }
   }
+
   if (i != argc) {
     std::cout << "Unexpected parameter " << argv[i] << std::endl;
     validArgs = false;
