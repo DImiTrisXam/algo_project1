@@ -1,7 +1,5 @@
 .clang-format
-lsh
-cube
-cluster
+datasets/*
 
 # Prerequisites
 *.d

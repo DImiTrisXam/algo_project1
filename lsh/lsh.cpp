@@ -1,6 +1,8 @@
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <sstream>
+#include <string>
 
 void use(void) {
   // how to use the program
@@ -83,6 +85,17 @@ int main(int argc, char const *argv[]) {
 
   std::ifstream iFile(iFile__);
   std::ifstream qFile(qFile__);
+
+  std::string line;
+
+  while (std::getline(iFile, line)) {
+    std::istringstream ss(line);
+
+    std::string name;
+    int var1, var2, var3;
+
+    ss >> name >> var1 >> var2 >> var3;
+  }
 
   return 0;
 }
