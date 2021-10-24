@@ -27,3 +27,15 @@ int manhattanDist(std::vector<int> x, std::vector<int> y) {
 
   return sum;
 }
+
+int hammingDist(int n1, int n2) {
+  int x = n1 ^ n2; // XOR the bits
+  int dist = 0;
+
+  while (x > 0) {  // go through all bits
+    dist += x & 1; // add least significant bit to distance
+    x >>= 1;       // shift 1 bit to the right (go to next bit)
+  }
+
+  return dist;
+}

@@ -5,5 +5,6 @@
 
 int euclidianDist(std::vector<int>, std::vector<int>);
 int manhattanDist(std::vector<int>, std::vector<int>);
+int hammingDist(int, int);
 
 #endif
