@@ -3,7 +3,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
-// #include <string>
+#include <vector>
 
 void use(void) {
   // how to use the program
@@ -23,7 +23,7 @@ int main(int argc, char const *argv[]) {
   std::string qFile__; // query file name
   std::string oFile__; // output file name
   int k = -1, L = -1, N = -1, R = -1;
-  
+
   parseLSHArgs(argc, argv, iFile__, qFile__, oFile__, k, L, N, R);
 
   std::cout << "iFile__: \"" << iFile__ << "\"\n"
@@ -35,18 +35,30 @@ int main(int argc, char const *argv[]) {
             << "R: " << R << "\n";
 
   std::ifstream iFile(iFile__);
-  std::ifstream qFile(qFile__);
+  // std::ifstream qFile(qFile__);
 
-  // std::string line;
+  std::string line;
 
-  // while (std::getline(iFile, line)) {
-  //   std::istringstream ss(line);
+  while (std::getline(iFile, line)) {
+    std::istringstream ss(line);
 
-  //   std::string name;
-  //   int var1, var2, var3;
+    std::string name;
+    std::vector<int> vec;
+    int temp;
 
-  //   ss >> name >> var1 >> var2 >> var3;
-  // }
+    ss >> name;
+
+    while (ss >> temp) {
+      vec.push_back(temp);
+    }
+
+    std::cout << "entry: \"" << name << "\"";
+    
+    for (auto entry : vec) {
+      std::cout << " " << entry;
+    }
+    std::cout << "\n";
+  }
 
   return 0;
 }
