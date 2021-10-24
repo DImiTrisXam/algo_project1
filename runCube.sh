@@ -1,1 +1,1 @@
-clear && make cube -s && ./cube -i bla1 -q bla2 -k 1 -M 2 -probes 3 -o bla3 -N 4 -R 5
+clear && make cube -s && ./build/cube -i bla1 -q bla2 -k 1 -M 2 -probes 3 -o bla3 -N 4 -R 5

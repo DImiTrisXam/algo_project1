@@ -1,29 +1,34 @@
 CPP = g++
 OBJ = lsh.o cube.o cluster.o
-OUT = lsh cube cluster
 CFLAGS = -c
+BIN = bin
+BUILD = build
 
-all: lsh cube
+all: lsh cube cluster
 
-lsh: lsh.o
-	$(CPP) $^ -o $@
+create_directories:
+	@mkdir -p bin
+	@mkdir -p build
 
-cube: cube.o
-	$(CPP) $^ -o $@
+lsh: create_directories bin/lsh.o
+	$(CPP) bin/lsh.o -o $(BUILD)/$@
 
-cluster: cluster.o
-	$(CPP) $^ -o $@
+cube: create_directories bin/cube.o
+	$(CPP) bin/cube.o -o $(BUILD)/$@
 
-lsh.o: lsh.cpp
-	$(CPP) $(CFLAGS) $<
+cluster: create_directories bin/cluster.o
+	$(CPP) bin/cluster.o -o $(BUILD)/$@
 
-cube.o: cube.cpp
-	$(CPP) $(CFLAGS) $<
+bin/lsh.o: lsh/lsh.cpp
+	$(CPP) $(CFLAGS) $< -o $@
 
-cluster.o: cluster.cpp
-	$(CPP) $(CFLAGS) $<
+bin/cube.o: cube/cube.cpp
+	$(CPP) $(CFLAGS) $< -o $@
+
+bin/cluster.o: cluster/cluster.cpp
+	$(CPP) $(CFLAGS) $< -o $@
 
 .PHONY: clean
 
 clean:
-	rm -f $(OBJ) $(OUT)
+	rm -r -f $(BIN) $(BUILD)

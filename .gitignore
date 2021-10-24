@@ -1,5 +1,7 @@
 .clang-format
 datasets/*
+bin
+build
 
 # Prerequisites
 *.d
