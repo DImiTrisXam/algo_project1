@@ -1,0 +1,3 @@
+bool parseLSHArgs(int argc, char **argv, std::string &input_file, std::string &query_file, std::string &output_file, int &k, int &L, int &N, int &R);
+bool parseCubeArgs(int argc, char **argv, std::string &input_file, std::string &query_file, std::string &output_file, int &k, int &N, int &R, int &M, int &probes);
+bool parseClusterArgs(int argc, char **argv, std::string &input_file, std::string &output_file, std::string &config_file, bool &complete, std::string &method);
