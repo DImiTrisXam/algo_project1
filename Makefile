@@ -3,7 +3,7 @@ OBJ = lsh.o cube.o cluster.o
 CFLAGS = -c
 BIN = bin
 BUILD = build
-UTIL = bin/metrics.o bin/utilities.o
+UTIL = bin/metrics.o bin/utilities.o bin/hash.o
 
 all: lsh cube cluster
 
@@ -33,6 +33,9 @@ bin/metrics.o: utilities/metrics.cpp utilities/metrics.hpp
 	$(CPP) $(CFLAGS) $< -o $@
 
 bin/utilities.o: utilities/utilities.cpp utilities/utilities.hpp 
+	$(CPP) $(CFLAGS) $< -o $@
+
+bin/hash.o: utilities/hash.cpp utilities/hash.hpp 
 	$(CPP) $(CFLAGS) $< -o $@
 
 .PHONY: clean
