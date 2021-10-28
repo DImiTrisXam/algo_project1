@@ -58,7 +58,7 @@ int ID(const std::vector<float> &p, int k, int w) {
   return sum % M;
 }
 
-int gFunc(std::vector<float> &p, int k, int w) {
+int gFunc(const std::vector<float> &p, int k, int w) {
   int tableSize = 1000;
 
   return ID(p, k, w) % tableSize;

@@ -4,6 +4,8 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <list>
+#include <functional>
 
 int hFunc(const std::vector<float> &, int, int);
 int ID(const std::vector<float> &, int, int);
@@ -31,6 +33,7 @@ public:
 			throw "Unable to create hashtable with size = " + std::to_string(SIZE) + ". Out of heap memory.";
 		for (int i = 0; i < SIZE; i++)
 			table[i] = nullptr;
+		// TODO: call generateHashFunctions here
 	}
 
 	/*
@@ -42,6 +45,7 @@ public:
 			throw "Unable to create hashtable with size = " + std::to_string(SIZE) + ". Out of heap memory.";
 		for (int i = 0; i < SIZE; i++)
 			table[i] = nullptr;
+		// TODO: call generateHashFunctions here
 	}
 
 	inline ~HashTable() {
@@ -195,9 +199,47 @@ public:
 private:
 	const unsigned int SIZE;
 	static const unsigned int HASH_MULTIPLIER = 65599;
-	Node<T>** table;
+	Node<T> **table;
 	unsigned int containedItems = 0;
+    std::list<std::function<unsigned int(const std::string& key)>> hashFunctions;
 
+	/*
+	* Generates the hash functions.
+	* Always call in HashTable constructor (TODO).
+	*/
+	inline void generateHashFunctions(int k /* and other args that are needed*/){
+		// some initializations probably here
+		// ...
+		// ...
+        for(int i=0; i<k; i++){
+            // generate "whatever needed" for hash function here
+			// ...
+			// ...
+            hashFunctions.push_front([=](const std::string& key){ //lambda captures "whatever needed" by value
+                // hash the key here
+                // should return unsigned int
+				// ...
+				// ...
+				return i; // replace with actual value
+            });
+        }
+    }
+
+	/*
+	* New hash function.
+	* Call all 'hashFunctions' and combine (how?) the results.
+	* Will replace current hash function when ready.
+	*/
+    inline unsigned int gHash(const std::string& key){
+        // TOFIX - example code below:
+        unsigned int sum = 0;
+        for(const auto& hashFunction : hashFunctions){ // calls all hash functions.
+            sum += hashFunction(key);
+        }
+        return sum % SIZE;
+    }
+
+    /* OLD (typical hash function) - to be removed */
 	inline unsigned int hash(const std::string& key) const {
 		const char* c_key = key.c_str();
 		unsigned int i = 0U, hashValue = 0U;
