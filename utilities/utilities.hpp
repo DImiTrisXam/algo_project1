@@ -8,3 +8,4 @@ bool parseCubeArgs(int, const char **, std::string &, std::string &, std::string
 bool parseClusterArgs(int, const char **, std::string &, std::string &, std::string &, bool &, std::string &);
 
 #endif
+

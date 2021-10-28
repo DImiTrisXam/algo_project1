@@ -5,7 +5,7 @@
 #include <iostream>
 #include <random>
 
-float dotProduct(std::vector<float> x, std::vector<float> y) {
+float dotProduct(const std::vector<float>& x, const std::vector<float>& y) {
   float product = 0;
 
   for (size_t i = 0; i < x.size(); i++)
@@ -14,7 +14,7 @@ float dotProduct(std::vector<float> x, std::vector<float> y) {
   return product;
 }
 
-int hFunc(std::vector<float> p, int w) {
+int hFunc(const std::vector<float>& p, int w) {
   // Create random engine with the help of seed
   unsigned seed = std::chrono::steady_clock::now().time_since_epoch().count();
   std::default_random_engine generator(seed);
@@ -40,7 +40,7 @@ int hFunc(std::vector<float> p, int w) {
   return (int)floor((dotProduct(p, v) + t) / (float)w);
 }
 
-int ID(std::vector<float> &p, int k, int w) {
+int ID(const std::vector<float> &p, int k, int w) {
   int sum = 0, r;
   unsigned int M = UINT_MAX - 4; // 2^32 - 5
 

@@ -3,8 +3,8 @@
 
 #include <vector>
 
-int euclidianDist(std::vector<int>, std::vector<int>);
-int manhattanDist(std::vector<int>, std::vector<int>);
+int euclidianDist(const std::vector<int>&, const std::vector<int>&);
+int manhattanDist(const std::vector<int>&, const std::vector<int>&);
 int hammingDist(int, int);
 
 #endif
