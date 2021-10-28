@@ -1,5 +1,5 @@
-#include "../utilities/utilities.hpp"
 #include "../utilities/hash.hpp"
+#include "../utilities/utilities.hpp"
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
@@ -35,36 +35,26 @@ int main(int argc, char const *argv[]) {
             << "N: " << N << "\n"
             << "R: " << R << "\n";
 
-  std::ifstream iFile(iFile__);
-  // std::ifstream qFile(qFile__);
+  int numOfInputs = readNumberOfLines(iFile__);
+  int tableSize = numOfInputs / 8;
 
-  std::string line;
+  // std::cout << "Number of lines in input file: " << numOfInputs << "\n";
 
-  HashTable<std::vector<int>> ht;
+  auto **tables = new HashTable<std::vector<float>> *[L];
 
-  while (std::getline(iFile, line)) {
-    std::istringstream ss(line);
+  for (size_t i = 0; i < L; i++) {
+    tables[i] = new HashTable<std::vector<float>>(tableSize);
+  }
 
-    std::string name;
-    std::vector<int> vec;
-    int temp;
+  readInputFile(iFile__, tables, L); // put the input in the hash tables
 
-    ss >> name;
+  std::ifstream qFile(qFile__);
 
-    while (ss >> temp) {
-      vec.push_back(temp);
-    }
+  // release hash table memory
+  for (size_t i = 0; i < L; i++) {
+    delete tables[i];
+  }
+  delete[] tables;
 
-    
-    ht.add(name, vec);
-    /*std::cout << "entry: \"" << name << "\"";
-    
-    for (auto entry : vec) {
-      std::cout << " " << entry;
-    }
-    std::cout << "\n";
-    */
-  } 
-  
   return 0;
 }

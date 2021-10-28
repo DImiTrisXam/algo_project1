@@ -2,9 +2,10 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <sstream>
 
 //================================================================================
-//================================== PARSE ARGS =======================================
+//================================== PARSE ARGS ==================================
 static bool tryParseArgInt(int &arg, const char *str, const char *name) {
   if (arg != -1) {
     std::cout << name << " passed more than once" << std::endl;
@@ -216,4 +217,49 @@ bool parseClusterArgs(int argc, const char **argv, std::string &input_file, std:
   }
 
   return true;
+}
+
+//================================================================================
+//================================== FILE UTILS ==================================
+
+int readNumberOfLines(std::string name) {
+  int lines = 0;
+
+  std::string line;
+  std::ifstream file(name);
+
+  while (std::getline(file, line))
+    ++lines;
+
+  return lines;
+}
+
+int readInputFile(std::string name, HashTable<std::vector<float>> **tables, int L) {
+  std::ifstream file(name);
+  std::string line;
+
+  while (std::getline(file, line)) {
+    std::istringstream ss(line);
+
+    std::string id;
+    std::vector<float> vec;
+    int temp;
+
+    ss >> id;
+
+    while (ss >> temp) {
+      vec.push_back(temp);
+    }
+
+    // std::cout << "entry: \"" << id << "\"";
+
+    // for (auto entry : vec) {
+    //   std::cout << " " << entry;
+    // }
+    // std::cout << "\n";
+
+    for (size_t i = 0; i < L; i++) {
+      tables[i]->add(id, vec);
+    }
+  }
 }
