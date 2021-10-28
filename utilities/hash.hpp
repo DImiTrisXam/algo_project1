@@ -50,12 +50,12 @@ public:
 	}
 
 	/*
-	* If the hashtable already contains the key, the value will NOT be replaced.
-	* @return: true if key-value pair was stored successfully. false if 'key' exists in the hashtable.
+	* If the hashtable already contains the key an exception is thrown.
+    * @throws: "const std::string" if out of memory or key already exists.
 	*/
-	inline bool add(const std::string& key, T value) {
+	inline void add(const std::string& key, T value) {
 		if (contains(key))
-			return false;
+            throw "Hashtable already contains key '" + key + "'.";
 		auto new_node = new Node<T>(key, value);
 		if (!new_node) // out of heap
 			throw "Unable to insert element with key: '" + key + "' in hashtable. Out of heap memory.";
@@ -63,7 +63,6 @@ public:
 		new_node->next = table[index];
 		table[index] = new_node;
 		containedItems++;
-		return true;
 	}
 
 	/*

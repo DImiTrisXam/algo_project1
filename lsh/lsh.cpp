@@ -1,4 +1,5 @@
 #include "../utilities/utilities.hpp"
+#include "../utilities/hash.hpp"
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
@@ -39,6 +40,8 @@ int main(int argc, char const *argv[]) {
 
   std::string line;
 
+  HashTable<std::vector<int>> ht;
+
   while (std::getline(iFile, line)) {
     std::istringstream ss(line);
 
@@ -52,12 +55,15 @@ int main(int argc, char const *argv[]) {
       vec.push_back(temp);
     }
 
-    std::cout << "entry: \"" << name << "\"";
+    
+    ht.add(name, vec);
+    /*std::cout << "entry: \"" << name << "\"";
     
     for (auto entry : vec) {
       std::cout << " " << entry;
     }
     std::cout << "\n";
+    */
   }
 
   return 0;
