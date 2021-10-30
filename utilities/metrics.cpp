@@ -2,7 +2,7 @@
 #include <cmath>
 #include <cstdlib>
 
-int euclidianDist(const std::vector<int>& x, const std::vector<int>& y) {
+double euclidianDist(const std::vector<float> &x, const std::vector<float> &y) {
   double sum = 0, diff;
 
   if (x.size() != y.size())
@@ -13,10 +13,10 @@ int euclidianDist(const std::vector<int>& x, const std::vector<int>& y) {
     sum += diff * diff;
   }
 
-  return (int)sqrt(sum);
+  return sqrt(sum);
 }
 
-int manhattanDist(const std::vector<int>& x, const std::vector<int>& y) {
+int manhattanDist(const std::vector<float> &x, const std::vector<float> &y) {
   int sum = 0;
 
   if (x.size() != y.size())

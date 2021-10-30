@@ -38,7 +38,7 @@ h_HashFunction::h_HashFunction(int w_, int pSize) : w(w_) {
 }
 
 h_HashFunction::~h_HashFunction() {
-  std::cout << "h_HashFunction destroyed\n";
+  // std::cout << "h_HashFunction destroyed\n";
 }
 
 /////////////////////////////////////////////
@@ -73,7 +73,7 @@ g_HashFunction::g_HashFunction(int pSize) {
 }
 
 g_HashFunction::~g_HashFunction() {
-  std::cout << "g_HashFunction destroyed\n";
+  // std::cout << "g_HashFunction destroyed\n";
 }
 
 /////////////////////////////////////////////
@@ -83,7 +83,7 @@ g_HashFunction::~g_HashFunction() {
 Data::Data(std::string k) : key(k) {}
 
 Data::~Data() {
-  std::cout << "Data destroyed\n";
+  // std::cout << "Data destroyed\n";
 }
 
 /////////////////////////////////////////////
@@ -121,6 +121,12 @@ void HashTable::display() {
   std::cout << "\n";
 }
 
+Bucket &HashTable::getNeighbourCandidates(Data &query) {
+  size_t index = this->gfunc->hash(query.value, *this);
+
+  return table[index];
+}
+
 HashTable::HashTable(int k, int w, int pSize, size_t s /* = 10000*/) : size(s) {
   table = new Bucket[this->size]; // allocate buckets
 
@@ -131,12 +137,12 @@ HashTable::HashTable(int k, int w, int pSize, size_t s /* = 10000*/) : size(s) {
 
   this->gfunc = new g_HashFunction(pSize); // initialize g func
 
-  std::cout << "HashTable initialized\n";
+  // std::cout << "HashTable initialized\n";
 }
 
 HashTable::~HashTable() {
   delete[] table;
   delete gfunc;
 
-  std::cout << "HashTable destroyed\n";
+  // std::cout << "HashTable destroyed\n";
 }
