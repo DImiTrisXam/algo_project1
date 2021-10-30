@@ -1,4 +1,4 @@
-#include "../utilities/hash.hpp"
+#include "../utilities/HashTable.hpp"
 #include "../utilities/utilities.hpp"
 #include <cstdlib>
 #include <fstream>
@@ -35,25 +35,23 @@ int main(int argc, char const *argv[]) {
             << "N: " << N << "\n"
             << "R: " << R << "\n";
 
-  int numOfInputs = readNumberOfLines(iFile__);
+  int dim = 0; // dimension of data
+  int numOfInputs = readNumberOfLines(iFile__, dim);
   int tableSize = numOfInputs / 8;
+  int w = 2; // window for hash table
 
-  // std::cout << "Number of lines in input file: " << numOfInputs << "\n";
-
-  auto **tables = new HashTable<std::vector<float>> *[L];
+  auto **tables = new HashTable *[L];
 
   for (size_t i = 0; i < L; i++) {
-    tables[i] = new HashTable<std::vector<float>>(tableSize);
+    tables[i] = new HashTable(k, w, dim, tableSize);
   }
 
   readInputFile(iFile__, tables, L); // put the input in the hash tables
-
-  std::ifstream qFile(qFile__);
+  readQueryFile(qFile__, tables, L); // search each query in the tables
 
   // release hash table memory
-  for (size_t i = 0; i < L; i++) {
+  for (size_t i = 0; i < L; i++)
     delete tables[i];
-  }
   delete[] tables;
 
   return 0;

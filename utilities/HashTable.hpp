@@ -52,6 +52,7 @@ public:
   int getsize();
   void insert(Data &);
   void display();
+  Bucket &getNeighbourCandidates(Data &);
   HashTable(int, int, int, size_t s = 10000);
   ~HashTable();
 };

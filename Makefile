@@ -3,7 +3,7 @@ OBJ = lsh.o cube.o cluster.o
 CFLAGS = -c
 BIN = bin
 BUILD = build
-UTIL = bin/metrics.o bin/utilities.o bin/hash.o
+UTIL = bin/metrics.o bin/utilities.o bin/HashTable.o
 
 all: lsh cube cluster
 
@@ -11,7 +11,7 @@ create_directories:
 	@mkdir -p bin
 	@mkdir -p build
 
-lsh: create_directories bin/lsh.o $(UTIL)
+lsh: create_directories bin/lsh.o bin/lshSearch.o $(UTIL)
 	$(CPP) bin/lsh.o $(UTIL) -o $(BUILD)/$@
 
 cube: create_directories bin/cube.o $(UTIL)
@@ -21,6 +21,9 @@ cluster: create_directories bin/cluster.o $(UTIL)
 	$(CPP) bin/cluster.o $(UTIL) -o $(BUILD)/$@
 
 bin/lsh.o: lsh/lsh.cpp
+	$(CPP) $(CFLAGS) $< -o $@
+
+bin/lshSearch.o: lsh/lshSearch.cpp
 	$(CPP) $(CFLAGS) $< -o $@
 
 bin/cube.o: cube/cube.cpp
@@ -36,6 +39,9 @@ bin/utilities.o: utilities/utilities.cpp utilities/utilities.hpp
 	$(CPP) $(CFLAGS) $< -o $@
 
 bin/hash.o: utilities/hash.cpp utilities/hash.hpp 
+	$(CPP) $(CFLAGS) $< -o $@
+
+bin/HashTable.o: utilities/HashTable.cpp utilities/HashTable.hpp 
 	$(CPP) $(CFLAGS) $< -o $@
 
 .PHONY: clean

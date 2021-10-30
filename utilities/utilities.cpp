@@ -222,44 +222,71 @@ bool parseClusterArgs(int argc, const char **argv, std::string &input_file, std:
 //================================================================================
 //================================== FILE UTILS ==================================
 
-int readNumberOfLines(std::string name) {
+int readNumberOfLines(std::string name, int &dim) {
   int lines = 0;
 
   std::string line;
   std::ifstream file(name);
 
-  while (std::getline(file, line))
-    ++lines;
+  while (std::getline(file, line)) {
+    if (lines == 0) { // only for first line
+      std::istringstream ss(line);
+      std::string id;
+      int temp;
+
+      ss >> id;
+
+      while (ss >> temp)
+        dim++; // increase dimension of data
+    }
+
+    lines++;
+  }
 
   return lines;
 }
 
-int readInputFile(std::string name, HashTable<std::vector<float>> **tables, int L) {
+int readInputFile(std::string name, HashTable **tables, int L) {
   std::ifstream file(name);
   std::string line;
 
   while (std::getline(file, line)) {
     std::istringstream ss(line);
 
+    Data *data;
+
     std::string id;
-    std::vector<float> vec;
     int temp;
 
     ss >> id;
 
-    while (ss >> temp) {
-      vec.push_back(temp);
-    }
+    data = new Data(id);
 
-    // std::cout << "entry: \"" << id << "\"";
+    while (ss >> temp)
+      data->value.push_back(temp);
 
-    // for (auto entry : vec) {
-    //   std::cout << " " << entry;
-    // }
-    // std::cout << "\n";
+    for (size_t i = 0; i < L; i++)
+      tables[i]->insert(*data);
+  }
+}
 
-    for (size_t i = 0; i < L; i++) {
-      tables[i]->add(id, vec);
-    }
+int readQueryFile(std::string name, HashTable **tables, int L) {
+  std::ifstream file(name);
+  std::string line;
+
+  while (std::getline(file, line)) {
+    std::istringstream ss(line);
+
+    Data *data;
+
+    std::string id;
+    int temp;
+
+    ss >> id;
+
+    data = new Data(id);
+
+    while (ss >> temp)
+      data->value.push_back(temp);
   }
 }
