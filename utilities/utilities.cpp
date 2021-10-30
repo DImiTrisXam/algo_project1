@@ -234,7 +234,7 @@ int readNumberOfLines(std::string name) {
   return lines;
 }
 
-int readInputFile(std::string name, HashTable<std::vector<float>> **tables, int L) {
+int readInputFile(const std::string& name, HashTable **tables, int L) {
   std::ifstream file(name);
   std::string line;
 
@@ -243,7 +243,7 @@ int readInputFile(std::string name, HashTable<std::vector<float>> **tables, int 
 
     std::string id;
     std::vector<float> vec;
-    int temp;
+    float temp;
 
     ss >> id;
 
@@ -259,7 +259,7 @@ int readInputFile(std::string name, HashTable<std::vector<float>> **tables, int 
     // std::cout << "\n";
 
     for (size_t i = 0; i < L; i++) {
-      tables[i]->add(id, vec);
+      tables[i]->add(vec, id);
     }
   }
 }

@@ -20,7 +20,7 @@ void use(void) {
 }
 
 int main(int argc, char const *argv[]) {
-  std::string iFile__; // input file name
+  /*std::string iFile__; // input file name
   std::string qFile__; // query file name
   std::string oFile__; // output file name
   int k = -1, L = -1, N = -1, R = -1;
@@ -36,14 +36,14 @@ int main(int argc, char const *argv[]) {
             << "R: " << R << "\n";
 
   int numOfInputs = readNumberOfLines(iFile__);
-  int tableSize = numOfInputs / 8;
+  unsigned int tableSize = numOfInputs / 8;
 
   // std::cout << "Number of lines in input file: " << numOfInputs << "\n";
 
-  auto **tables = new HashTable<std::vector<float>> *[L];
+  auto **tables = new HashTable *[L];
 
   for (size_t i = 0; i < L; i++) {
-    tables[i] = new HashTable<std::vector<float>>(tableSize);
+    tables[i] = new HashTable(tableSize);
   }
 
   readInputFile(iFile__, tables, L); // put the input in the hash tables
@@ -57,4 +57,36 @@ int main(int argc, char const *argv[]) {
   delete[] tables;
 
   return 0;
+  */
+
+ 
+ HashTable table(4, 2, 8, 10);
+
+  //std::ifstream file("test_data");
+  std::ifstream file;
+  file.open("./test", std::ifstream::in);
+
+  std::cout << file.is_open() << std::endl;
+  std::string line;
+
+  while (std::getline(file, line)) {
+    std::istringstream ss(line);
+
+    std::string id;
+    std::vector<float> vec;
+    int temp;
+
+    ss >> id;
+
+    while (ss >> temp) {
+      vec.push_back(temp);
+    }
+
+    table.add(vec, id);
+  }
+
+  table.PRINT();
+
+  return 0; 
+ 
 }
