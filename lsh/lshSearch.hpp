@@ -3,13 +3,13 @@
 
 #include "../utilities/HashTable.hpp"
 
-// struct Neighbor {
-//   std::string id;
-//   double dist;
-// };
+struct Neighbor {
+  std::string id;
+  double dist;
+};
 
 void trueDistance();
-std::vector<double> approximateKNN(HashTable **);
+std::vector<Neighbor> approximateKNN(HashTable **);
 void approximateRangeSearch();
 
 #endif

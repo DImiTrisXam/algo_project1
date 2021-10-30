@@ -1,37 +1,45 @@
 #include "lshSearch.hpp"
-#include "../utilities/HashTable.hpp"
 #include "../utilities/metrics.hpp"
 #include "../utilities/utilities.hpp"
 #include <iostream>
 #include <limits>
 #include <queue>
 
+struct CompareDist {
+  bool operator()(Neighbor const &n1, Neighbor const &n2) {
+    return n1.dist < n2.dist;
+  }
+};
+
 void trueDistance() {
 }
 
-std::vector<double> approximateKNN(Data &query, int k, HashTable **tables, int L) {
-  std::vector<double> b;                                  // k best neighbors
-  std::priority_queue<double> pq;                         // priority queue size k
-  double bDist = std::numeric_limits<double>::infinity(); // k'th best distance, initialize to infinity
+std::vector<Neighbor> approximateKNN(Data &query, int k, HashTable **tables, int L) {
+  std::vector<Neighbor> b;                                              // k best neighbors
+  std::priority_queue<Neighbor, std::vector<Neighbor>, CompareDist> pq; // priority queue size k
+  double bDist = std::numeric_limits<double>::infinity();               // k'th best distance, initialize to infinity
+  Neighbor n;
+
+  n.id = "id";
+  n.dist = bDist;
 
   for (size_t i = 0; i < k; i++) // initialize priority queue
-    pq.push(bDist);
+    pq.push(n);
 
   for (size_t i = 0; i < L; i++) { // for every table
     Bucket buck = tables[i]->getNeighbourCandidates(query);
-    // Neighbor n;
 
     for (const auto &p : buck) { // for each item in bucket
       // distance between candidate and query
       double dist = euclidianDist(query.value, p->value);
 
       if (dist < bDist) { // if better than k-th best distance
-        // n.id = p->key;
-        // n.dist = dist;
+        n.id = p->key;
+        n.dist = dist;
 
         pq.pop();
-        pq.push(dist);    // put neighbour in k
-        bDist = pq.top(); // change k-th best distance
+        pq.push(n);            // put neighbour in k
+        bDist = pq.top().dist; // change k-th best distance
       }
     }
   }
