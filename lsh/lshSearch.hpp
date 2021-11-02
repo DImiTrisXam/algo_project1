@@ -1,7 +1,7 @@
 #ifndef __LSHSEARCH__
 #define __LSHSEARCH__
 
-#include "../utilities/HashTable.hpp"
+#include "../utilities/hash.hpp"
 
 struct Neighbor {
   std::string id;

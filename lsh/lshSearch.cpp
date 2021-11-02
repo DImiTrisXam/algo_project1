@@ -27,14 +27,14 @@ std::vector<Neighbor> approximateKNN(Data &query, int k, HashTable **tables, int
     pq.push(n);
 
   for (size_t i = 0; i < L; i++) { // for every table
-    Bucket buck = tables[i]->getNeighbourCandidates(query);
+    std::list<Data *> buck = tables[i]->getNeighborCandidates(query);
 
     for (const auto &p : buck) { // for each item in bucket
       // distance between candidate and query
-      double dist = euclidianDist(query.value, p->value);
+      double dist = euclidianDist(query.vec, p->vec);
 
       if (dist < bDist) { // if better than k-th best distance
-        n.id = p->key;
+        n.id = p->id;
         n.dist = dist;
 
         pq.pop();

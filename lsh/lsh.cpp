@@ -1,4 +1,4 @@
-#include "../utilities/HashTable.hpp"
+#include "../utilities/hash.hpp"
 #include "../utilities/utilities.hpp"
 #include <cstdlib>
 #include <fstream>
@@ -20,7 +20,7 @@ void use(void) {
 }
 
 int main(int argc, char const *argv[]) {
-  /*std::string iFile__; // input file name
+  std::string iFile__; // input file name
   std::string qFile__; // query file name
   std::string oFile__; // output file name
   int k = -1, L = -1, N = -1, R = -1;
@@ -47,7 +47,7 @@ int main(int argc, char const *argv[]) {
   }
 
   readInputFile(iFile__, tables, L); // put the input in the hash tables
-  readQueryFile(qFile__, tables, L); // search each query in the tables
+  // readQueryFile(qFile__, tables, L); // search each query in the tables
 
   // release hash table memory
   for (size_t i = 0; i < L; i++)
@@ -55,36 +55,4 @@ int main(int argc, char const *argv[]) {
   delete[] tables;
 
   return 0;
-  */
-
- 
- HashTable table(4, 2, 8, 10);
-
-  //std::ifstream file("test_data");
-  std::ifstream file;
-  file.open("./test", std::ifstream::in);
-
-  std::cout << file.is_open() << std::endl;
-  std::string line;
-
-  while (std::getline(file, line)) {
-    std::istringstream ss(line);
-
-    std::string id;
-    std::vector<float> vec;
-    int temp;
-
-    ss >> id;
-
-    while (ss >> temp) {
-      vec.push_back(temp);
-    }
-
-    table.add(vec, id);
-  }
-
-  table.PRINT();
-
-  return 0; 
- 
 }

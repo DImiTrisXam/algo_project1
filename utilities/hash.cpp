@@ -1,10 +1,9 @@
-#include "hash.hpp" 
-#include <climits>
-#include <iostream>
+#include "hash.hpp"
 #include <chrono>
-#include <random>
+#include <climits>
 #include <cmath>
-
+#include <iostream>
+#include <random>
 
 const unsigned int M = UINT_MAX - 4;
 
@@ -17,26 +16,24 @@ float dotProduct(const std::vector<float> &x, const std::vector<float> &y) {
   return product;
 }
 
-
-Data::Data(const std::vector<float>& vec, const std::string& id): vec(vec), id(id){}
+Data::Data(const std::vector<float> &vec, const std::string &id) : vec(vec), id(id) {}
 
 /* DEBUG ONLY */
-void Data::PRINT() const { 
+void Data::PRINT() const {
   std::cerr << "Id: '" << id << "', ";
-  for(const auto value : vec)
+  for (const auto value : vec)
     std::cerr << value << " ";
   std::cerr << "\n";
 }
-
 
 /*
 * @throws: "const std::string" if out of memory.
 */
 HashTable::HashTable(int k, int w, int pSize, unsigned int tableSize) : size(tableSize) {
-  table = new std::list<Data*>[size];
+  table = new std::list<Data *>[size];
   if (!table) // out of heap
     throw "Unable to create hashtable with size = " + std::to_string(size) + ". Out of heap memory.";
-    
+
   generateHashFunctions(k, w, pSize);
   initr(pSize);
 }
@@ -49,16 +46,14 @@ HashTable::~HashTable() {
 /*
 * @throws: "const std::string" if out of memory.
 */
-void HashTable::add(const std::vector<float>& vec, const std::string& id) {
+void HashTable::add(const std::vector<float> &vec, const std::string &id) {
   auto newData = new Data(vec, id);
   if (!newData) // out of heap
     throw "Unable to insert element with id: '" + id + "' in hashtable. Out of heap memory.";
-  auto index = gHash(vec);       
+  auto index = gHash(vec);
   table[index].push_front(newData);
   containedItems++;
 }
-
-
 
 /*
 * @return: true only if the hashtable is empty.
@@ -75,8 +70,8 @@ unsigned int HashTable::getCurrentSize() const {
 }
 
 void HashTable::eraseAll() {
-  for(size_t i=0; i<size; i++){
-    for(const auto* data : table[i])
+  for (size_t i = 0; i < size; i++) {
+    for (const auto *data : table[i])
       delete data;
   }
 }
@@ -85,9 +80,9 @@ void HashTable::eraseAll() {
 * DEBUG ONLY
 */
 void HashTable::PRINT() const {
-  for(size_t i=0; i<size; i++){
+  for (size_t i = 0; i < size; i++) {
     std::cerr << "Bucket " << i << " -------------------\n";
-    for(const Data* data : table[i])
+    for (const Data *data : table[i])
       data->PRINT();
   }
 }
@@ -95,23 +90,23 @@ void HashTable::PRINT() const {
 /*
 * Generates the hash functions.
 */
-void HashTable::generateHashFunctions(int k, int w, int pSize){
-  for(size_t i=0; i<k; i++){
+void HashTable::generateHashFunctions(int k, int w, int pSize) {
+  for (size_t i = 0; i < k; i++) {
     unsigned seed = std::chrono::steady_clock::now().time_since_epoch().count();
     std::default_random_engine generator(seed);
 
-    std::normal_distribution<float> distN(0.0, 1.0);                  // standard normal distribution
+    std::normal_distribution<float> distN(0.0, 1.0);            // standard normal distribution
     std::uniform_real_distribution<float> distU(0.0, (float)w); // uniform real distribution
 
     // pick v's coordinates from normal distribution
     std::vector<float> v;
     for (size_t i = 1; i <= pSize; i++)
       v.push_back(distN(generator));
-    int t = distU(generator); // pick t from uniform distribution        
+    int t = distU(generator); // pick t from uniform distribution
 
-    hashFunctions.push_front([=](const std::vector<float>& vec){ //lambda captures "whatever needed" by value
+    hashFunctions.push_front([=](const std::vector<float> &vec) { // lambda captures "whatever needed" by value
       return (size_t)floor((dotProduct(vec, v) + t) / (float)w);
-    }); 
+    });
   }
 }
 
@@ -122,13 +117,13 @@ int HashTable::ID(const std::vector<float> &p) const {
   int sum = 0;
   int i = 0;
 
-  for(const auto& hashFunction : hashFunctions)
+  for (const auto &hashFunction : hashFunctions)
     sum += r[i++] * hashFunction(p);
-    
+
   return abs(sum % M);
 }
 
-void HashTable::initr(int pSize){
+void HashTable::initr(int pSize) {
   unsigned seed = std::chrono::steady_clock::now().time_since_epoch().count();
   std::default_random_engine generator(seed);
 
@@ -139,7 +134,15 @@ void HashTable::initr(int pSize){
     this->r.push_back(distU(generator));
 }
 
-
 size_t HashTable::gHash(const std::vector<float> &p) const {
   return ID(p) % size;
+}
+
+/*
+* Returns a list of items that are candidates for closest neighbor.
+*/
+std::list<Data *> &HashTable::getNeighborCandidates(Data &query) {
+  size_t index = gHash(query.vec);
+
+  return table[index];
 }

@@ -246,14 +246,12 @@ int readNumberOfLines(std::string name, int &dim) {
   return lines;
 }
 
-int readInputFile(const std::string& name, HashTable **tables, int L) {
+int readInputFile(const std::string &name, HashTable **tables, int L) {
   std::ifstream file(name);
   std::string line;
 
   while (std::getline(file, line)) {
     std::istringstream ss(line);
-
-    Data *data;
 
     std::string id;
     std::vector<float> vec;
@@ -261,18 +259,16 @@ int readInputFile(const std::string& name, HashTable **tables, int L) {
 
     ss >> id;
 
-    data = new Data(id);
-
     while (ss >> temp)
-      data->value.push_back(temp);
+      vec.push_back(temp);
 
-    for (size_t i = 0; i < L; i++) {
+    Data *data = new Data(vec, id);
+
+    for (size_t i = 0; i < L; i++)
       tables[i]->add(vec, id);
-    }
   }
 }
 
-    
 int readQueryFile(std::string name, HashTable **tables, int L) {
   std::ifstream file(name);
   std::string line;
@@ -280,16 +276,15 @@ int readQueryFile(std::string name, HashTable **tables, int L) {
   while (std::getline(file, line)) {
     std::istringstream ss(line);
 
-    Data *data;
-
     std::string id;
-    int temp;
+    std::vector<float> vec;
+    float temp;
 
     ss >> id;
 
-    data = new Data(id);
-
     while (ss >> temp)
-      data->value.push_back(temp);
+      vec.push_back(temp);
+    
+    Data *data = new Data(vec, id);
   }
 }
