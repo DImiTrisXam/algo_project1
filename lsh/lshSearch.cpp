@@ -83,5 +83,21 @@ std::vector<Neighbor> approximateKNN(Data &query, int k, HashTable **tables, int
   return b;
 }
 
-void approximateRangeSearch() {
+std::vector<std::string> approximateRangeSearch(Data &query, int r, HashTable **tables, int L) {
+  std::vector<std::string> rNeighbors;
+
+  for (size_t i = 0; i < L; i++) { // for every table
+    std::list<Data *> buck = tables[i]->getNeighborCandidates(query);
+
+    for (const auto &p : buck) { // for each item in bucket
+      // distance between candidate and query
+      double dist = euclidianDist(query.vec, p->vec);
+
+      if (dist < r) { // if smaller than radius
+        rNeighbors.push_back(p->id);
+      }
+    }
+  }
+
+  return rNeighbors;
 }
