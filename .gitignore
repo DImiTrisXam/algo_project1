@@ -1,4 +1,6 @@
 .clang-format
+.vscode/*
+workspace.code-workspace
 datasets/*
 bin
 build
