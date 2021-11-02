@@ -8,7 +8,7 @@ struct Neighbor {
   double dist;
 };
 
-void trueDistance();
+std::vector<double> trueDistanceN(Data &, int, HashTable **, int);
 std::vector<Neighbor> approximateKNN(HashTable **);
 void approximateRangeSearch();
 

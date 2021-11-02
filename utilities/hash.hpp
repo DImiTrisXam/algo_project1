@@ -24,6 +24,8 @@ public:
   void eraseAll();
   void PRINT() const; /* DEBUG ONLY */
   std::list<Data *> &getNeighborCandidates(Data &);
+  int getTableSize();
+  std::list<Data *> *getTable();
 
 private:
   const unsigned int size;

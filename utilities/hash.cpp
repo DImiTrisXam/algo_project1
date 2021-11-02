@@ -146,3 +146,11 @@ std::list<Data *> &HashTable::getNeighborCandidates(Data &query) {
 
   return table[index];
 }
+
+int HashTable::getTableSize() {
+  return size;
+}
+
+std::list<Data *> *HashTable::getTable() {
+  return table;
+}
