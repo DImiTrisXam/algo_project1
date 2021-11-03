@@ -4,6 +4,7 @@ workspace.code-workspace
 datasets/*
 bin
 build
+output*
 
 # Prerequisites
 *.d

@@ -44,4 +44,4 @@ bin/hash.o: utilities/hash.cpp utilities/hash.hpp
 .PHONY: clean
 
 clean:
-	rm -r -f $(BIN) $(BUILD)
+	rm -r -f $(BIN) $(BUILD) output*
