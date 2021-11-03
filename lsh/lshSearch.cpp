@@ -1,6 +1,5 @@
 #include "lshSearch.hpp"
 #include "../utilities/metrics.hpp"
-#include "../utilities/utilities.hpp"
 #include <iostream>
 #include <limits>
 #include <queue>
@@ -23,14 +22,14 @@ std::vector<double> trueDistanceN(Data &query, int k, HashTable **tables, int L)
     int size = tables[i]->getTableSize();
     std::list<Data *> *table = tables[i]->getTable();
 
-    for (size_t i = 0; i < size; i++) {
-      for (const auto &p : table[i]) { // for each item in bucket
+    for (size_t j = 0; j < size; j++) {
+      for (const Data *p : table[i]) { // for each item in bucket
         // distance between candidate and query
         double dist = euclidianDist(query.vec, p->vec);
 
         if (dist < bDist) { // if better than k-th best distance
           pq.pop();
-          pq.push(dist);    // put neighbour in k
+          pq.push(dist);    // put neighbor in k
           bDist = pq.top(); // change k-th best distance
         }
       }
@@ -41,6 +40,8 @@ std::vector<double> trueDistanceN(Data &query, int k, HashTable **tables, int L)
     b.push_back(pq.top());
     pq.pop();
   }
+
+  // std::cout << '\n';
 
   return b;
 }
@@ -60,25 +61,31 @@ std::vector<Neighbor> approximateKNN(Data &query, int k, HashTable **tables, int
   for (size_t i = 0; i < L; i++) { // for every table
     std::list<Data *> buck = tables[i]->getNeighborCandidates(query);
 
-    for (const auto &p : buck) { // for each item in bucket
+    for (const Data *p : buck) { // for each item in bucket
       // distance between candidate and query
       double dist = euclidianDist(query.vec, p->vec);
+
+      // std::cout << dist << ' ';
 
       if (dist < bDist) { // if better than k-th best distance
         n.id = p->id;
         n.dist = dist;
 
         pq.pop();
-        pq.push(n);            // put neighbour in k
+        pq.push(n);            // put neighbor in k
         bDist = pq.top().dist; // change k-th best distance
       }
     }
+    // std::cout << '\n';
   }
 
   while (!pq.empty()) { // put items of queue to vector
+    // std::cout << pq.top().dist << ' ';
     b.push_back(pq.top());
     pq.pop();
   }
+
+  // std::cout << '\n';
 
   return b;
 }
@@ -89,7 +96,7 @@ std::vector<std::string> approximateRangeSearch(Data &query, int r, HashTable **
   for (size_t i = 0; i < L; i++) { // for every table
     std::list<Data *> buck = tables[i]->getNeighborCandidates(query);
 
-    for (const auto &p : buck) { // for each item in bucket
+    for (const Data *p : buck) { // for each item in bucket
       // distance between candidate and query
       double dist = euclidianDist(query.vec, p->vec);
 

@@ -1,0 +1,325 @@
+Query: 1
+Nearest neighbor-1: 2177
+distanceLSH: 276.782
+distanceTrue: inf
+Nearest neighbor-2: 2177
+distanceLSH: 276.782
+distanceTrue: inf
+Nearest neighbor-3: 2177
+distanceLSH: 276.782
+distanceTrue: inf
+tLSH: 1.93102e-312
+tTrue: 6.90647e-310
+R-near neighbors:
+Query: 2
+Nearest neighbor-1: 2782
+distanceLSH: 256.852
+distanceTrue: inf
+Nearest neighbor-2: 2782
+distanceLSH: 256.852
+distanceTrue: inf
+Nearest neighbor-3: 2782
+distanceLSH: 256.852
+distanceTrue: inf
+tLSH: 1.93102e-312
+tTrue: 6.90647e-310
+R-near neighbors:
+Query: 3
+Nearest neighbor-1: 2708
+distanceLSH: 206.737
+distanceTrue: inf
+Nearest neighbor-2: 2708
+distanceLSH: 206.737
+distanceTrue: inf
+Nearest neighbor-3: 2708
+distanceLSH: 206.737
+distanceTrue: inf
+tLSH: 1.93102e-312
+tTrue: 6.90647e-310
+R-near neighbors:
+9973
+9939
+8907
+6996
+6802
+6163
+5233
+5200
+2708
+2699
+9973
+9939
+8907
+6996
+6802
+6163
+5233
+5200
+2708
+2699
+9973
+9939
+8907
+6996
+6802
+6163
+5233
+5200
+2708
+2699
+9973
+9939
+8907
+6996
+6802
+6163
+5233
+5200
+2708
+2699
+9973
+9939
+8907
+6996
+6802
+6163
+5233
+5200
+2708
+2699
+Query: 4
+Nearest neighbor-1: 9844
+distanceLSH: 215.177
+distanceTrue: inf
+Nearest neighbor-2: 9844
+distanceLSH: 215.177
+distanceTrue: inf
+Nearest neighbor-3: 9844
+distanceLSH: 215.177
+distanceTrue: inf
+tLSH: 1.93102e-312
+tTrue: 6.90647e-310
+R-near neighbors:
+9844
+9826
+9583
+9575
+4098
+9844
+9826
+9583
+9575
+4098
+9844
+9826
+9583
+9575
+4098
+9844
+9826
+9583
+9575
+4098
+Query: 5
+Nearest neighbor-1: 4720
+distanceLSH: 250.509
+distanceTrue: inf
+Nearest neighbor-2: 4720
+distanceLSH: 250.509
+distanceTrue: inf
+Nearest neighbor-3: 4720
+distanceLSH: 250.509
+distanceTrue: inf
+tLSH: 1.93102e-312
+tTrue: 6.90647e-310
+R-near neighbors:
+Query: 6
+Nearest neighbor-1: 1098
+distanceLSH: 275.151
+distanceTrue: inf
+Nearest neighbor-2: 1098
+distanceLSH: 275.151
+distanceTrue: inf
+Nearest neighbor-3: 1098
+distanceLSH: 275.151
+distanceTrue: inf
+tLSH: 1.93102e-312
+tTrue: 6.90647e-310
+R-near neighbors:
+Query: 7
+Nearest neighbor-1: 2457
+distanceLSH: 246.609
+distanceTrue: inf
+Nearest neighbor-2: 2457
+distanceLSH: 246.609
+distanceTrue: inf
+Nearest neighbor-3: 2457
+distanceLSH: 246.609
+distanceTrue: inf
+tLSH: 1.93102e-312
+tTrue: 6.90647e-310
+R-near neighbors:
+2457
+2457
+2457
+2457
+2457
+Query: 8
+Nearest neighbor-1: 5448
+distanceLSH: 173.948
+distanceTrue: inf
+Nearest neighbor-2: 5448
+distanceLSH: 173.948
+distanceTrue: inf
+Nearest neighbor-3: 5448
+distanceLSH: 173.948
+distanceTrue: inf
+tLSH: 1.93102e-312
+tTrue: 6.90647e-310
+R-near neighbors:
+9395
+9250
+8860
+7587
+6712
+6640
+6208
+5901
+5869
+5752
+5672
+5448
+4598
+4579
+3110
+2975
+2805
+2736
+2503
+2449
+2206
+1236
+885
+9395
+9250
+8860
+7587
+6712
+6640
+6208
+5901
+5869
+5752
+5672
+5448
+4598
+4579
+3110
+2975
+2805
+2736
+2503
+2449
+2206
+1236
+885
+9395
+9250
+8860
+7587
+6712
+6640
+6208
+5901
+5869
+5752
+5672
+5448
+4598
+4579
+3110
+2975
+2805
+2736
+2503
+2449
+2206
+1236
+885
+9395
+9250
+8860
+7587
+6712
+6640
+6208
+5901
+5869
+5752
+5672
+5448
+4598
+4579
+3110
+2975
+2805
+2736
+2503
+2449
+2206
+1236
+885
+9395
+9250
+8860
+7587
+6712
+6640
+6208
+5901
+5869
+5752
+5672
+5448
+4598
+4579
+3110
+2975
+2805
+2736
+2503
+2449
+2206
+1236
+885
+Query: 9
+Nearest neighbor-1: 9629
+distanceLSH: 248.473
+distanceTrue: inf
+Nearest neighbor-2: 9629
+distanceLSH: 248.473
+distanceTrue: inf
+Nearest neighbor-3: 9629
+distanceLSH: 248.473
+distanceTrue: inf
+tLSH: 1.93102e-312
+tTrue: 6.90647e-310
+R-near neighbors:
+9629
+9629
+9629
+9629
+9629
+Query: 10
+Nearest neighbor-1: 4765
+distanceLSH: 250.014
+distanceTrue: inf
+Nearest neighbor-2: 4765
+distanceLSH: 250.014
+distanceTrue: inf
+Nearest neighbor-3: 4765
+distanceLSH: 250.014
+distanceTrue: inf
+tLSH: 1.93102e-312
+tTrue: 6.90647e-310
+R-near neighbors:

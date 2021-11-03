@@ -1,8 +1,10 @@
 #include "utilities.hpp"
 #include <cstdlib>
 #include <cstring>
+#include <fstream>
 #include <iostream>
 #include <sstream>
+#include <vector>
 
 //================================================================================
 //================================== PARSE ARGS ==================================
@@ -246,7 +248,7 @@ int readNumberOfLines(std::string name, int &dim) {
   return lines;
 }
 
-int readInputFile(const std::string &name, HashTable **tables, int L) {
+int readInputFile(std::string &name, HashTable **tables, int L) {
   std::ifstream file(name);
   std::string line;
 
@@ -267,13 +269,19 @@ int readInputFile(const std::string &name, HashTable **tables, int L) {
     for (size_t i = 0; i < L; i++)
       tables[i]->add(vec, id);
   }
+
+  return 0;
 }
 
-int readQueryFile(std::string name, HashTable **tables, int L) {
-  std::ifstream file(name);
+int readQueryFile(std::string &qfile_, std::string &ofile_, const std::string &lshORcube, int N, int R, HashTable **tables, int L) {
+  std::ifstream qfile(qfile_);
+  std::ofstream ofile(ofile_);
+  // std::ofstream file;
+  // file.open(file_, std::ios_base::app);
   std::string line;
+  double tLSH, tTrue;
 
-  while (std::getline(file, line)) {
+  while (std::getline(qfile, line)) {
     std::istringstream ss(line);
 
     std::string id;
@@ -284,7 +292,36 @@ int readQueryFile(std::string name, HashTable **tables, int L) {
 
     while (ss >> temp)
       vec.push_back(temp);
-    
-    Data *data = new Data(vec, id);
+
+    Data *query = new Data(vec, id);
+    // TODO: fix trueDistanceN, approximateKNN
+    std::vector<double> trueDistVec = trueDistanceN(*query, N, tables, L);
+    std::vector<Neighbor> knnVec = approximateKNN(*query, N, tables, L);
+    // approximateRangeSearch works
+    std::vector<std::string> rVec = approximateRangeSearch(*query, R, tables, L);
+
+    printOutputFile(ofile, lshORcube, id, trueDistVec, knnVec, rVec, tLSH, tTrue);
+
+    delete query;
   }
+
+  return 0;
+}
+
+void printOutputFile(std::ofstream &file, const std::string &lshORcube, std::string &qid, std::vector<double> &trueDistVec,
+                     std::vector<Neighbor> &knnVec, std::vector<std::string> &rVec, double tLSH, double tTrue) {
+  file << "Query: " << qid << '\n';
+
+  for (size_t i = 0; i < knnVec.size(); i++) {
+    file << "Nearest neighbor-" << i + 1 << ": " << knnVec[i].id << '\n'
+         << "distance" << lshORcube << ": " << knnVec[i].dist << '\n'
+         << "distanceTrue: " << trueDistVec[i] << '\n';
+  }
+
+  file << "tLSH: " << tLSH << '\n'
+       << "tTrue: " << tTrue << '\n'
+       << "R-near neighbors:\n";
+
+  for (const auto &id : rVec)
+    file << id << '\n';
 }

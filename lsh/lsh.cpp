@@ -1,5 +1,5 @@
-#include "../utilities/hash.hpp"
 #include "../utilities/utilities.hpp"
+#include "lshSearch.hpp"
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
@@ -27,9 +27,9 @@ int main(int argc, char const *argv[]) {
 
   parseLSHArgs(argc, argv, iFile__, qFile__, oFile__, k, L, N, R);
 
-  std::cout << "iFile__: \"" << iFile__ << "\"\n"
-            << "qFile__: \"" << qFile__ << "\"\n"
-            << "oFile__: \"" << oFile__ << "\"\n"
+  std::cout << "Input file: \"" << iFile__ << "\"\n"
+            << "Query file: \"" << qFile__ << "\"\n"
+            << "Output file: \"" << oFile__ << "\"\n"
             << "k: " << k << "\n"
             << "L: " << L << "\n"
             << "N: " << N << "\n"
@@ -46,8 +46,11 @@ int main(int argc, char const *argv[]) {
     tables[i] = new HashTable(k, w, dim, tableSize);
   }
 
+  std::cout << "Processing input file... ";
   readInputFile(iFile__, tables, L); // put the input in the hash tables
-  // readQueryFile(qFile__, tables, L); // search each query in the tables
+  std::cout << "DONE\nProcessing query file... ";
+  readQueryFile(qFile__, oFile__, "LSH", N, R, tables, L); // search each query in the tables
+  std::cout << "DONE\n";
 
   // release hash table memory
   for (size_t i = 0; i < L; i++)

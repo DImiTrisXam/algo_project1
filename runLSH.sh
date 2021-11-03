@@ -1,1 +1,1 @@
-clear && make lsh -s && ./build/lsh -i datasets/input_small_id -q bla2 -k 1 -L 2 -o bla3 -N 3 -R 4
+clear && make lsh -s && ./build/lsh -i datasets/input_small_id -q test_query_data -o output.txt -N 3 -R 250

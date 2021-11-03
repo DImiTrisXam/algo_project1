@@ -12,7 +12,7 @@ create_directories:
 	@mkdir -p build
 
 lsh: create_directories bin/lsh.o bin/lshSearch.o $(UTIL)
-	$(CPP) bin/lsh.o $(UTIL) -o $(BUILD)/$@
+	$(CPP) bin/lsh.o bin/lshSearch.o $(UTIL) -o $(BUILD)/$@
 
 cube: create_directories bin/cube.o $(UTIL)
 	$(CPP) bin/cube.o $(UTIL) -o $(BUILD)/$@
@@ -23,7 +23,7 @@ cluster: create_directories bin/cluster.o $(UTIL)
 bin/lsh.o: lsh/lsh.cpp
 	$(CPP) $(CFLAGS) $< -o $@
 
-bin/lshSearch.o: lsh/lshSearch.cpp
+bin/lshSearch.o: lsh/lshSearch.cpp lsh/lshSearch.hpp 
 	$(CPP) $(CFLAGS) $< -o $@
 
 bin/cube.o: cube/cube.cpp
