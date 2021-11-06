@@ -252,6 +252,8 @@ int readInputFile(std::string &name, HashTable **tables, int L) {
   std::ifstream file(name);
   std::string line;
 
+  std::cout << "Processing input file... ";
+
   while (std::getline(file, line)) {
     std::istringstream ss(line);
 
@@ -264,11 +266,11 @@ int readInputFile(std::string &name, HashTable **tables, int L) {
     while (ss >> temp)
       vec.push_back(temp);
 
-    Data *data = new Data(vec, id);
-
     for (size_t i = 0; i < L; i++)
       tables[i]->add(vec, id);
   }
+
+  std::cout << "DONE\n";
 
   return 0;
 }
@@ -279,7 +281,8 @@ int readQueryFile(std::string &qfile_, std::string &ofile_, const std::string &l
   // std::ofstream file;
   // file.open(file_, std::ios_base::app);
   std::string line;
-  double tLSH, tTrue;
+
+  std::cout << "Processing query file and printing to output file... ";
 
   while (std::getline(qfile, line)) {
     std::istringstream ss(line);
@@ -294,32 +297,56 @@ int readQueryFile(std::string &qfile_, std::string &ofile_, const std::string &l
       vec.push_back(temp);
 
     Data *query = new Data(vec, id);
-    // TODO: fix trueDistanceN, approximateKNN
-    std::vector<double> trueDistVec = trueDistanceN(*query, N, tables, L);
-    std::vector<Neighbor> knnVec = approximateKNN(*query, N, tables, L);
+
+    // time trueDistanceN function
+    auto start = std::chrono::high_resolution_clock::now();
+    auto trueDistVec = trueDistanceN(*query, N, tables, L);
+    auto end = std::chrono::high_resolution_clock::now();
+
+    auto tTrue = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+    
+    // for (const auto &p : trueDistVec) {
+    //   std::cout << p.id << ", " << p.dist << "  ";
+    // }
+    // std::cout << "\n";
+    
+    // time approximateKNN function
+    start = std::chrono::high_resolution_clock::now();
+    auto knnVec = approximateKNN(*query, N, tables, L);
+    end = std::chrono::high_resolution_clock::now();
+
+    auto tLSH = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+    
+    // for (const auto &p : knnVec) {
+    //   std::cout << p.id << ", " << p.dist << "  ";
+    // }
+    // std::cout << "\n";
+
     // approximateRangeSearch works
-    std::vector<std::string> rVec = approximateRangeSearch(*query, R, tables, L);
+    auto rVec = approximateRangeSearch(*query, R, tables, L);
 
     printOutputFile(ofile, lshORcube, id, trueDistVec, knnVec, rVec, tLSH, tTrue);
 
     delete query;
   }
 
+  std::cout << "DONE\n";
+
   return 0;
 }
 
-void printOutputFile(std::ofstream &file, const std::string &lshORcube, std::string &qid, std::vector<double> &trueDistVec,
-                     std::vector<Neighbor> &knnVec, std::vector<std::string> &rVec, double tLSH, double tTrue) {
+void printOutputFile(std::ofstream &file, const std::string &lshORcube, std::string &qid, std::vector<Neighbor> &trueDistVec,
+                     std::vector<Neighbor> &knnVec, std::vector<std::string> &rVec, std::chrono::nanoseconds tLSH, std::chrono::nanoseconds tTrue) {
   file << "Query: " << qid << '\n';
 
-  for (size_t i = 0; i < knnVec.size(); i++) {
+  for (auto i = 0; i < knnVec.size(); i++) {
     file << "Nearest neighbor-" << i + 1 << ": " << knnVec[i].id << '\n'
          << "distance" << lshORcube << ": " << knnVec[i].dist << '\n'
-         << "distanceTrue: " << trueDistVec[i] << '\n';
+         << "distanceTrue: " << trueDistVec[i].dist << '\n';
   }
-
-  file << "tLSH: " << tLSH << '\n'
-       << "tTrue: " << tTrue << '\n'
+  // multiply nanoseconds with 10^-9 to print seconds
+  file << "tLSH: " << tLSH.count() * 1e-9 << " seconds\n"
+       << "tTrue: " << tTrue.count() * 1e-9 << " seconds\n"
        << "R-near neighbors:\n";
 
   for (const auto &id : rVec)

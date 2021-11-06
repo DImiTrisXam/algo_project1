@@ -2,6 +2,7 @@
 #define __UTILITIES__
 
 #include "../lsh/lshSearch.hpp"
+#include <chrono>
 #include <string>
 
 bool parseLSHArgs(int, const char **, std::string &, std::string &, std::string &, int &, int &, int &, int &);
@@ -10,6 +11,7 @@ bool parseClusterArgs(int, const char **, std::string &, std::string &, std::str
 int readNumberOfLines(std::string, int &);
 int readInputFile(std::string &, HashTable **, int);
 int readQueryFile(std::string &, std::string &, const std::string &, int, int, HashTable **, int);
-void printOutputFile(std::ofstream &, const std::string &, std::string &, std::vector<double> &, std::vector<Neighbor> &, std::vector<std::string> &, double, double);
+void printOutputFile(std::ofstream &, const std::string &, std::string &, std::vector<Neighbor> &, std::vector<Neighbor> &,
+                     std::vector<std::string> &, std::chrono::nanoseconds, std::chrono::nanoseconds);
 
 #endif

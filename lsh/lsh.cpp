@@ -1,5 +1,4 @@
 #include "../utilities/utilities.hpp"
-#include "lshSearch.hpp"
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
@@ -46,11 +45,8 @@ int main(int argc, char const *argv[]) {
     tables[i] = new HashTable(k, w, dim, tableSize);
   }
 
-  std::cout << "Processing input file... ";
   readInputFile(iFile__, tables, L); // put the input in the hash tables
-  std::cout << "DONE\nProcessing query file... ";
   readQueryFile(qFile__, oFile__, "LSH", N, R, tables, L); // search each query in the tables
-  std::cout << "DONE\n";
 
   // release hash table memory
   for (size_t i = 0; i < L; i++)
