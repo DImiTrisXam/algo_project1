@@ -1,9 +1,6 @@
 #include "../utilities/utilities.hpp"
-#include <cstdlib>
 #include <fstream>
 #include <iostream>
-#include <sstream>
-#include <vector>
 
 void use(void) {
   // how to use the program
@@ -45,7 +42,7 @@ int main(int argc, char const *argv[]) {
     tables[i] = new HashTable(k, w, dim, tableSize);
   }
 
-  readInputFile(iFile__, tables, L); // put the input in the hash tables
+  readInputFile(iFile__, tables, L);                       // put the input in the hash tables
   readQueryFile(qFile__, oFile__, "LSH", N, R, tables, L); // search each query in the tables
 
   // release hash table memory

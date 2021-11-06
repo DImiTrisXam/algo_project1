@@ -1,5 +1,4 @@
 #include "../utilities/utilities.hpp"
-#include <cstdlib>
 #include <fstream>
 #include <iostream>
 
@@ -34,8 +33,21 @@ int main(int argc, char const *argv[]) {
             << "N: " << N << "\n"
             << "R: " << R << "\n";
 
-  std::ifstream iFile(iFile__);
-  std::ifstream qFile(qFile__);
+  int dim = 0; // dimension of data
+  int numOfInputs = readNumberOfLines(iFile__, dim);
+  int tableSize = numOfInputs / 8;
+  int w = 2; // window for hash table
+
+  auto **tables = new HashTable *[1];
+
+  tables[0] = new HashTable(k, w, dim, tableSize);
+
+  readInputFile(iFile__, tables, 1);                             // put the input in the hash tables
+  readQueryFile(qFile__, oFile__, "Hypercube", N, R, tables, 1); // search each query in the tables
+
+  // release hash table memory
+  delete tables[0];
+  delete[] tables;
 
   return 0;
 }
