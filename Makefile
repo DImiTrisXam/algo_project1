@@ -12,11 +12,11 @@ create_directories:
 	@mkdir -p bin
 	@mkdir -p build
 
-lsh: create_directories bin/lsh.o $(UTIL_OBJ_FILES)
-	$(CPP) bin/lsh.o $(UTIL_OBJ_FILES) -o $(BUILD)/$@
+lsh: create_directories bin/lsh.o bin/lshSearch.o $(UTIL_OBJ_FILES)
+	$(CPP) bin/lsh.o bin/lshSearch.o $(UTIL_OBJ_FILES) -o $(BUILD)/$@
 
-cube: create_directories bin/cube.o $(UTIL_OBJ_FILES)
-	$(CPP) bin/cube.o $(UTIL_OBJ_FILES) -o $(BUILD)/$@
+cube: create_directories bin/cube.o bin/cubeSearch.o $(UTIL_OBJ_FILES)
+	$(CPP) bin/cube.o bin/cubeSearch.o $(UTIL_OBJ_FILES) -o $(BUILD)/$@
 
 cluster: create_directories bin/cluster.o $(UTIL_OBJ_FILES)
 	$(CPP) bin/cluster.o $(UTIL_OBJ_FILES) -o $(BUILD)/$@
@@ -32,6 +32,12 @@ bin/cluster.o: cluster/cluster.cpp
 
 $(BIN)/%.o: $(UTIL_DIR)/%.cpp $(UTIL_DIR)/%.hpp
 	$(CPP) $(CFLAGS) -o $@ $<
+
+bin/lshSearch.o: lsh/lshSearch.cpp lsh/lshSearch.hpp
+	$(CPP) $(CFLAGS) $< -o $@
+
+bin/cubeSearch.o: cube/cubeSearch.cpp cube/cubeSearch.hpp
+	$(CPP) $(CFLAGS) $< -o $@
 
 .PHONY: clean
 

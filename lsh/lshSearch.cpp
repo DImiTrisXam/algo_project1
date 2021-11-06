@@ -1,4 +1,4 @@
-#include "search.hpp"
+#include "lshSearch.hpp"
 #include "../utilities/metrics.hpp"
 #include <iostream>
 #include <limits>
