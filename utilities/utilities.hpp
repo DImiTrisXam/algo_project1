@@ -1,7 +1,7 @@
 #ifndef __UTILITIES__
 #define __UTILITIES__
 
-#include "../lsh/lshSearch.hpp"
+#include "search.hpp"
 #include <chrono>
 #include <string>
 
