@@ -191,7 +191,7 @@ bool parseClusterArgs(int argc, const char **argv, std::string &input_file, std:
     } else if (!strcmp(argv[i], "-m")) {
       method = argv[++i];
     } else if (!strcmp(argv[i], "-complete")) {
-      complete = argv[++i];
+      complete = true;
     } else {
       std::cout << "Unexpected parameter " << argv[i] << std::endl;
       validArgs = false;
@@ -304,19 +304,19 @@ int readQueryFile(std::string &qfile_, std::string &ofile_, const std::string &l
     auto end = std::chrono::high_resolution_clock::now();
 
     auto tTrue = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
-    
+
     // for (const auto &p : trueDistVec) {
     //   std::cout << p.id << ", " << p.dist << "  ";
     // }
     // std::cout << "\n";
-    
+
     // time approximateKNN function
     start = std::chrono::high_resolution_clock::now();
     auto knnVec = approximateKNN(*query, N, tables, L);
     end = std::chrono::high_resolution_clock::now();
 
     auto tLSH = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
-    
+
     // for (const auto &p : knnVec) {
     //   std::cout << p.id << ", " << p.dist << "  ";
     // }
@@ -351,4 +351,70 @@ void printOutputFile(std::ofstream &file, const std::string &lshORcube, std::str
 
   for (const auto &id : rVec)
     file << id << '\n';
+}
+
+bool parseConfigFile(std::string &name, int &K, int &L, int &k, int &M, int &d, int &probes) {
+  std::ifstream file(name);
+  std::string line;
+  bool validArgs = true;
+
+  std::cout << "Processing config file... ";
+
+  while (std::getline(file, line)) {
+    std::istringstream ss(line);
+
+    std::string parameter;
+    std::string value;
+
+    ss >> parameter;
+    ss >> value;
+
+    if (!parameter.compare("number_of_clusters:")) {
+      if (tryParseArgInt(K, value.c_str(), "number_of_clusters:") == false) {
+        validArgs = false;
+      }
+    } else if (!parameter.compare("number_of_vector_hash_tables:")) {
+      if (tryParseArgInt(L, value.c_str(), "number_of_vector_hash_tables:") == false) {
+        validArgs = false;
+      }
+    } else if (!parameter.compare("number_of_vector_hash_functions:")) {
+      if (tryParseArgInt(k, value.c_str(), "number_of_vector_hash_functions:") == false) {
+        validArgs = false;
+      }
+    } else if (!parameter.compare("max_number_M_hypercube:")) {
+      if (tryParseArgInt(M, value.c_str(), "max_number_M_hypercube:") == false) {
+        validArgs = false;
+      }
+    } else if (!parameter.compare("number_of_hypercube_dimensions:")) {
+      if (tryParseArgInt(d, value.c_str(), "number_of_hypercube_dimensions:") == false) {
+        validArgs = false;
+      }
+    } else if (!parameter.compare("number_of_probes:")) {
+      if (tryParseArgInt(probes, value.c_str(), "number_of_probes:") == false) {
+        validArgs = false;
+      }
+    } else {
+      std::cout << "Unexpected parameter " << parameter << std::endl;
+      validArgs = false;
+    }
+  }
+
+  std::cout << "DONE\n";
+
+  if (!validArgs)
+    return false;
+
+  // default parameters
+  if (L == -1)
+    L = 3;
+  if (k == -1)
+    k = 4;
+  if (M == -1)
+    M = 10;
+  if (d == -1)
+    d = 3;
+  if (probes == -1)
+    probes = 2;
+
+  return true;
 }

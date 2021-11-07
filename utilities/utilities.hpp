@@ -13,5 +13,6 @@ int readInputFile(std::string &, HashTable **, int);
 int readQueryFile(std::string &, std::string &, const std::string &, int, int, HashTable **, int);
 void printOutputFile(std::ofstream &, const std::string &, std::string &, std::vector<Neighbor> &, std::vector<Neighbor> &,
                      std::vector<std::string> &, std::chrono::nanoseconds, std::chrono::nanoseconds);
+bool parseConfigFile(std::string &, int &, int &, int &, int &, int &, int &);
 
 #endif

@@ -27,10 +27,18 @@ int main(int argc, char const *argv[]) {
             << "cFile__: \"" << cFile__ << "\"\n"
             << "oFile__: \"" << oFile__ << "\"\n"
             << "complete: " << complete << "\n"
-            << "method: " << method << "\n";
+            << "method: " << method << "\n\n";
 
-  std::ifstream iFile(iFile__);
-  std::ifstream qFile(cFile__);
+  int K = -1, L = -1, k = -1, M = -1, d = -1, probes = -1;
+
+  parseConfigFile(cFile__, K, L, k, M, d, probes);
+
+  std::cout << "\nnumber_of_clusters: " << K << "\n"
+            << "number_of_vector_hash_tables: " << L << "\n"
+            << "number_of_vector_hash_functions: " << k << "\n"
+            << "max_number_M_hypercube: " << M << "\n"
+            << "number_of_hypercube_dimensions: " << d << "\n"
+            << "number_of_probes: " << probes << "\n";
 
   return 0;
 }
