@@ -27,15 +27,19 @@ public:
   int getTableSize();
   std::list<Data *> *getTable();
 
-private:
-  const unsigned int size;
+protected:
+const unsigned int size;
   std::list<Data *> *table; // array of lists
   unsigned int containedItems = 0;
   std::list<std::function<size_t(const std::vector<float> &)>> hashFunctions;
+
+  void generateHashFunctions(int, int, int); // called once in constructor
+
+
+private:
   std::vector<float> r; // used by gHash only
 
   int ID(const std::vector<float> &) const;
-  void generateHashFunctions(int, int, int); // called once in constructor
   void initr(int);                           // called once in constructor
   size_t gHash(const std::vector<float> &) const;
 };

@@ -1,7 +1,7 @@
 #ifndef __CUBESEARCH__
 #define __CUBESEARCH__
 
-#include "../utilities/hash.hpp"
+#include "../utilities/hypercube.hpp"
 #include "../utilities/PriorityQueue.hpp"
 
 std::vector<Neighbor> trueDistanceN(Data &, int, HashTable **);
