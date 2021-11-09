@@ -1,53 +1,93 @@
 #include "../utilities/utilities.hpp"
+#include "../utilities/hypercube.hpp"
+#include "cubeSearch.hpp"
 #include <fstream>
 #include <iostream>
+#include <cmath>
 
 void use(void) {
-  // how to use the program
-  std::cout << "\nUsage: -i <input file>\n"
-            << "\n       -q <query file>\n"
-            << "\n       -k <int>\n"
-            << "\n       -M <int>\n"
-            << "\n       -probes <int>\n"
-            << "\n       -o <output file>\n"
-            << "\n       -N <number of nearest>\n"
-            << "\n       -R <radius>\n";
+    // how to use the program
+    std::cout << "\nUsage: -i <input file>\n"
+        << "\n       -q <query file>\n"
+        << "\n       -k <int>\n"
+        << "\n       -M <int>\n"
+        << "\n       -probes <int>\n"
+        << "\n       -o <output file>\n"
+        << "\n       -N <number of nearest>\n"
+        << "\n       -R <radius>\n";
 
-  exit(1);
+    exit(1);
 }
 
 int main(int argc, char const *argv[]) {
-  std::string iFile__; // input file name
-  std::string qFile__; // query file name
-  std::string oFile__; // output file name
-  int k = -1, M = -1, probes = -1, N = -1, R = -1;
+    std::string iFile__; // input file name
+    std::string qFile__; // query file name
+    std::string oFile__; // output file name
+    int k = -1, M = -1, probes = -1, N = -1, R = -1;
 
-  parseCubeArgs(argc, argv, iFile__, qFile__, oFile__, k, N, R, M, probes);
+    parseCubeArgs(argc, argv, iFile__, qFile__, oFile__, k, N, R, M, probes);
 
-  std::cout << "iFile__: \"" << iFile__ << "\"\n"
-            << "qFile__: \"" << qFile__ << "\"\n"
-            << "oFile__: \"" << oFile__ << "\"\n"
-            << "k: " << k << "\n"
-            << "M: " << M << "\n"
-            << "probes: " << probes << "\n"
-            << "N: " << N << "\n"
-            << "R: " << R << "\n";
+    std::cout << "iFile__: \"" << iFile__ << "\"\n"
+    << "qFile__: \"" << qFile__ << "\"\n"
+    << "oFile__: \"" << oFile__ << "\"\n"
+    << "k: " << k << "\n"
+    << "M: " << M << "\n"
+    << "probes: " << probes << "\n"
+    << "N: " << N << "\n"
+    << "R: " << R << "\n";
 
-  int dim = 0; // dimension of data
-  int numOfInputs = readNumberOfLines(iFile__, dim);
-  int tableSize = numOfInputs / 8;
-  int w = 2; // window for hash table
+    int dim = 0; // dimension of data
+    int numOfInputs = readNumberOfLines(iFile__, dim);
+    int tableSize = pow(2, k);
+    int w = 2; // window for hash table
 
-  auto **tables = new HashTable *[1];
+    HashTable *cube = (HashTable*)new Hypercube(k, w, dim, tableSize);
+    
 
-  tables[0] = new HashTable(k, w, dim, tableSize);
+    readInputFile(iFile__, &cube, 1);     // put the input in the hypercube
 
-  readInputFile(iFile__, tables, 1);                             // put the input in the hash tables
-  readQueryFile(qFile__, oFile__, "Hypercube", N, R, tables, 1); // search each query in the tables
+    //cube->PRINT();
 
-  // release hash table memory
-  delete tables[0];
-  delete[] tables;
+    std::ofstream ofile(oFile__);
 
-  return 0;
+    std::vector<Data *> *queries = readQueryFile(qFile__);
+
+    for (const auto query : *queries){
+        auto start = std::chrono::high_resolution_clock::now();
+        auto trueDistVec = trueDistanceN(*query, N, cube);
+        auto end = std::chrono::high_resolution_clock::now();
+
+        auto tTrue = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+        
+        // for (const auto &p : trueDistVec) {
+        //   std::cout << p.id << ", " << p.dist << "  ";
+        // }
+        // std::cout << "\n";
+
+        // time approximateKNN function
+        start = std::chrono::high_resolution_clock::now();
+        //auto knnVec = approximateKNN(*query, N, cube);
+        end = std::chrono::high_resolution_clock::now();
+
+        auto tLSH = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+
+        // for (const auto &p : knnVec) {
+        //   std::cout << p.id << ", " << p.dist << "  ";
+        // }
+        // std::cout << "\n";
+
+        // approximateRangeSearch works
+        //auto rVec = approximateRangeSearch(*query, R, cube);
+        //printOutputFile(ofile, "Hypercube", query->id, trueDistVec, knnVec, rVec, tLSH, tTrue);
+  }
+  std::cout << "DONE\n";
+
+   
+
+   
+
+    // release hypercube memory
+    //delete cube;
+
+    return 0;
 }

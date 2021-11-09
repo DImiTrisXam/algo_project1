@@ -18,7 +18,7 @@ class HashTable {
 public:
   HashTable(int k, int w, int pSize, unsigned int tableSize = 509);
   ~HashTable();
-  void add(const std::vector<float>, const std::string);
+  virtual void add(const std::vector<float> &, const std::string &);
   bool isEmpty() const;
   unsigned int getCurrentSize() const;
   void eraseAll();

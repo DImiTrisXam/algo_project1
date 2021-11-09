@@ -1,9 +1,15 @@
 #ifndef __UTILITIES__
 #define __UTILITIES__
 
-#include "../lsh/lshSearch.hpp"
+//#include "../lsh/lshSearch.hpp"
+#include "hash.hpp"
 #include <chrono>
 #include <string>
+
+struct Neighbor {
+  std::string id;
+  double dist; // distance (key for priority queue)
+};
 
 bool parseLSHArgs(int, const char **, std::string &, std::string &, std::string &, int &, int &, int &, int &);
 bool parseCubeArgs(int, const char **, std::string &, std::string &, std::string &, int &, int &, int &, int &, int &);

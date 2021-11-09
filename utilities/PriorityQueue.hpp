@@ -3,11 +3,8 @@
 
 #include <string>
 #include <vector>
+#include "utilities.hpp"
 
-struct Neighbor {
-  std::string id;
-  double dist; // distance (key for priority queue)
-};
 
 class PriorityQueue {
   std::vector<Neighbor> heap;

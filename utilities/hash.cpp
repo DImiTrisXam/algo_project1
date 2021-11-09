@@ -46,7 +46,7 @@ HashTable::~HashTable() {
 /*
 * @throws: "const std::string" if out of memory.
 */
-void HashTable::add(const std::vector<float> vec, const std::string id) {
+void HashTable::add(const std::vector<float> &vec, const std::string &id) {
   auto newData = new Data(vec, id);
   if (!newData) // out of heap
     throw "Unable to insert element with id: '" + id + "' in hashtable. Out of heap memory.";
@@ -82,8 +82,11 @@ void HashTable::eraseAll() {
 void HashTable::PRINT() const {
   for (size_t i = 0; i < size; i++) {
     std::cerr << "Bucket " << i << " -------------------\n";
-    for (const Data *data : table[i])
-      data->PRINT();
+    for (const Data *data : table[i]){
+      if (!table[i].empty())
+        data->PRINT();
+      
+      }
   }
 }
 
@@ -117,8 +120,10 @@ int HashTable::ID(const std::vector<float> &p) const {
   int sum = 0;
   int i = 0;
 
-  for (const auto &hashFunction : hashFunctions)
+  for (const auto &hashFunction : hashFunctions){
     sum += r[i++] * hashFunction(p);
+    
+    }
 
   return abs(sum % M);
 }
