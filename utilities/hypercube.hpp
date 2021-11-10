@@ -8,6 +8,7 @@ class Hypercube : public HashTable {
 public:
     Hypercube(int k, int w, int pSize, unsigned int tableSize = 509);
     virtual void add(const std::vector<float> &vec, const std::string &);
+    std::list<Data *> &getNeighborCandidates(Data &query, size_t &);
 
 private:
     //std::unordered_map<int, int> vertices;   // maps a bitstring stored as an integer to a bucket(vertice)
