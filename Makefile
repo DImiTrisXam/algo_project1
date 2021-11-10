@@ -24,14 +24,14 @@ cluster: create_directories bin/cluster.o bin/clusteringMethods.o bin/lshSearch.
 bin/lsh.o: lsh/lsh.cpp
 	$(CPP) $(CFLAGS) $< -o $@
 
-bin/cube.o: cube/cube.cpp
+bin/cube.o: cube/cube.cpp 
 	$(CPP) $(CFLAGS) $< -o $@
 
 bin/cluster.o: cluster/cluster.cpp
 	$(CPP) $(CFLAGS) $< -o $@
 
 $(BIN)/%.o: $(UTIL_DIR)/%.cpp $(UTIL_DIR)/%.hpp
-	$(CPP) $(CFLAGS) -o $@ $<
+	$(CPP) $(CFLAGS) $< -o $@ 
 
 bin/lshSearch.o: lsh/lshSearch.cpp lsh/lshSearch.hpp
 	$(CPP) $(CFLAGS) $< -o $@

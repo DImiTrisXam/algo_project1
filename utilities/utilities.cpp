@@ -275,14 +275,15 @@ int readInputFile(std::string &name, HashTable **tables, int L) {
   return 0;
 }
 
-int readQueryFile(std::string &qfile_, std::string &ofile_, const std::string &lshORcube, int N, int R, HashTable **tables, int L) {
+std::vector<Data *>* readQueryFile(std::string &qfile_) {
   std::ifstream qfile(qfile_);
-  std::ofstream ofile(ofile_);
   // std::ofstream file;
   // file.open(file_, std::ios_base::app);
   std::string line;
 
   std::cout << "Processing query file and printing to output file... ";
+
+  std::vector<Data *> *queries = new std::vector<Data *>;
 
   while (std::getline(qfile, line)) {
     std::istringstream ss(line);
@@ -298,44 +299,13 @@ int readQueryFile(std::string &qfile_, std::string &ofile_, const std::string &l
 
     Data *query = new Data(vec, id);
 
-    // time trueDistanceN function
-    auto start = std::chrono::high_resolution_clock::now();
-    auto trueDistVec = trueDistanceN(*query, N, tables, L);
-    auto end = std::chrono::high_resolution_clock::now();
-
-    auto tTrue = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
-
-    // for (const auto &p : trueDistVec) {
-    //   std::cout << p.id << ", " << p.dist << "  ";
-    // }
-    // std::cout << "\n";
-
-    // time approximateKNN function
-    start = std::chrono::high_resolution_clock::now();
-    auto knnVec = approximateKNN(*query, N, tables, L);
-    end = std::chrono::high_resolution_clock::now();
-
-    auto tLSH = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
-
-    // for (const auto &p : knnVec) {
-    //   std::cout << p.id << ", " << p.dist << "  ";
-    // }
-    // std::cout << "\n";
-
-    // approximateRangeSearch works
-    auto rVec = approximateRangeSearch(*query, R, tables, L);
-
-    printOutputFile(ofile, lshORcube, id, trueDistVec, knnVec, rVec, tLSH, tTrue);
-
-    delete query;
+    queries->push_back(query);
   }
 
-  std::cout << "DONE\n";
-
-  return 0;
+  return queries;
 }
 
-void printOutputFile(std::ofstream &file, const std::string &lshORcube, std::string &qid, std::vector<Neighbor> &trueDistVec,
+void printOutputFile(std::ofstream &file, const std::string lshORcube, const std::string &qid, std::vector<Neighbor> &trueDistVec,
                      std::vector<Neighbor> &knnVec, std::vector<std::string> &rVec, std::chrono::nanoseconds tLSH, std::chrono::nanoseconds tTrue) {
   file << "Query: " << qid << '\n';
 
