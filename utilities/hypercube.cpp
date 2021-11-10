@@ -52,3 +52,12 @@ void Hypercube::add(const std::vector<float> &vec, const std::string &id) {
     containedItems++;
 }
 
+/*
+* Returns a list of items that are candidates for closest neighbor.
+*/
+std::list<Data *> &Hypercube::getNeighborCandidates(Data &query, size_t &index_) {
+  size_t index = hash(query.vec);
+    index_ = index;
+
+  return table[index];
+}
