@@ -1,11 +1,13 @@
 #include "hash.hpp"
 #include <chrono>
 #include <climits>
+#include <limits>
 #include <cmath>
 #include <iostream>
 #include <random>
 
 const unsigned int M = UINT_MAX - 4;
+const double inf = std::numeric_limits<double>::infinity();
 
 float dotProduct(const std::vector<float> &x, const std::vector<float> &y) {
   float product = 0;
@@ -16,7 +18,7 @@ float dotProduct(const std::vector<float> &x, const std::vector<float> &y) {
   return product;
 }
 
-Data::Data(const std::vector<float> &vec, const std::string &id) : vec(vec), id(id) {}
+Data::Data(const std::vector<float> &vec, const std::string &id) : vec(vec), id(id), cluster(-1), minDist(inf) {}
 
 /* DEBUG ONLY */
 void Data::PRINT() const {

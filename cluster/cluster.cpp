@@ -1,4 +1,5 @@
 #include "../utilities/utilities.hpp"
+#include "clusteringMethods.hpp"
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
@@ -39,6 +40,9 @@ int main(int argc, char const *argv[]) {
             << "max_number_M_hypercube: " << M << "\n"
             << "number_of_hypercube_dimensions: " << d << "\n"
             << "number_of_probes: " << probes << "\n";
+
+  // Cluster cl = Cluster(K, method);
+  // cl.begin(iFile__);
 
   return 0;
 }

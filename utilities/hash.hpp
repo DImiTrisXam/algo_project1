@@ -9,6 +9,8 @@ class Data {
 public:
   const std::vector<float> vec; // dianisma
   const std::string id;
+  int cluster; // which cluster data point is in
+  double minDist; // distance to nearest cluster
 
   Data(const std::vector<float> &, const std::string &);
   void PRINT() const; /* DEBUG ONLY */

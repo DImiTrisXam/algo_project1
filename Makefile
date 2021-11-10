@@ -18,8 +18,8 @@ lsh: create_directories bin/lsh.o bin/lshSearch.o $(UTIL_OBJ_FILES)
 cube: create_directories bin/cube.o bin/cubeSearch.o $(UTIL_OBJ_FILES)
 	$(CPP) bin/cube.o bin/cubeSearch.o $(UTIL_OBJ_FILES) -o $(BUILD)/$@
 
-cluster: create_directories bin/cluster.o bin/lshSearch.o $(UTIL_OBJ_FILES)
-	$(CPP) bin/cluster.o bin/lshSearch.o $(UTIL_OBJ_FILES) -o $(BUILD)/$@
+cluster: create_directories bin/cluster.o bin/clusteringMethods.o bin/lshSearch.o $(UTIL_OBJ_FILES)
+	$(CPP) bin/cluster.o bin/clusteringMethods.o bin/lshSearch.o $(UTIL_OBJ_FILES) -o $(BUILD)/$@
 
 bin/lsh.o: lsh/lsh.cpp
 	$(CPP) $(CFLAGS) $< -o $@
@@ -37,6 +37,9 @@ bin/lshSearch.o: lsh/lshSearch.cpp lsh/lshSearch.hpp
 	$(CPP) $(CFLAGS) $< -o $@
 
 bin/cubeSearch.o: cube/cubeSearch.cpp cube/cubeSearch.hpp
+	$(CPP) $(CFLAGS) $< -o $@
+
+bin/clusteringMethods.o: cluster/clusteringMethods.cpp cluster/clusteringMethods.hpp
 	$(CPP) $(CFLAGS) $< -o $@
 
 .PHONY: clean
