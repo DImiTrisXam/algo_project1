@@ -27,7 +27,7 @@ short Hypercube::f(size_t index, std::unordered_map<size_t, short> &hMap) {
   return randNum;
 }
 
-size_t Hypercube::hash(const std::vector<float> &vec) {
+size_t Hypercube::hash(std::vector<float> &vec) {
   size_t vertice = 0, bit;
   auto hValuesIter = hValues.begin();
   for (const auto &hashFunction : hashFunctions) {
@@ -41,7 +41,7 @@ size_t Hypercube::hash(const std::vector<float> &vec) {
 /*
 * @throws: "const std::string" if out of memory.
 */
-void Hypercube::add(const std::vector<float> &vec, const std::string &id) {
+void Hypercube::add(std::vector<float> &vec, std::string &id) {
   auto newData = new Data(vec, id);
   if (!newData) // out of heap
     throw "Unable to insert element with id: '" + id + "' in hashtable. Out of heap memory.";

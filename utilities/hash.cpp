@@ -18,7 +18,7 @@ float dotProduct(const std::vector<float> &x, const std::vector<float> &y) {
   return product;
 }
 
-Data::Data(const std::vector<float> &vec, const std::string &id) : vec(vec), id(id), cluster(-1), minDist(inf) {}
+Data::Data(std::vector<float> vec, std::string id) : vec(vec), id(id), cluster(-1), minDist(inf) {}
 
 /* DEBUG ONLY */
 void Data::PRINT() const {
@@ -48,7 +48,7 @@ HashTable::~HashTable() {
 /*
 * @throws: "const std::string" if out of memory.
 */
-void HashTable::add(const std::vector<float> &vec, const std::string &id) {
+void HashTable::add(std::vector<float> &vec, std::string &id) {
   auto newData = new Data(vec, id);
   if (!newData) // out of heap
     throw "Unable to insert element with id: '" + id + "' in hashtable. Out of heap memory.";
@@ -108,7 +108,7 @@ void HashTable::generateHashFunctions(int k, int w, int pSize) {
       v.push_back(distN(generator));
     int t = distU(generator); // pick t from uniform distribution
 
-    hashFunctions.push_front([=](const std::vector<float> &vec) { // lambda captures "whatever needed" by value
+    hashFunctions.push_front([=](std::vector<float> &vec) { // lambda captures "whatever needed" by value
       return (size_t)floor((dotProduct(vec, v) + t) / (float)w);
     });
   }
@@ -117,7 +117,7 @@ void HashTable::generateHashFunctions(int k, int w, int pSize) {
 /*
 * Calls all 'hashFunctions' and combines the results.
 */
-int HashTable::ID(const std::vector<float> &p) const {
+int HashTable::ID(std::vector<float> &p) const {
   int sum = 0;
   int i = 0;
 
@@ -139,7 +139,7 @@ void HashTable::initr(int pSize) {
     this->r.push_back(distU(generator));
 }
 
-size_t HashTable::gHash(const std::vector<float> &p) const {
+size_t HashTable::gHash(std::vector<float> &p) const {
   return ID(p) % size;
 }
 
