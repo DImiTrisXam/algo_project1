@@ -6,6 +6,7 @@
 #include <fstream>
 #include <iostream>
 #include <limits>
+#include <random>
 #include <sstream>
 #include <string>
 
@@ -45,7 +46,8 @@ int Cluster::simpleInitialization() {
 }
 
 // kmeans++ initialization
-int kppInitialization() {}
+int Cluster::kppInitialization() {
+}
 
 // Lloyd's assignment algorithm
 int Cluster::LloydsAssignment() {
@@ -101,7 +103,7 @@ int Cluster::updateCentroid() {
 
 int Cluster::begin(std::string &inputFile) {
   int maxIterations = points.size();
-  bool flag = false; // a flag to check if there are no changes in clusters
+  // bool flag = false; // a flag to check if there are no changes in clusters
 
   readInputFile(inputFile);
   simpleInitialization();
@@ -119,13 +121,9 @@ int Cluster::begin(std::string &inputFile) {
   }
 
   for (auto i = 0; i < maxIterations; i++) {
-    if (AssignmentFunc) {
-      flag = true;
-    }
-    updateCentroid();
-
-    if (flag) // if no changes break loop
+    if (AssignmentFunc) // if no changes break loop
       break;
+    updateCentroid();
   }
 
   return 0;
