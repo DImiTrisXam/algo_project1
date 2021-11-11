@@ -275,15 +275,15 @@ int readInputFile(std::string &name, HashTable **tables, int L) {
   return 0;
 }
 
-std::vector<Data *>* readQueryFile(std::string &qfile_) {
+std::vector<Data *> *readQueryFile(std::string &qfile_) {
   std::ifstream qfile(qfile_);
   // std::ofstream file;
   // file.open(file_, std::ios_base::app);
   std::string line;
 
-  std::cout << "Processing query file and printing to output file... ";
+  std::cout << "Processing query file... ";
 
-  std::vector<Data *> *queries = new std::vector<Data *>;
+  auto queries = new std::vector<Data *>;
 
   while (std::getline(qfile, line)) {
     std::istringstream ss(line);
@@ -301,6 +301,8 @@ std::vector<Data *>* readQueryFile(std::string &qfile_) {
 
     queries->push_back(query);
   }
+
+  std::cout << "DONE\n";
 
   return queries;
 }

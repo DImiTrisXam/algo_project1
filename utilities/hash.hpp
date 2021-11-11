@@ -9,7 +9,7 @@ class Data {
 public:
   const std::vector<float> vec; // dianisma
   const std::string id;
-  int cluster; // which cluster data point is in
+  int cluster;    // which cluster data point is in
   double minDist; // distance to nearest cluster
 
   Data(const std::vector<float> &, const std::string &);
@@ -30,19 +30,18 @@ public:
   std::list<Data *> *getTable();
 
 protected:
-const unsigned int size;
+  const unsigned int size;
   std::list<Data *> *table; // array of lists
   unsigned int containedItems = 0;
   std::list<std::function<size_t(const std::vector<float> &)>> hashFunctions;
 
   void generateHashFunctions(int, int, int); // called once in constructor
 
-
 private:
   std::vector<float> r; // used by gHash only
 
   int ID(const std::vector<float> &) const;
-  void initr(int);                           // called once in constructor
+  void initr(int); // called once in constructor
   size_t gHash(const std::vector<float> &) const;
 };
 

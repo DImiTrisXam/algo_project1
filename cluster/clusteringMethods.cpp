@@ -49,7 +49,7 @@ int kppInitialization() {}
 
 // Lloyd's assignment algorithm
 int Cluster::LloydsAssignment() {
-  int ret = 0;
+  int ret = 1;
 
   for (auto i = 0; i < centroids.size(); ++i) {
 
@@ -59,10 +59,10 @@ int Cluster::LloydsAssignment() {
       if (dist < p->minDist) {
         p->minDist = dist;
 
-        if (p->cluster == i) // if there is no change
-          ret = 1;
-        else
+        if (p->cluster != i) { // if there is change
+          ret = 0;
           p->cluster = i;
+        }
       }
     }
   }

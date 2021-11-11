@@ -1,9 +1,9 @@
 #include "hash.hpp"
 #include <chrono>
 #include <climits>
-#include <limits>
 #include <cmath>
 #include <iostream>
+#include <limits>
 #include <random>
 
 const unsigned int M = UINT_MAX - 4;
@@ -84,11 +84,10 @@ void HashTable::eraseAll() {
 void HashTable::PRINT() const {
   for (size_t i = 0; i < size; i++) {
     std::cerr << "Bucket " << i << " -------------------\n";
-    for (const Data *data : table[i]){
+    for (const Data *data : table[i]) {
       if (!table[i].empty())
         data->PRINT();
-      
-      }
+    }
   }
 }
 
@@ -122,10 +121,9 @@ int HashTable::ID(const std::vector<float> &p) const {
   int sum = 0;
   int i = 0;
 
-  for (const auto &hashFunction : hashFunctions){
+  for (const auto &hashFunction : hashFunctions) {
     sum += r[i++] * hashFunction(p);
-    
-    }
+  }
 
   return abs(sum % M);
 }
