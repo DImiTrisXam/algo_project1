@@ -1,1 +1,1 @@
-clear && make cluster -s && ./build/cluster -i datasets/input_small_id -c cluster/cluster.conf -o outputCluster.txt -complete -m Classic
+clear && make cluster -s && ./build/cluster -i datasets/input_small_id -c cluster/cluster.conf -o outputCluster.txt -m Classic
