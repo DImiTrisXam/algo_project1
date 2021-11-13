@@ -1,11 +1,9 @@
 #include "clusteringMethods.hpp"
 #include "../utilities/metrics.hpp"
 #include <algorithm>
-#include <chrono>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
-#include <limits>
 #include <random>
 #include <sstream>
 #include <string>
@@ -51,7 +49,7 @@ int Cluster::readInputFile(std::string &name) {
   std::cout << "DONE\n";
 }
 
-int Cluster::printOutputFile(std::string &name, bool complete) {
+int Cluster::printOutputFile(std::string &name, bool complete, std::chrono::nanoseconds t) {
   std::ofstream file(name);
   std::string line;
 
@@ -94,6 +92,9 @@ int Cluster::printOutputFile(std::string &name, bool complete) {
       file << "}\n";
     }
   }
+
+  // multiply nanoseconds with 10^-9 to print seconds
+  file << "clustering_time: " << t.count() * 1e-9 << '\n';
 
   std::cout << "DONE\n";
 }
@@ -250,6 +251,8 @@ int Cluster::updateCentroid() {
 int Cluster::begin(std::string &outputFile, bool complete) {
   auto maxIterations = points.size();
 
+  auto start = std::chrono::high_resolution_clock::now();
+
   // simpleInitialization();
   kppInitialization();
 
@@ -275,9 +278,13 @@ int Cluster::begin(std::string &outputFile, bool complete) {
     updateCentroid();
   }
 
+  auto end = std::chrono::high_resolution_clock::now();
+
+  auto time = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+
   std::cout << "Iterations: " << i + 1 << "\n";
 
-  printOutputFile(outputFile, complete);
+  printOutputFile(outputFile, complete, time);
 
   return 0;
 }

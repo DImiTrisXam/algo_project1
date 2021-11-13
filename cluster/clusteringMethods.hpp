@@ -3,6 +3,7 @@
 
 #include "../utilities/hash.hpp"
 #include <vector>
+#include <chrono>
 
 struct Centroid {
   std::vector<float> vec;
@@ -18,7 +19,7 @@ class Cluster {
 
   void printCentroids();
   int readInputFile(std::string &);
-  int printOutputFile(std::string &, bool);
+  int printOutputFile(std::string &, bool, std::chrono::nanoseconds);
   int simpleInitialization();
   int kppInitialization();
   bool LloydsAssignment();
