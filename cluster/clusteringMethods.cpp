@@ -205,7 +205,7 @@ bool Cluster::LloydsAssignment() {
     c->indexes.clear();                     // remove previous iteration's indexes
   }
 
-  for (int i = 0; i < points.size(); i++) { // for every point
+  for (auto i = 0; i < points.size(); i++) { // for every point
     std::vector<double> centroidDists;
 
     for (auto &c : centroids) {                                       // for every centroid
@@ -262,20 +262,21 @@ int Cluster::Silhouette() {
   auto silhouette = new double[points.size()];          // silhouettes of points for clustering [-1,1]
   auto nearestNeighbor = new int[points.size()];
 
-  for (auto &c1 : centroids) {    // for every cluster
-    for (auto &i : c1->indexes) { // for every point in cluster
-      std::vector<double> centroidDists;
+  // compute second best clusters for each point
+  for (auto i = 0; i < points.size(); i++) { // for every point
+    std::vector<double> centroidDists;
 
-      for (auto &c2 : centroids) {                          // for every other cluster
-        auto dist = euclidianDist(c2->vec, points[i]->vec); // get distance of point to each centroid
-        centroidDists.push_back(dist);
-      }
-
-      // change smallest distance to infinity
-      centroidDists[points[i]->cluster] = std::numeric_limits<double>::infinity();
-      // find index of 2nd closest cluster
-      int N = std::min_element(centroidDists.begin(), centroidDists.end()) - centroidDists.begin();
+    for (auto &c2 : centroids) {                          // for every other cluster
+      auto dist = euclidianDist(c2->vec, points[i]->vec); // get distance of point to each centroid
+      centroidDists.push_back(dist);
     }
+
+    // change smallest distance to infinity
+    centroidDists[points[i]->cluster] = std::numeric_limits<double>::infinity();
+    // find index of 2nd closest cluster
+    int N = std::min_element(centroidDists.begin(), centroidDists.end()) - centroidDists.begin();
+
+    nearestNeighbor[i] = N;
   }
 
   for (auto c = 0; c < centroids.size(); c++) { // for every cluster
@@ -283,17 +284,6 @@ int Cluster::Silhouette() {
 
     for (auto &i : centroids[c]->indexes) { // for every point in cluster
       auto N = nearestNeighbor[i];
-      // std::vector<double> centroidDists;
-
-      // for (auto c2 = 0; c2 < centroids.size(); c2++) {                 // for every centroid
-      //   auto dist = euclidianDist(centroids[c2]->vec, points[i]->vec); // get distance of point to each centroid
-      //   centroidDists.push_back(dist);
-      // }
-
-      // // change smallest distance to infinity
-      // centroidDists[points[i]->cluster] = std::numeric_limits<double>::infinity();
-      // // find index of 2nd closest cluster
-      // size_t N = std::min_element(centroidDists.begin(), centroidDists.end()) - centroidDists.begin();
 
       double sum1 = 0; // sum of distances of point to other points in cluster
       double sum2 = 0; // sum of distances of point to other points in next closest cluster
