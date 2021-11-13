@@ -122,11 +122,14 @@ int Cluster::kppInitialization() {
   std::default_random_engine generator(seed);
   std::uniform_int_distribution<int> distribution(0, points.size() - 1);
 
+  Centroid *c = new Centroid;
   // choose first centroid randomly
-  centroids[0]->vec = points[distribution(generator)]->vec;
+  c->vec = points[distribution(generator)]->vec;
+
+  centroids.push_back(c);
 
   for (auto t = 1; t < K; t++) {
-    std::vector<double> D; // min distances of each to some centroid
+    std::vector<double> D; // min distances of each point to some centroid
 
     for (auto i = 0; i < points.size(); i++) { // for every non-centroid point
       std::vector<double> centroidDist;        // distance of point to every centroid
@@ -139,7 +142,8 @@ int Cluster::kppInitialization() {
         }
       }
 
-      D.push_back(*std::min_element(centroidDist.begin(), centroidDist.end()));
+      if (!centroidDist.empty()) // if not empty (just for the first loop where t=1)
+        D.push_back(*std::min_element(centroidDist.begin(), centroidDist.end()));
     }
 
     auto Psize = D.size() + 1;
@@ -160,18 +164,24 @@ int Cluster::kppInitialization() {
       P[r] = sum;
     }
 
-    std::uniform_real_distribution<float> distribution(0, P[Psize]);
+    std::uniform_real_distribution<float> distribution(0, P[Psize - 1]);
     auto x = distribution(generator); // pick random float
 
     for (auto r = 1; r < Psize; r++) {
       if (x > P[r - 1] && x <= P[r]) {
-        centroids[t]->vec = points[r]->vec;
+        c = new Centroid;
+
+        c->vec = points[r]->vec;
+        centroids.push_back(c);
+
         break;
       }
     }
+
+    delete P;
   }
 
-  printCentroids();
+  // printCentroids();
 
   return 0;
 }
@@ -240,8 +250,8 @@ int Cluster::updateCentroid() {
 int Cluster::begin(std::string &outputFile, bool complete) {
   auto maxIterations = points.size();
 
-  simpleInitialization();
-  // kppInitialization(); // doesn't work
+  // simpleInitialization();
+  kppInitialization();
 
   size_t i = 0;
   int flag; // a flag to check if there are no changes in clusters

@@ -24,9 +24,9 @@ int main(int argc, char const *argv[]) {
 
   parseClusterArgs(argc, argv, iFile__, oFile__, cFile__, complete, method);
 
-  std::cout << "iFile__: \"" << iFile__ << "\"\n"
-            << "cFile__: \"" << cFile__ << "\"\n"
-            << "oFile__: \"" << oFile__ << "\"\n"
+  std::cout << "Input file: \"" << iFile__ << "\"\n"
+            << "Config file: \"" << cFile__ << "\"\n"
+            << "Output file: \"" << oFile__ << "\"\n"
             << "complete: " << complete << "\n"
             << "method: " << method << "\n\n";
 
@@ -39,7 +39,7 @@ int main(int argc, char const *argv[]) {
             << "number_of_vector_hash_functions: " << k << "\n"
             << "max_number_M_hypercube: " << M << "\n"
             << "number_of_hypercube_dimensions: " << d << "\n"
-            << "number_of_probes: " << probes << "\n";
+            << "number_of_probes: " << probes << "\n\n";
 
   Cluster cl = Cluster(K, method, iFile__);
   cl.begin(oFile__, complete);
