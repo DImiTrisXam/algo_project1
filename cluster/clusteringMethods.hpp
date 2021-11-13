@@ -2,13 +2,14 @@
 #define __CLUSTER__
 
 #include "../utilities/hash.hpp"
-#include <vector>
 #include <chrono>
+#include <vector>
 
 struct Centroid {
   std::vector<float> vec;
   std::vector<float> vecSum; // sum of all points in cluster of centroid
   std::vector<int> indexes;  // indexes of all the points in cluster of centroid
+  double silhouette;         // silhouette of centroid's cluster
 };
 
 class Cluster {
@@ -16,6 +17,7 @@ class Cluster {
   std::vector<Centroid *> centroids;
   int K;              // number of clusters
   std::string method; // method of assignment (Lloyd's algorithm, LSH, Hypercube)
+  double overallSilhouette;
 
   void printCentroids();
   int readInputFile(std::string &);
@@ -26,6 +28,7 @@ class Cluster {
   bool LSHAssignment();
   bool HypercubeAssignment();
   int updateCentroid();
+  int Silhouette();
 
 public:
   int begin(std::string &, bool);

@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <limits>
 #include <random>
 #include <sstream>
 #include <string>
@@ -96,6 +97,13 @@ int Cluster::printOutputFile(std::string &name, bool complete, std::chrono::nano
   // multiply nanoseconds with 10^-9 to print seconds
   file << "clustering_time: " << t.count() * 1e-9 << '\n';
 
+  file << "Silhouette: [" << centroids[0]->silhouette;
+
+  for (auto i = 1; i < centroids.size(); i++) {
+    file << ", " << centroids[i]->silhouette;
+  }
+  file << ", " << overallSilhouette << "]\n";
+
   std::cout << "DONE\n";
 }
 
@@ -179,7 +187,7 @@ int Cluster::kppInitialization() {
       }
     }
 
-    delete P;
+    delete[] P;
   }
 
   // printCentroids();
@@ -207,7 +215,7 @@ bool Cluster::LloydsAssignment() {
     // find index of smallest distance
     size_t index = std::min_element(centroidDists.begin(), centroidDists.end()) - centroidDists.begin();
 
-    points[i]->minDist = centroidDists[index];
+    // points[i]->minDist = centroidDists[index];
 
     if (points[i]->cluster != index) { // if there is change
       ret = false;                     // continue iterations
@@ -248,6 +256,81 @@ int Cluster::updateCentroid() {
   return 0;
 }
 
+int Cluster::Silhouette() {
+  auto averageDistSame = new double[points.size()];     // average distance of point to points of same cluster
+  auto averageDistNeighbor = new double[points.size()]; // average distance of point to points of best neighbor cluster
+  auto silhouette = new double[points.size()];          // silhouettes of points for clustering [-1,1]
+  auto nearestNeighbor = new int[points.size()];
+
+  for (auto &c1 : centroids) {    // for every cluster
+    for (auto &i : c1->indexes) { // for every point in cluster
+      std::vector<double> centroidDists;
+
+      for (auto &c2 : centroids) {                          // for every other cluster
+        auto dist = euclidianDist(c2->vec, points[i]->vec); // get distance of point to each centroid
+        centroidDists.push_back(dist);
+      }
+
+      // change smallest distance to infinity
+      centroidDists[points[i]->cluster] = std::numeric_limits<double>::infinity();
+      // find index of 2nd closest cluster
+      int N = std::min_element(centroidDists.begin(), centroidDists.end()) - centroidDists.begin();
+    }
+  }
+
+  for (auto c = 0; c < centroids.size(); c++) { // for every cluster
+    double sum = 0;                             // sum of silhouettes of all points in cluster
+
+    for (auto &i : centroids[c]->indexes) { // for every point in cluster
+      auto N = nearestNeighbor[i];
+      // std::vector<double> centroidDists;
+
+      // for (auto c2 = 0; c2 < centroids.size(); c2++) {                 // for every centroid
+      //   auto dist = euclidianDist(centroids[c2]->vec, points[i]->vec); // get distance of point to each centroid
+      //   centroidDists.push_back(dist);
+      // }
+
+      // // change smallest distance to infinity
+      // centroidDists[points[i]->cluster] = std::numeric_limits<double>::infinity();
+      // // find index of 2nd closest cluster
+      // size_t N = std::min_element(centroidDists.begin(), centroidDists.end()) - centroidDists.begin();
+
+      double sum1 = 0; // sum of distances of point to other points in cluster
+      double sum2 = 0; // sum of distances of point to other points in next closest cluster
+
+      for (auto &j : centroids[c]->indexes) { // for every other point in cluster
+        if (i != j) {                         // if not same point
+          sum1 += euclidianDist(points[i]->vec, points[j]->vec);
+        }
+      }
+
+      for (auto &j : centroids[N]->indexes) { // for every other point in closest neigbor cluster
+        sum2 += euclidianDist(points[i]->vec, points[j]->vec);
+      }
+
+      averageDistSame[i] = sum1 / (double)centroids[c]->indexes.size();
+      averageDistNeighbor[i] = sum2 / (double)centroids[N]->indexes.size();
+
+      auto max = averageDistSame[i] > averageDistNeighbor[i] ? averageDistSame[i] : averageDistNeighbor[i];
+      silhouette[i] = (averageDistNeighbor[i] - averageDistSame[i]) / max;
+
+      sum += silhouette[i];
+      overallSilhouette += silhouette[i];
+    }
+
+    centroids[c]->silhouette = sum / (double)centroids[c]->indexes.size();
+  }
+
+  overallSilhouette /= (double)points.size();
+
+  delete[] averageDistSame;
+  delete[] averageDistNeighbor;
+  delete[] silhouette;
+  delete[] nearestNeighbor;
+
+  return 0;
+}
+
 int Cluster::begin(std::string &outputFile, bool complete) {
   auto maxIterations = points.size();
 
@@ -279,17 +362,21 @@ int Cluster::begin(std::string &outputFile, bool complete) {
   }
 
   auto end = std::chrono::high_resolution_clock::now();
-
   auto time = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
 
   std::cout << "Iterations: " << i + 1 << "\n";
+  std::cout << "Computing Silhouette... ";
+
+  Silhouette();
+
+  std::cout << "DONE\n";
 
   printOutputFile(outputFile, complete, time);
 
   return 0;
 }
 
-Cluster::Cluster(int K_, std::string met, std::string &inputFile) : K(K_), method(met) {
+Cluster::Cluster(int K_, std::string met, std::string &inputFile) : K(K_), method(met), overallSilhouette(0) {
   readInputFile(inputFile);
 }
 
