@@ -1,5 +1,6 @@
 #include "../utilities/hypercube.hpp"
 #include "../utilities/utilities.hpp"
+#include "../utilities/metrics.hpp"
 #include "cubeSearch.hpp"
 #include <cmath>
 #include <fstream>
@@ -55,7 +56,7 @@ int main(int argc, char const *argv[]) {
 
   for (const auto query : *queries) {
     auto start = std::chrono::high_resolution_clock::now();
-    auto trueDistVec = trueDistanceN(*query, N, cube);
+    auto trueDistVec = trueDistanceN(*query, N, cube, euclidianDist);
     auto end = std::chrono::high_resolution_clock::now();
 
     auto tTrue = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
@@ -67,7 +68,7 @@ int main(int argc, char const *argv[]) {
 
     // time approximateKNN function
     start = std::chrono::high_resolution_clock::now();
-    auto knnVec = approximateKNN(*query, N, cube, M, probes, k);
+    auto knnVec = approximateKNN(*query, N, cube, M, probes, k, euclidianDist);
     end = std::chrono::high_resolution_clock::now();
 
     auto tLSH = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
@@ -78,7 +79,8 @@ int main(int argc, char const *argv[]) {
     // std::cout << "\n";
 
     // approximateRangeSearch works
-    auto rVec = approximateRangeSearch(*query, R, cube, M, probes, k);
+    auto rVec = approximateRangeSearch(*query, R, cube, M, probes, k, euclidianDist);
+    //std::cout << "approximate range search for cube len: " << rVec.size() << "\n";
     printOutputFile(ofile, "Hypercube", query->id, trueDistVec, knnVec, rVec, tLSH, tTrue);
   }
   

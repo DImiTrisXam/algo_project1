@@ -1,4 +1,5 @@
 #include "../utilities/utilities.hpp"
+#include "../utilities/metrics.hpp"
 #include "lshSearch.hpp"
 #include <fstream>
 #include <iostream>
@@ -55,7 +56,7 @@ int main(int argc, char const *argv[]) {
   // search each query in the tables
   for (const auto query : *queries) {
     auto start = std::chrono::high_resolution_clock::now();
-    auto trueDistVec = trueDistanceN(*query, N, tables, L);
+    auto trueDistVec = trueDistanceN(*query, N, tables, L, euclidianDist);
     auto end = std::chrono::high_resolution_clock::now();
 
     auto tTrue = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
@@ -67,7 +68,7 @@ int main(int argc, char const *argv[]) {
 
     // time approximateKNN function
     start = std::chrono::high_resolution_clock::now();
-    auto knnVec = approximateKNN(*query, N, tables, L);
+    auto knnVec = approximateKNN(*query, N, tables, L, euclidianDist);
     end = std::chrono::high_resolution_clock::now();
 
     auto tLSH = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
@@ -78,7 +79,7 @@ int main(int argc, char const *argv[]) {
     // std::cout << "\n";
 
     // approximateRangeSearch works
-    auto rVec = approximateRangeSearch(*query, R, tables, L);
+    auto rVec = approximateRangeSearch(*query, R, tables, L, euclidianDist);
     printOutputFile(ofile, "LSH", query->id, trueDistVec, knnVec, rVec, tLSH, tTrue);
   }
 
