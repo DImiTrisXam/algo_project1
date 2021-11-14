@@ -250,6 +250,7 @@ int readNumberOfLines(std::string name, int &dim) {
 
 int readInputFile(std::string &name, HashTable **tables, int L) {
   std::ifstream file(name);
+
   std::string line;
 
   std::cout << "Processing input file... ";
@@ -262,6 +263,8 @@ int readInputFile(std::string &name, HashTable **tables, int L) {
     float temp;
 
     ss >> id;
+
+    // std::cout << "id: " << id << "\n";
 
     while (ss >> temp)
       vec.push_back(temp);
@@ -277,8 +280,9 @@ int readInputFile(std::string &name, HashTable **tables, int L) {
 
 std::vector<Data *> *readQueryFile(std::string &qfile_) {
   std::ifstream qfile(qfile_);
-  // std::ofstream file;
-  // file.open(file_, std::ios_base::app);
+  if (!qfile.good())
+    return nullptr;
+
   std::string line;
 
   std::cout << "Processing query file... ";
@@ -317,7 +321,7 @@ void printOutputFile(std::ofstream &file, const std::string lshORcube, const std
          << "distanceTrue: " << trueDistVec[i].dist << '\n';
   }
   // multiply nanoseconds with 10^-9 to print seconds
-  file << "tLSH: " << tLSH.count() * 1e-9 << " seconds\n"
+  file << "t" << lshORcube << ": " << tLSH.count() * 1e-9 << " seconds\n"
        << "tTrue: " << tTrue.count() * 1e-9 << " seconds\n"
        << "R-near neighbors:\n";
 

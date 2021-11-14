@@ -1,5 +1,6 @@
 #include "../utilities/hypercube.hpp"
 #include "../utilities/utilities.hpp"
+#include "../utilities/metrics.hpp"
 #include "cubeSearch.hpp"
 #include <cmath>
 #include <fstream>
@@ -48,42 +49,60 @@ int main(int argc, char const *argv[]) {
   //cube->PRINT();
 
   std::ofstream ofile(oFile__);
+  std::string answer;
+  std::vector<Data *> *queries;
 
-  std::vector<Data *> *queries = readQueryFile(qFile__);
+  while (true){
+    queries = readQueryFile(qFile__);
 
-  std::cout << "Printing to output file... ";
+    if (!queries){
+        std::cout << "Invalid query file. Exiting program...\n";
+        break; 
+    }
 
-  for (const auto query : *queries) {
-    auto start = std::chrono::high_resolution_clock::now();
-    auto trueDistVec = trueDistanceN(*query, N, cube);
-    auto end = std::chrono::high_resolution_clock::now();
+    std::cout << "Printing to output file... ";
 
-    auto tTrue = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+    for (const auto query : *queries) {
+        auto start = std::chrono::high_resolution_clock::now();
+        auto trueDistVec = trueDistanceN(*query, N, cube, euclidianDist);
+        auto end = std::chrono::high_resolution_clock::now();
 
-    // for (const auto &p : trueDistVec) {
-    //   std::cout << p.id << ", " << p.dist << "  ";
-    // }
-    // std::cout << "\n";
+        auto tTrue = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
 
-    // time approximateKNN function
-    start = std::chrono::high_resolution_clock::now();
-    auto knnVec = approximateKNN(*query, N, cube, M, probes, k);
-    end = std::chrono::high_resolution_clock::now();
+        // time approximateKNN function
+        start = std::chrono::high_resolution_clock::now();
+        auto knnVec = approximateKNN(*query, N, cube, M, probes, k, euclidianDist);
+        end = std::chrono::high_resolution_clock::now();
 
-    auto tLSH = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+        auto tLSH = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
 
-    // for (const auto &p : knnVec) {
-    //   std::cout << p.id << ", " << p.dist << "  ";
-    // }
-    // std::cout << "\n";
 
-    // approximateRangeSearch works
-    auto rVec = approximateRangeSearch(*query, R, cube, M, probes, k);
-    printOutputFile(ofile, "Hypercube", query->id, trueDistVec, knnVec, rVec, tLSH, tTrue);
+        // approximateRangeSearch 
+        auto rVec = approximateRangeSearch(*query, R, cube, M, probes, k, euclidianDist);
+        //std::cout << "approximate range search for cube len: " << rVec.size() << "\n";
+        printOutputFile(ofile, "Hypercube", query->id, trueDistVec, knnVec, rVec, tLSH, tTrue);
+    
+        
+
+    }
+    for (const Data *data : *queries) {
+            delete data;
+        }
+        delete queries;
+
+        std::cout << "DONE\nPress X to terminate or Press Y to continue with new query file: ";
+        std::cin >> answer;
+        if (answer.compare("X") == 0)
+            break;
+        else if (answer.compare("Y") == 0){
+            std::cout << "Enter path of new query file: ";
+            std::cin >> qFile__;
+        }
+        else 
+            break;
+  
   }
   
-  std::cout << "DONE\n";
-
   // release hypercube memory
   delete cube;
 
