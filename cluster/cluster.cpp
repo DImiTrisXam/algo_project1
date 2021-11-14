@@ -1,5 +1,5 @@
-#include "../utilities/utilities.hpp"
 #include "../utilities/metrics.hpp"
+#include "../utilities/utilities.hpp"
 #include "clusteringMethods.hpp"
 #include <cstdlib>
 #include <fstream>
@@ -43,7 +43,7 @@ int main(int argc, char const *argv[]) {
             << "number_of_probes: " << probes << "\n\n";
 
   Cluster cl = Cluster(K, method, iFile__);
-  cl.begin(oFile__, iFile__, complete, L, k, M, probes, euclidianDist);
+  cl.begin(oFile__, iFile__, complete, L, k, M, d, probes, euclidianDist);
 
   return 0;
 }

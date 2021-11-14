@@ -21,7 +21,6 @@ std::vector<Neighbor> trueDistanceN(Data &query, int k, HashTable *cube, const s
   auto size = cube->getTableSize();
   auto table = cube->getTable();
 
-
   for (auto j = 0; j < size; j++) {
     for (const auto &p : table[j]) { // for each item in bucket
       // distance between candidate and query

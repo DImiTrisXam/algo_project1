@@ -250,7 +250,7 @@ static HashTable **indexPointsHypercube(std::string &inputFile, int k, int w, in
   return cube;
 }
 
-bool Cluster::reverseAssignment(int iter, std::string &inputFile, int L, int k, int M, int probes, const std::function<double(const std::vector<float> &, const std::vector<float> &)> &metric) {
+bool Cluster::reverseAssignment(int iter, std::string &inputFile, int L, int k, int M, int d, int probes, const std::function<double(const std::vector<float> &, const std::vector<float> &)> &metric) {
   bool ret = false;
   int dim = points[0]->vec.size(); // dimension of data
   int w = 2;                       // window for hash table
@@ -262,10 +262,10 @@ bool Cluster::reverseAssignment(int iter, std::string &inputFile, int L, int k, 
       int tableSize = points.size() / 8;
       indexedPoints = indexPointsLSH(inputFile, L, k, w, dim, tableSize);
     } else if (method.compare("Hypercube") == 0) {
-      int tableSize = pow(2, k);
+      int tableSize = pow(2, d);
       // HashTable *tmp = indexPointsHypercube(inputFile, L, k, w, dim, tableSize);
       // indexedPoints = &tmp;
-      indexedPoints = indexPointsHypercube(inputFile, k, w, dim, tableSize);
+      indexedPoints = indexPointsHypercube(inputFile, d, w, dim, tableSize);
     }
 
     for (auto &c : centroids) {               // for every centroid
@@ -290,12 +290,13 @@ bool Cluster::reverseAssignment(int iter, std::string &inputFile, int L, int k, 
   for (int i = 0; i < centroids.size(); i++) {
     std::vector<std::string> centroidPoints;
     Data *query = new Data(centroids[i]->vec, "centroid");
+
     if (method.compare("LSH") == 0) {
       centroidPoints = approximateRangeSearch(*query, radius, indexedPoints, L, metric); // Reverse assignment through range search with LSH
-      std::cout << "LSH result size " << centroidPoints.size() << std::endl;
+      // std::cout << "LSH result size " << centroidPoints.size() << std::endl;
     } else if (method.compare("Hypercube") == 0) {
       centroidPoints = approximateRangeSearch(*query, radius, *indexedPoints, M, probes, k, metric); // Reverse assignment through range search with hypercube projection
-      std::cout << "Hypercube result size " << centroidPoints.size() << std::endl;
+      // std::cout << "Hypercube result size " << centroidPoints.size() << std::endl;
     }
 
     // resolve points' ids to indexes in "points" vector
@@ -317,7 +318,6 @@ bool Cluster::reverseAssignment(int iter, std::string &inputFile, int L, int k, 
           double newDistance = metric(centroids[i]->vec, points[index]->vec);
 
           if (newDistance < oldDistance) {
-            //centroids[]->indexes.erase(centroids[i]->indexes.begin() + index);
             std::vector<int> vec = centroids[points[index]->cluster]->indexes; //remove index from old centroid
             vec.erase(std::remove(vec.begin(), vec.end(), index), vec.end());
 
@@ -335,13 +335,11 @@ bool Cluster::reverseAssignment(int iter, std::string &inputFile, int L, int k, 
     }
   }
 
-  if (unassignedCounter == 0) {
-    ret = true; // stop iterations
-    return ret;
-  }
-
   if (unassignedCounter <= stopCondition) {
     ret = true; // stop iterations
+
+    if (unassignedCounter == 0)
+      return ret;
 
     // for every unassigned point, compare its distances to all centroids
     for (int i = 0; i < points.size(); i++) {
@@ -442,7 +440,7 @@ int Cluster::Silhouette(const std::function<double(const std::vector<float> &, c
   return 0;
 }
 
-int Cluster::begin(std::string &outputFile, std::string &inputFile, bool complete, int L, int k, int M, int probes, const std::function<double(const std::vector<float> &, const std::vector<float> &)> &metric) {
+int Cluster::begin(std::string &outputFile, std::string &inputFile, bool complete, int L, int k, int M, int d, int probes, const std::function<double(const std::vector<float> &, const std::vector<float> &)> &metric) {
   auto maxIterations = points.size();
 
   auto start = std::chrono::high_resolution_clock::now();
@@ -459,7 +457,7 @@ int Cluster::begin(std::string &outputFile, std::string &inputFile, bool complet
     if (method.compare("Classic") == 0) {
       flag = LloydsAssignment(metric);
     } else if (method.compare("LSH") == 0 || method.compare("Hypercube") == 0) {
-      flag = reverseAssignment(i, inputFile, L, k, M, probes, metric);
+      flag = reverseAssignment(i, inputFile, L, k, M, d, probes, metric);
     } else {
       return -1;
     }

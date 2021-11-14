@@ -27,12 +27,12 @@ class Cluster {
   int simpleInitialization();
   int kppInitialization(const std::function<double(const std::vector<float> &, const std::vector<float> &)> &);
   bool LloydsAssignment(const std::function<double(const std::vector<float> &, const std::vector<float> &)> &);
-  bool reverseAssignment(int, std::string &, int, int, int, int, const std::function<double(const std::vector<float> &, const std::vector<float> &)> &);
+  bool reverseAssignment(int, std::string &, int, int, int, int, int, const std::function<double(const std::vector<float> &, const std::vector<float> &)> &);
   int updateCentroid();
   int Silhouette(const std::function<double(const std::vector<float> &, const std::vector<float> &)> &);
 
 public:
-  int begin(std::string &, std::string &, bool, int, int, int, int, const std::function<double(const std::vector<float> &, const std::vector<float> &)> &);
+  int begin(std::string &, std::string &, bool, int, int, int, int, int, const std::function<double(const std::vector<float> &, const std::vector<float> &)> &);
   Cluster(int, std::string, std::string &);
   ~Cluster();
 };
