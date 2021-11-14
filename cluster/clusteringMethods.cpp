@@ -49,6 +49,8 @@ int Cluster::readInputFile(std::string &name) {
     Data *d = new Data(vec, id);
 
     points.push_back(d);
+
+    idToIndexMap[d->id] = points.size() - 1;
   }
 
   std::cout << "DONE\n";
@@ -124,8 +126,6 @@ int Cluster::simpleInitialization() {
     centroids.push_back(c);
   }
 
-  // printCentroids();
-
   return 0;
 }
 
@@ -160,10 +160,10 @@ int Cluster::kppInitialization(const std::function<double(const std::vector<floa
     }
 
     auto Psize = D.size() + 1;
-    auto P = new double[Psize];                        // partial sums of D(i)^2
+    std::vector<double> P;                             // partial sums of D(i)^2
     auto maxD = *std::max_element(D.begin(), D.end()); // for normalization of D(i)
 
-    P[0] = 0;
+    P.push_back(0);
 
     // compute partial sums
     for (auto r = 1; r < Psize; r++) {
@@ -174,27 +174,19 @@ int Cluster::kppInitialization(const std::function<double(const std::vector<floa
         sum += normalizedD_i * normalizedD_i;
       }
 
-      P[r] = sum;
+      P.push_back(sum);
     }
 
     std::uniform_real_distribution<float> distribution(0, P[Psize - 1]);
     auto x = distribution(generator); // pick random float
 
-    for (auto r = 1; r < Psize; r++) {
-      if (x > P[r - 1] && x <= P[r]) {
-        c = new Centroid;
+    // find r with binary search where: x > P[r - 1] && x <= P[r]
+    size_t r = std::lower_bound(P.begin(), P.end(), x) - P.begin();
+    c = new Centroid;
 
-        c->vec = points[r]->vec;
-        centroids.push_back(c);
-
-        break;
-      }
-    }
-
-    delete[] P;
+    c->vec = points[r]->vec;
+    centroids.push_back(c);
   }
-
-  // printCentroids();
 
   return 0;
 }
@@ -218,8 +210,6 @@ bool Cluster::LloydsAssignment(const std::function<double(const std::vector<floa
 
     // find index of smallest distance
     size_t index = std::min_element(centroidDists.begin(), centroidDists.end()) - centroidDists.begin();
-
-    // points[i]->minDist = centroidDists[index];
 
     if (points[i]->cluster != index) { // if there is change
       ret = false;                     // continue iterations
@@ -261,7 +251,6 @@ static HashTable **indexPointsHypercube(std::string &inputFile, int k, int w, in
 }
 
 bool Cluster::reverseAssignment(int iter, std::string &inputFile, int L, int k, int M, int probes, const std::function<double(const std::vector<float> &, const std::vector<float> &)> &metric) {
-
   bool ret = false;
   int dim = points[0]->vec.size(); // dimension of data
   int w = 2;                       // window for hash table
@@ -270,8 +259,7 @@ bool Cluster::reverseAssignment(int iter, std::string &inputFile, int L, int k, 
 
   if (iter == 0) {
     if (method.compare("LSH") == 0) {
-      int numOfInputs = readNumberOfLines(inputFile, dim);
-      int tableSize = numOfInputs / 8;
+      int tableSize = points.size() / 8;
       indexedPoints = indexPointsLSH(inputFile, L, k, w, dim, tableSize);
     } else if (method.compare("Hypercube") == 0) {
       int tableSize = pow(2, k);
@@ -279,11 +267,10 @@ bool Cluster::reverseAssignment(int iter, std::string &inputFile, int L, int k, 
       // indexedPoints = &tmp;
       indexedPoints = indexPointsHypercube(inputFile, k, w, dim, tableSize);
     }
-  }
 
-  for (auto &c : centroids) {               // for every centroid
-    c->vecSum = std::vector<float>(dim, 0); // initialize to all zeroes
-    c->indexes.clear();                     // remove previous iteration's indexes
+    for (auto &c : centroids) {               // for every centroid
+      c->vecSum = std::vector<float>(dim, 0); // initialize to all zeroes
+    }
   }
 
   auto minDist = std::numeric_limits<double>::infinity();
@@ -295,92 +282,83 @@ bool Cluster::reverseAssignment(int iter, std::string &inputFile, int L, int k, 
     }
   }
 
-  static double radius = (double)(minDist / 2);
-  std::vector<bool> assignedPoints(points.size(), false); // initialize vector with false values
-  double stopCondition = ((10 * points.size()) / 100);    // 10% of points are not assigned -> stop
-  int unassignedCounter = points.size();
+  double radius = pow(2, iter) * (double)(minDist / 2);
+  static std::vector<bool> assignedPoints(points.size(), false); // initialize vector with false values
+  static double stopCondition = ((10 * points.size()) / 100);    // 10% of points are not assigned -> stop
+  static int unassignedCounter = points.size();
 
-  while (true) {
-    if (unassignedCounter <= stopCondition || radius > 20000.0) {
-
-      ret = true; // stop iterations
-      break;
+  for (int i = 0; i < centroids.size(); i++) {
+    std::vector<std::string> centroidPoints;
+    Data *query = new Data(centroids[i]->vec, "centroid");
+    if (method.compare("LSH") == 0) {
+      centroidPoints = approximateRangeSearch(*query, radius, indexedPoints, L, metric); // Reverse assignment through range search with LSH
+      std::cout << "LSH result size " << centroidPoints.size() << std::endl;
+    } else if (method.compare("Hypercube") == 0) {
+      centroidPoints = approximateRangeSearch(*query, radius, *indexedPoints, M, probes, k, metric); // Reverse assignment through range search with hypercube projection
+      std::cout << "Hypercube result size " << centroidPoints.size() << std::endl;
     }
-    for (int i = 0; i < centroids.size(); i++) {
-      if (unassignedCounter <= stopCondition || radius > 20000.0) {
-        ret = true; // stop iterations
-        break;
-      }
-      std::vector<std::string> centroidPoints;
-      Data *query = new Data(centroids[i]->vec, "centroid");
-      if (method.compare("LSH") == 0) {
-        centroidPoints = approximateRangeSearch(*query, radius, indexedPoints, L, metric); // Reverse assignment through range search with LSH
-        std::cout << "LSH result size " << centroidPoints.size() << std::endl;
-      } else if (method.compare("Hypercube") == 0) {
-        centroidPoints = approximateRangeSearch(*query, radius, *indexedPoints, M, probes, k, metric); // Reverse assignment through range search with hypercube projection
-                                                                                                       //std::cout << "Hypercube result size " << centroidPoints.size() << std::endl;
-      }
 
-      // resolve points' ids to indexes in "points" vector
-      for (auto const &point : centroidPoints) {
-        // auto iter = std::find_if(points.begin(), points.end(), [=](Data *data) { return data->id == point; });
-        auto iter = idToIndexMap.find(point);
+    // resolve points' ids to indexes in "points" vector
+    for (auto const &point : centroidPoints) {
+      auto iter = idToIndexMap.find(point);
 
-        if (iter != idToIndexMap.end()) { // found id in "points" vector
-          // size_t index = iter - points.begin();
-          size_t index = iter->second;
-          if (assignedPoints[index] == false) { // point hasn't been assigned to a centroid yet
+      if (iter != idToIndexMap.end()) { // found id in "points" vector
+        size_t index = iter->second;
+        if (assignedPoints[index] == false) { // point hasn't been assigned to a centroid yet
+
+          points[index]->cluster = i;             // update cluster of point
+          centroids[i]->indexes.push_back(index); // add point to cluster
+          assignedPoints[index] = true;           // set point assignment to true
+
+          for (auto j = 0; j < dim; j++) // add point to the sum
+            centroids[i]->vecSum[j] += points[index]->vec[j];
+        } else { // point already assigned to a centroid, compare distances and choose min
+          double oldDistance = metric(centroids[points[index]->cluster]->vec, points[index]->vec);
+          double newDistance = metric(centroids[i]->vec, points[index]->vec);
+
+          if (newDistance < oldDistance) {
+            //centroids[]->indexes.erase(centroids[i]->indexes.begin() + index);
+            std::vector<int> vec = centroids[points[index]->cluster]->indexes; //remove index from old centroid
+            vec.erase(std::remove(vec.begin(), vec.end(), index), vec.end());
+
+            for (auto j = 0; j < dim; j++) // remove point from the sum of old cluster
+              centroids[i]->vecSum[j] -= points[index]->vec[j];
 
             points[index]->cluster = i;             // update cluster of point
-            centroids[i]->indexes.push_back(index); // add point to cluster
-            assignedPoints[index] = true;           // set point assignment to true
-          } else {                                  // point already assigned to a centroid, compare distances and choose min
-            double oldDistance = metric(centroids[points[index]->cluster]->vec, points[index]->vec);
-            double newDistance = metric(centroids[i]->vec, points[index]->vec);
-            if (newDistance < oldDistance) {
-
-              //centroids[]->indexes.erase(centroids[i]->indexes.begin() + index);          //remove index from old centroid
-              std::vector<int> vec = centroids[points[index]->cluster]->indexes;
-
-              vec.erase(std::remove(vec.begin(), vec.end(), index), vec.end());
-
-              points[index]->cluster = i;             // update cluster of point
-              centroids[i]->indexes.push_back(index); //add point to cluster
-            }
+            centroids[i]->indexes.push_back(index); //add point to cluster
           }
+        }
 
-          unassignedCounter--;
-        } else // point is a centroid, assignment to another centroid is invalid
-          continue;
-      }
-      if (unassignedCounter <= stopCondition || radius > 20000.0) {
-        ret = true; // stop iterations
-        break;
-      }
+        unassignedCounter--;
+      } else // point is a centroid, assignment to another centroid is invalid
+        continue;
     }
-
-    radius *= 2;
-    std::cout << "radius is " << radius << "\n";
   }
 
-  // for every unassigned point, compare its distances to all centroids
-  for (int i = 0; i < points.size(); i++) {
-    if (assignedPoints[i] == false) {
-      minDist = std::numeric_limits<double>::infinity();
-      int centroidIndex;
-      for (int j = 0; j < centroids.size(); j++) {
-        double distance = metric(centroids[j]->vec, points[i]->vec);
-        if (distance < minDist) {
-          minDist = distance;
-          centroidIndex = j;
-        }
-      }
-      points[i]->cluster = centroidIndex;             // update cluster of point
-      centroids[centroidIndex]->indexes.push_back(i); // add point to cluster
-    }
+  if (unassignedCounter == 0) {
+    ret = true; // stop iterations
+    return ret;
+  }
 
-    for (auto j = 0; j < dim; j++) // add point to the sum
-      centroids[points[i]->cluster]->vecSum[j] += points[i]->vec[j];
+  if (unassignedCounter <= stopCondition) {
+    ret = true; // stop iterations
+
+    // for every unassigned point, compare its distances to all centroids
+    for (int i = 0; i < points.size(); i++) {
+      if (assignedPoints[i] == false) {
+        minDist = std::numeric_limits<double>::infinity();
+        int centroidIndex;
+        for (int j = 0; j < centroids.size(); j++) {
+          double distance = metric(centroids[j]->vec, points[i]->vec);
+          if (distance < minDist) {
+            minDist = distance;
+            centroidIndex = j;
+          }
+        }
+        points[i]->cluster = centroidIndex;             // update cluster of point
+        centroids[centroidIndex]->indexes.push_back(i); // add point to cluster
+      }
+    }
   }
 
   return ret;
@@ -486,10 +464,10 @@ int Cluster::begin(std::string &outputFile, std::string &inputFile, bool complet
       return -1;
     }
 
+    updateCentroid();
+
     if (flag)
       break;
-
-    updateCentroid();
   }
 
   auto end = std::chrono::high_resolution_clock::now();
@@ -498,7 +476,7 @@ int Cluster::begin(std::string &outputFile, std::string &inputFile, bool complet
   std::cout << "Iterations: " << i + 1 << "\n";
   std::cout << "Computing Silhouette... ";
 
-  //Silhouette(metric);
+  // Silhouette(metric);
 
   std::cout << "DONE\n";
 
