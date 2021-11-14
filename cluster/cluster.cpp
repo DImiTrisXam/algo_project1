@@ -42,7 +42,7 @@ int main(int argc, char const *argv[]) {
             << "number_of_probes: " << probes << "\n\n";
 
   Cluster cl = Cluster(K, method, iFile__);
-  cl.begin(oFile__, complete);
+  cl.begin(oFile__, iFile__, complete, L, k);
 
   return 0;
 }

@@ -94,7 +94,7 @@ std::vector<Neighbor> approximateKNN(Data &query, int k, HashTable **tables, int
   return b;
 }
 
-std::vector<std::string> approximateRangeSearch(Data &query, int r, HashTable **tables, int L) {
+std::vector<std::string> approximateRangeSearch(Data &query, double r, HashTable **tables, int L) {
   std::vector<std::string> rNeighbors;
 
   for (size_t i = 0; i < L; i++) { // for every table

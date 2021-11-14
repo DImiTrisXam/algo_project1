@@ -6,6 +6,6 @@
 
 std::vector<Neighbor> trueDistanceN(Data &, int, HashTable **, int);
 std::vector<Neighbor> approximateKNN(Data &, int, HashTable **, int);
-std::vector<std::string> approximateRangeSearch(Data &, int, HashTable **, int);
+std::vector<std::string> approximateRangeSearch(Data &, double, HashTable **, int);
 
 #endif

@@ -18,8 +18,8 @@ lsh: create_directories bin/lsh.o bin/lshSearch.o $(UTIL_OBJ_FILES)
 cube: create_directories bin/cube.o bin/cubeSearch.o $(UTIL_OBJ_FILES)
 	$(CPP) bin/cube.o bin/cubeSearch.o $(UTIL_OBJ_FILES) -o $(BUILD)/$@
 
-cluster: create_directories bin/cluster.o bin/clusteringMethods.o $(UTIL_OBJ_FILES)
-	$(CPP) bin/cluster.o bin/clusteringMethods.o $(UTIL_OBJ_FILES) -o $(BUILD)/$@
+cluster: create_directories bin/cluster.o bin/clusteringMethods.o bin/lshSearch.o $(UTIL_OBJ_FILES)
+	$(CPP) bin/cluster.o bin/clusteringMethods.o bin/lshSearch.o $(UTIL_OBJ_FILES) -o $(BUILD)/$@
 
 bin/lsh.o: lsh/lsh.cpp
 	$(CPP) $(CFLAGS) $< -o $@

@@ -22,12 +22,12 @@ class Cluster {
   int simpleInitialization();
   int kppInitialization();
   bool LloydsAssignment();
-  bool LSHAssignment();
+  bool LSHAssignment(std::string &, int, int );
   bool HypercubeAssignment();
   int updateCentroid();
 
 public:
-  int begin(std::string &, bool);
+  int begin(std::string &, std::string &, bool, int , int );
   Cluster(int, std::string, std::string &);
   ~Cluster();
 };
