@@ -263,8 +263,6 @@ bool Cluster::reverseAssignment(int iter, std::string &inputFile, int L, int k, 
       indexedPoints = indexPointsLSH(inputFile, L, k, w, dim, tableSize);
     } else if (method.compare("Hypercube") == 0) {
       int tableSize = pow(2, d);
-      // HashTable *tmp = indexPointsHypercube(inputFile, L, k, w, dim, tableSize);
-      // indexedPoints = &tmp;
       indexedPoints = indexPointsHypercube(inputFile, d, w, dim, tableSize);
     }
 
@@ -474,7 +472,7 @@ int Cluster::begin(std::string &outputFile, std::string &inputFile, bool complet
   std::cout << "Iterations: " << i + 1 << "\n";
   std::cout << "Computing Silhouette... ";
 
-  // Silhouette(metric);
+  Silhouette(metric);
 
   std::cout << "DONE\n";
 

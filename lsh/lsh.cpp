@@ -1,5 +1,5 @@
-#include "../utilities/utilities.hpp"
 #include "../utilities/metrics.hpp"
+#include "../utilities/utilities.hpp"
 #include "lshSearch.hpp"
 #include <fstream>
 #include <iostream>
@@ -48,47 +48,63 @@ int main(int argc, char const *argv[]) {
   readInputFile(iFile__, tables, L); // put the input in the hash tables
 
   std::ofstream ofile(oFile__);
+  std::string answer;
+  std::vector<Data *> *queries;
 
-  std::vector<Data *> *queries = readQueryFile(qFile__);
+  while (true) {
+    queries = readQueryFile(qFile__);
+    if (!queries) {
+      std::cout << "Invalid query file. Exiting program...\n";
+      break;
+    }
 
-  std::cout << "Printing to output file... ";
+    std::cout << "Printing to output file... ";
 
-  // search each query in the tables
-  for (const auto query : *queries) {
-    auto start = std::chrono::high_resolution_clock::now();
-    auto trueDistVec = trueDistanceN(*query, N, tables, L, euclidianDist);
-    auto end = std::chrono::high_resolution_clock::now();
+    // search each query in the tables
+    for (const auto query : *queries) {
+      auto start = std::chrono::high_resolution_clock::now();
+      auto trueDistVec = trueDistanceN(*query, N, tables, L, euclidianDist);
+      auto end = std::chrono::high_resolution_clock::now();
 
-    auto tTrue = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+      auto tTrue = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
 
-    // for (const auto &p : trueDistVec) {
-    //   std::cout << p.id << ", " << p.dist << "  ";
-    // }
-    // std::cout << "\n";
+      // for (const auto &p : trueDistVec) {
+      //   std::cout << p.id << ", " << p.dist << "  ";
+      // }
+      // std::cout << "\n";
 
-    // time approximateKNN function
-    start = std::chrono::high_resolution_clock::now();
-    auto knnVec = approximateKNN(*query, N, tables, L, euclidianDist);
-    end = std::chrono::high_resolution_clock::now();
+      // time approximateKNN function
+      start = std::chrono::high_resolution_clock::now();
+      auto knnVec = approximateKNN(*query, N, tables, L, euclidianDist);
+      end = std::chrono::high_resolution_clock::now();
 
-    auto tLSH = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+      auto tLSH = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
 
-    // for (const auto &p : knnVec) {
-    //   std::cout << p.id << ", " << p.dist << "  ";
-    // }
-    // std::cout << "\n";
+      // for (const auto &p : knnVec) {
+      //   std::cout << p.id << ", " << p.dist << "  ";
+      // }
+      // std::cout << "\n";
 
-    // approximateRangeSearch works
-    auto rVec = approximateRangeSearch(*query, R, tables, L, euclidianDist);
-    printOutputFile(ofile, "LSH", query->id, trueDistVec, knnVec, rVec, tLSH, tTrue);
+      // approximateRangeSearch
+      auto rVec = approximateRangeSearch(*query, R, tables, L, euclidianDist);
+      printOutputFile(ofile, "LSH", query->id, trueDistVec, knnVec, rVec, tLSH, tTrue);
+    }
+
+    for (const Data *data : *queries) {
+      delete data;
+    }
+    delete queries;
+
+    std::cout << "DONE\nPress X to terminate or Press Y to continue with new query file: ";
+    std::cin >> answer;
+    if (answer.compare("X") == 0)
+      break;
+    else if (answer.compare("Y") == 0) {
+      std::cout << "Enter path of new query file: ";
+      std::cin >> qFile__;
+    } else
+      break;
   }
-
-  std::cout << "DONE\n";
-
-  for (const Data *data : *queries) {
-    delete data;
-  }
-  delete queries;
 
   // release hash table memory
   for (size_t i = 0; i < L; i++)
