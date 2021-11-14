@@ -25,13 +25,13 @@ class Cluster {
   int simpleInitialization();
   int kppInitialization();
   bool LloydsAssignment();
-  bool LSHAssignment(std::string &, int, int );
+  bool LSHAssignment(std::string &, int, int);
   bool HypercubeAssignment();
   int updateCentroid();
-  int Silhouette()
+  int Silhouette();
 
 public:
-  int begin(std::string &, std::string &, bool, int , int );
+  int begin(std::string &, std::string &, bool, int, int);
   Cluster(int, std::string, std::string &);
   ~Cluster();
 };
