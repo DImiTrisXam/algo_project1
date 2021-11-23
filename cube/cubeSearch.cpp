@@ -150,17 +150,10 @@ std::vector<std::string> approximateRangeSearch(Data &query, int r, HashTable *c
   }
 
   int count = 0, currentProbes = 0;
-  // bool flag = false;
 
   for (int dist = 0; dist < d; dist++) {
-    // if (flag)
-    //   break;
     for (const auto &index : vertices[dist]) {
-      // if (flag)
-      //   break;
       if (currentProbes > probes) {
-        // flag = true;
-        // break;
         return rNeighbors;
       }
 
@@ -169,8 +162,6 @@ std::vector<std::string> approximateRangeSearch(Data &query, int r, HashTable *c
       for (const auto &p : buck) { // for each item in bucket
 
         if (count > M) {
-          // flag = true;
-          // break;
           return rNeighbors;
         }
 

@@ -28,9 +28,9 @@ int main(int argc, char const *argv[]) {
 
   parseCubeArgs(argc, argv, iFile__, qFile__, oFile__, k, N, R, M, probes);
 
-  std::cout << "iFile__: \"" << iFile__ << "\"\n"
-            << "qFile__: \"" << qFile__ << "\"\n"
-            << "oFile__: \"" << oFile__ << "\"\n"
+  std::cout << "Input file: \"" << iFile__ << "\"\n"
+            << "Query file: \"" << qFile__ << "\"\n"
+            << "Output file: \"" << oFile__ << "\"\n"
             << "k: " << k << "\n"
             << "M: " << M << "\n"
             << "probes: " << probes << "\n"
