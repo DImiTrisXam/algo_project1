@@ -9,7 +9,7 @@
 const unsigned int M = UINT_MAX - 4;
 const double inf = std::numeric_limits<double>::infinity();
 
-int mod(int a, unsigned int b) {
+unsigned int mod(int a, unsigned int b) {
   if (a > 0)
     return a % b;
   else
@@ -124,8 +124,8 @@ void HashTable::generateHashFunctions(int k, int w, int pSize) {
 /*
 * Calls all 'hashFunctions' and combines the results.
 */
-int HashTable::ID(std::vector<float> &p) const {
-  int sum = 0;
+unsigned int HashTable::ID(std::vector<float> &p) const {
+  unsigned int sum = 0;
   int i = 0;
 
   for (const auto &hashFunction : hashFunctions) {

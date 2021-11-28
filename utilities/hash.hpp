@@ -40,7 +40,7 @@ protected:
 private:
   std::vector<int> r; // used by gHash only
 
-  int ID(std::vector<float> &) const;
+  unsigned int ID(std::vector<float> &) const;
   void initr(int); // called once in constructor
   size_t gHash(std::vector<float> &) const;
 };
