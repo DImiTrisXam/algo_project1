@@ -109,7 +109,7 @@ void HashTable::generateHashFunctions(int k, int w, int pSize) {
     int t = distU(generator); // pick t from uniform distribution
 
     hashFunctions.push_front([=](std::vector<float> &vec) { // lambda captures "whatever needed" by value
-      return (size_t)floor((dotProduct(vec, v) + t) / (float)w);
+      return (int)floor((dotProduct(vec, v) + t) / (float)w);
     });
   }
 }
@@ -122,10 +122,10 @@ int HashTable::ID(std::vector<float> &p) const {
   int i = 0;
 
   for (const auto &hashFunction : hashFunctions) {
-    sum += r[i++] * hashFunction(p);
+    sum += abs((r[i++] * hashFunction(p)) % M); // (r_k * h_k(p)) mod M
   }
 
-  return abs(sum % M);
+  return sum % M;
 }
 
 void HashTable::initr(int pSize) {
