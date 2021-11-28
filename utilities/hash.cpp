@@ -122,7 +122,7 @@ int HashTable::ID(std::vector<float> &p) const {
   int i = 0;
 
   for (const auto &hashFunction : hashFunctions) {
-    sum += abs((r[i++] * hashFunction(p)) % M); // (r_k * h_k(p)) mod M
+    sum += abs(r[i++] * hashFunction(p)) % M; // (r_k * h_k(p)) mod M
   }
 
   return sum % M;
