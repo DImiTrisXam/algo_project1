@@ -9,6 +9,13 @@
 const unsigned int M = UINT_MAX - 4;
 const double inf = std::numeric_limits<double>::infinity();
 
+int mod(int a, unsigned int b) {
+  if (a > 0)
+    return a % b;
+  else
+    return b - (-a % b);
+}
+
 float dotProduct(const std::vector<float> &x, const std::vector<float> &y) {
   float product = 0;
 
@@ -122,7 +129,7 @@ int HashTable::ID(std::vector<float> &p) const {
   int i = 0;
 
   for (const auto &hashFunction : hashFunctions) {
-    sum += abs(r[i++] * hashFunction(p)) % M; // (r_k * h_k(p)) mod M
+    sum += mod(r[i++] * hashFunction(p), M); // (r_k * h_k(p)) mod M
   }
 
   return sum % M;
