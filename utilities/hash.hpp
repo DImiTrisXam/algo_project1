@@ -33,14 +33,14 @@ protected:
   const unsigned int size;
   std::list<Data *> *table; // array of lists
   unsigned int containedItems = 0;
-  std::list<std::function<size_t(std::vector<float> &)>> hashFunctions;
+  std::list<std::function<int(std::vector<float> &)>> hashFunctions;
 
   void generateHashFunctions(int, int, int); // called once in constructor
 
 private:
-  std::vector<float> r; // used by gHash only
+  std::vector<int> r; // used by gHash only
 
-  int ID(std::vector<float> &) const;
+  unsigned int ID(std::vector<float> &) const;
   void initr(int); // called once in constructor
   size_t gHash(std::vector<float> &) const;
 };

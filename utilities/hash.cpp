@@ -9,6 +9,13 @@
 const unsigned int M = UINT_MAX - 4;
 const double inf = std::numeric_limits<double>::infinity();
 
+unsigned int mod(int a, unsigned int b) {
+  if (a > 0)
+    return a % b;
+  else
+    return b - (-a % b);
+}
+
 float dotProduct(const std::vector<float> &x, const std::vector<float> &y) {
   float product = 0;
 
@@ -109,7 +116,7 @@ void HashTable::generateHashFunctions(int k, int w, int pSize) {
     int t = distU(generator); // pick t from uniform distribution
 
     hashFunctions.push_front([=](std::vector<float> &vec) { // lambda captures "whatever needed" by value
-      return (size_t)floor((dotProduct(vec, v) + t) / (float)w);
+      return (int)floor((dotProduct(vec, v) + t) / (float)w);
     });
   }
 }
@@ -117,15 +124,15 @@ void HashTable::generateHashFunctions(int k, int w, int pSize) {
 /*
 * Calls all 'hashFunctions' and combines the results.
 */
-int HashTable::ID(std::vector<float> &p) const {
-  int sum = 0;
+unsigned int HashTable::ID(std::vector<float> &p) const {
+  unsigned int sum = 0;
   int i = 0;
 
   for (const auto &hashFunction : hashFunctions) {
-    sum += r[i++] * hashFunction(p);
+    sum += mod(r[i++] * hashFunction(p), M); // (r_k * h_k(p)) mod M
   }
 
-  return abs(sum % M);
+  return sum % M;
 }
 
 void HashTable::initr(int pSize) {
