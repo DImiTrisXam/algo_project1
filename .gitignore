@@ -1,10 +1,11 @@
-.clang-format
 .vscode/*
 workspace.code-workspace
-datasets/*
-bin
-build
-output*
+
+project*/.clang-format
+project*/datasets/*
+project*/bin
+project*/build
+project*/output*
 
 # Prerequisites
 *.d
