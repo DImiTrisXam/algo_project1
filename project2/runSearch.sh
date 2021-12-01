@@ -1,1 +1,1 @@
-clear && make search -s && ./build/search -i  datasets/nasdaq2015_2017.csv -q test_query -o outputSearch.txt -k 15 -L 7 -M 1000 -probes 2 -algorithm LSH -metric discrete
+clear && make search -s && ./build/search -i datasets/nasdaq2017_LQ.csv -q test_query -o outputSearch.txt -k 15 -L 7 -M 1000 -probes 2 -algorithm LSH -metric discrete
