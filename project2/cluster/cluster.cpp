@@ -20,16 +20,19 @@ int main(int argc, char const *argv[]) {
   std::string iFile__; // input file name
   std::string cFile__; // configuration file name
   std::string oFile__; // output file name
-  bool complete;
-  std::string method; // type of method (Classic, LSH or Hypercube)
+  bool complete, silhouette;
+  std::string update;     // type of update method (Mean Frechet or Mean Vector)
+  std::string assignment; // type of assignment method (Classic, LSH, Hypercube, LSH_Frechet)
 
-  parseClusterArgs(argc, argv, iFile__, oFile__, cFile__, complete, method);
+  parseClusterArgs(argc, argv, iFile__, oFile__, cFile__, update, assignment, complete, silhouette);
 
   std::cout << "Input file: \"" << iFile__ << "\"\n"
             << "Config file: \"" << cFile__ << "\"\n"
             << "Output file: \"" << oFile__ << "\"\n"
+            << "update: " << update << "\n"
+            << "assignment: " << assignment << "\n"
             << "complete: " << complete << "\n"
-            << "method: " << method << "\n\n";
+            << "silhouette: " << silhouette << "\n\n";
 
   int K = -1, L = -1, k = -1, M = -1, d = -1, probes = -1;
 
@@ -42,7 +45,7 @@ int main(int argc, char const *argv[]) {
             << "number_of_hypercube_dimensions: " << d << "\n"
             << "number_of_probes: " << probes << "\n\n";
 
-  Cluster cl = Cluster(K, method, iFile__);
+  Cluster cl = Cluster(K, assignment, iFile__);
   cl.begin(oFile__, iFile__, complete, L, k, M, d, probes, euclidianDist);
 
   return 0;

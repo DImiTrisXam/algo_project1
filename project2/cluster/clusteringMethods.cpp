@@ -1,6 +1,6 @@
 #include "clusteringMethods.hpp"
-#include "../cube/cubeSearch.hpp"
-#include "../lsh/lshSearch.hpp"
+#include "../search/cubeSearch.hpp"
+#include "../search/lshSearch.hpp"
 #include "../utilities/metrics.hpp"
 #include "../utilities/utilities.hpp"
 #include <algorithm>
