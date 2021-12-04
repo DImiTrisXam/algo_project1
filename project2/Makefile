@@ -28,7 +28,7 @@ create_directories:
 search: create_directories $(SEARCH_OBJ_FILES) $(UTIL_OBJ_FILES)
 	$(CPP) $(SEARCH_OBJ_FILES) $(UTIL_OBJ_FILES) -o $(BUILD)/$@
 
-cluster: create_directories $(CLUSTER_DEPENDS)  $(UTIL_OBJ_FILES)
+cluster: create_directories $(CLUSTER_DEPENDS) $(UTIL_OBJ_FILES)
 	$(CPP) $(CLUSTER_DEPENDS) $(UTIL_OBJ_FILES) -o $(BUILD)/$@
 
 $(BIN)/%.o: $(UTIL_DIR)/%.cpp $(UTIL_DIR)/%.hpp
@@ -40,7 +40,10 @@ $(BIN)/%.o: $(SEARCH_DIR)/%.cpp $(SEARCH_INC_FILES)
 $(BIN)/%.o: $(CLUSTER_DIR)/%.cpp $(CLUSTER_INC_FILES)
 	$(CPP) $(CFLAGS) $< -o $@
 
+test: create_directories test.cpp $(UTIL_OBJ_FILES)
+	$(CPP) test.cpp $(UTIL_OBJ_FILES) -o test
+
 .PHONY: clean
 
 clean:
-	rm -r -f $(BIN) $(BUILD) output*
+	rm -r -f $(BIN) $(BUILD) output* test
