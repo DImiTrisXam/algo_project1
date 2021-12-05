@@ -41,9 +41,8 @@ int main(int argc, char const *argv[]) {
 
   auto **tables = new HashTable *[L];
 
-  for (size_t i = 0; i < L; i++) {
+  for (auto i = 0; i < L; i++)
     tables[i] = new HashTable(k, w, dim, tableSize);
-  }
 
   readInputFile(iFile__, tables, L); // put the input in the hash tables
 
@@ -53,6 +52,7 @@ int main(int argc, char const *argv[]) {
 
   while (true) {
     queries = readQueryFile(qFile__);
+
     if (!queries) {
       std::cout << "Invalid query file. Exiting program...\n";
       break;
@@ -68,11 +68,6 @@ int main(int argc, char const *argv[]) {
 
       auto tTrue = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
 
-      // for (const auto &p : trueDistVec) {
-      //   std::cout << p.id << ", " << p.dist << "  ";
-      // }
-      // std::cout << "\n";
-
       // time approximateKNN function
       start = std::chrono::high_resolution_clock::now();
       auto knnVec = approximateKNN(*query, N, tables, L, euclidianDist);
@@ -80,23 +75,18 @@ int main(int argc, char const *argv[]) {
 
       auto tLSH = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
 
-      // for (const auto &p : knnVec) {
-      //   std::cout << p.id << ", " << p.dist << "  ";
-      // }
-      // std::cout << "\n";
-
       // approximateRangeSearch
       auto rVec = approximateRangeSearch(*query, R, tables, L, euclidianDist);
       printOutputFile(ofile, "LSH", query->id, trueDistVec, knnVec, rVec, tLSH, tTrue);
     }
 
-    for (const Data *data : *queries) {
+    for (const Data *data : *queries)
       delete data;
-    }
     delete queries;
 
     std::cout << "DONE\nPress X to terminate or Press Y to continue with new query file: ";
     std::cin >> answer;
+    
     if (answer.compare("X") == 0)
       break;
     else if (answer.compare("Y") == 0) {
@@ -107,7 +97,7 @@ int main(int argc, char const *argv[]) {
   }
 
   // release hash table memory
-  for (size_t i = 0; i < L; i++)
+  for (auto i = 0; i < L; i++)
     delete tables[i];
   delete[] tables;
 

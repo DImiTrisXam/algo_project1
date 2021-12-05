@@ -78,17 +78,16 @@ int main(int argc, char const *argv[]) {
 
       // approximateRangeSearch
       auto rVec = approximateRangeSearch(*query, R, cube, M, probes, k, euclidianDist);
-      //std::cout << "approximate range search for cube len: " << rVec.size() << "\n";
       printOutputFile(ofile, "Hypercube", query->id, trueDistVec, knnVec, rVec, tLSH, tTrue);
     }
-    
+
     for (const Data *data : *queries)
       delete data;
     delete queries;
 
     std::cout << "DONE\nPress X to terminate or Press Y to continue with new query file: ";
     std::cin >> answer;
-    
+
     if (answer.compare("X") == 0)
       break;
     else if (answer.compare("Y") == 0) {
