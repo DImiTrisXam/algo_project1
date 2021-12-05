@@ -1,6 +1,8 @@
 #include "../utilities/metrics.hpp"
 #include "../utilities/utilities.hpp"
+#include "cubeSearch.hpp"
 #include "lshSearch.hpp"
+#include <cmath>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -42,17 +44,25 @@ int main(int argc, char const *argv[]) {
 
   int dim = 0; // dimension of data
   int numOfInputs = readNumberOfLines(iFile__, dim);
-  int tableSize = numOfInputs / 8;
+  int tableSize;
   int w = 2; // window for hash table
+  HashTable **tables;
+  HashTable *cube;
 
-  // std::cout << dim << " " << numOfInputs;
+  if (algorithm.compare("LSH") == 0 || algorithm.compare("Frechet") == 0) {
+    tableSize = numOfInputs / 8;
+    tables = new HashTable *[L];
 
-  auto **tables = new HashTable *[L];
+    for (auto i = 0; i < L; i++)
+      tables[i] = new HashTable(k, w, dim, tableSize);
 
-  for (auto i = 0; i < L; i++)
-    tables[i] = new HashTable(k, w, dim, tableSize);
+    readInputFile(iFile__, tables, L); // put the input in the hash tables
+  } else if (algorithm.compare("Hypercube") == 0) {
+    tableSize = pow(2, k);
+    cube = (HashTable *)new Hypercube(k, w, dim, tableSize);
 
-  readInputFile(iFile__, tables, L); // put the input in the hash tables
+    readInputFile(iFile__, &cube, 1); // put the input in the hypercube
+  }
 
   std::ofstream ofile(oFile__);
   std::string answer;
@@ -60,7 +70,7 @@ int main(int argc, char const *argv[]) {
 
   while (true) {
     queries = readQueryFile(qFile__);
-    
+
     if (!queries) {
       std::cout << "Invalid query file. Exiting program...\n";
       break;
@@ -70,25 +80,36 @@ int main(int argc, char const *argv[]) {
 
     // search each query in the tables
     for (const auto query : *queries) {
+      std::vector<Neighbor> trueDistVec;
+      std::vector<Neighbor> knnVec;
+
+      // time trueDistanceN function
       auto start = std::chrono::high_resolution_clock::now();
-      auto trueDistVec = trueDistanceN(*query, N, tables, L, euclidianDist);
+
+      if (algorithm.compare("LSH") == 0 || algorithm.compare("Frechet") == 0) {
+        trueDistVec = trueDistanceN(*query, N, tables, L, euclidianDist);
+      } else if (algorithm.compare("Hypercube") == 0) {
+        trueDistVec = trueDistanceN(*query, N, cube, euclidianDist);
+      }
+
       auto end = std::chrono::high_resolution_clock::now();
 
       auto tTrue = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
 
-      // for (const auto &p : trueDistVec) {
-      //   std::cout << p.id << ", " << p.dist << "  ";
-      // }
-      // std::cout << "\n";
-
       // time approximateKNN function
       start = std::chrono::high_resolution_clock::now();
-      auto knnVec = approximateKNN(*query, N, tables, L, euclidianDist);
+
+      if (algorithm.compare("LSH") == 0 || algorithm.compare("Frechet") == 0) {
+        knnVec = approximateKNN(*query, N, tables, L, euclidianDist);
+      } else if (algorithm.compare("Hypercube") == 0) {
+        knnVec = approximateKNN(*query, N, cube, M, probes, k, euclidianDist);
+      }
+
       end = std::chrono::high_resolution_clock::now();
 
       auto tLSH = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
 
-      printOutputFile(ofile, "LSH", query->id, trueDistVec, knnVec, tLSH, tTrue);
+      printOutputFile(ofile, algorithm, query->id, trueDistVec, knnVec, tLSH, tTrue);
     }
 
     for (const Data *data : *queries)
@@ -97,7 +118,7 @@ int main(int argc, char const *argv[]) {
 
     std::cout << "DONE\nPress X to terminate or Press Y to continue with new query file: ";
     std::cin >> answer;
-    
+
     if (answer.compare("X") == 0)
       break;
     else if (answer.compare("Y") == 0) {
@@ -107,10 +128,15 @@ int main(int argc, char const *argv[]) {
       break;
   }
 
-  // release hash table memory
-  for (auto i = 0; i < L; i++)
-    delete tables[i];
-  delete[] tables;
+  if (algorithm.compare("LSH") == 0 || algorithm.compare("Frechet") == 0) {
+    // release hash table memory
+    for (auto i = 0; i < L; i++)
+      delete tables[i];
+    delete[] tables;
+  } else if (algorithm.compare("Hypercube") == 0) {
+    // release hypercube memory
+    delete cube;
+  }
 
   return 0;
 }
