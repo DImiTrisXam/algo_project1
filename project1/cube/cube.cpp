@@ -1,6 +1,6 @@
 #include "../utilities/hypercube.hpp"
-#include "../utilities/utilities.hpp"
 #include "../utilities/metrics.hpp"
+#include "../utilities/utilities.hpp"
 #include "cubeSearch.hpp"
 #include <cmath>
 #include <fstream>
@@ -52,57 +52,52 @@ int main(int argc, char const *argv[]) {
   std::string answer;
   std::vector<Data *> *queries;
 
-  while (true){
+  while (true) {
     queries = readQueryFile(qFile__);
 
-    if (!queries){
-        std::cout << "Invalid query file. Exiting program...\n";
-        break; 
+    if (!queries) {
+      std::cout << "Invalid query file. Exiting program...\n";
+      break;
     }
 
     std::cout << "Printing to output file... ";
 
     for (const auto query : *queries) {
-        auto start = std::chrono::high_resolution_clock::now();
-        auto trueDistVec = trueDistanceN(*query, N, cube, euclidianDist);
-        auto end = std::chrono::high_resolution_clock::now();
+      auto start = std::chrono::high_resolution_clock::now();
+      auto trueDistVec = trueDistanceN(*query, N, cube, euclidianDist);
+      auto end = std::chrono::high_resolution_clock::now();
 
-        auto tTrue = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+      auto tTrue = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
 
-        // time approximateKNN function
-        start = std::chrono::high_resolution_clock::now();
-        auto knnVec = approximateKNN(*query, N, cube, M, probes, k, euclidianDist);
-        end = std::chrono::high_resolution_clock::now();
+      // time approximateKNN function
+      start = std::chrono::high_resolution_clock::now();
+      auto knnVec = approximateKNN(*query, N, cube, M, probes, k, euclidianDist);
+      end = std::chrono::high_resolution_clock::now();
 
-        auto tLSH = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+      auto tLSH = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
 
-
-        // approximateRangeSearch 
-        auto rVec = approximateRangeSearch(*query, R, cube, M, probes, k, euclidianDist);
-        //std::cout << "approximate range search for cube len: " << rVec.size() << "\n";
-        printOutputFile(ofile, "Hypercube", query->id, trueDistVec, knnVec, rVec, tLSH, tTrue);
-    
-        
-
+      // approximateRangeSearch
+      auto rVec = approximateRangeSearch(*query, R, cube, M, probes, k, euclidianDist);
+      //std::cout << "approximate range search for cube len: " << rVec.size() << "\n";
+      printOutputFile(ofile, "Hypercube", query->id, trueDistVec, knnVec, rVec, tLSH, tTrue);
     }
-    for (const Data *data : *queries) {
-            delete data;
-        }
-        delete queries;
+    
+    for (const Data *data : *queries)
+      delete data;
+    delete queries;
 
-        std::cout << "DONE\nPress X to terminate or Press Y to continue with new query file: ";
-        std::cin >> answer;
-        if (answer.compare("X") == 0)
-            break;
-        else if (answer.compare("Y") == 0){
-            std::cout << "Enter path of new query file: ";
-            std::cin >> qFile__;
-        }
-        else 
-            break;
-  
+    std::cout << "DONE\nPress X to terminate or Press Y to continue with new query file: ";
+    std::cin >> answer;
+    
+    if (answer.compare("X") == 0)
+      break;
+    else if (answer.compare("Y") == 0) {
+      std::cout << "Enter path of new query file: ";
+      std::cin >> qFile__;
+    } else
+      break;
   }
-  
+
   // release hypercube memory
   delete cube;
 

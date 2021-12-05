@@ -26,7 +26,7 @@ int main(int argc, char const *argv[]) {
   double delta = -1;
   std::string algorithm, metric;
 
-  parseSearchArgs(argc, argv, iFile__, oFile__,qFile__, algorithm, k, L, M, probes, metric, delta);
+  parseSearchArgs(argc, argv, iFile__, oFile__, qFile__, algorithm, k, L, M, probes, metric, delta);
 
   std::cout << "Input file: \"" << iFile__ << "\"\n"
             << "Query file: \"" << qFile__ << "\"\n"
@@ -45,13 +45,12 @@ int main(int argc, char const *argv[]) {
   int tableSize = numOfInputs / 8;
   int w = 2; // window for hash table
 
-//   std::cout << dim << " " << numOfInputs; 
+  // std::cout << dim << " " << numOfInputs;
 
   auto **tables = new HashTable *[L];
 
-  for (size_t i = 0; i < L; i++) {
+  for (auto i = 0; i < L; i++)
     tables[i] = new HashTable(k, w, dim, tableSize);
-  }
 
   readInputFile(iFile__, tables, L); // put the input in the hash tables
 
@@ -61,6 +60,7 @@ int main(int argc, char const *argv[]) {
 
   while (true) {
     queries = readQueryFile(qFile__);
+    
     if (!queries) {
       std::cout << "Invalid query file. Exiting program...\n";
       break;
@@ -91,13 +91,13 @@ int main(int argc, char const *argv[]) {
       printOutputFile(ofile, "LSH", query->id, trueDistVec, knnVec, tLSH, tTrue);
     }
 
-    for (const Data *data : *queries) {
+    for (const Data *data : *queries)
       delete data;
-    }
     delete queries;
 
     std::cout << "DONE\nPress X to terminate or Press Y to continue with new query file: ";
     std::cin >> answer;
+    
     if (answer.compare("X") == 0)
       break;
     else if (answer.compare("Y") == 0) {
@@ -108,7 +108,7 @@ int main(int argc, char const *argv[]) {
   }
 
   // release hash table memory
-  for (size_t i = 0; i < L; i++)
+  for (auto i = 0; i < L; i++)
     delete tables[i];
   delete[] tables;
 
