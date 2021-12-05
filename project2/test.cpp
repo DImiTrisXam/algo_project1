@@ -1,7 +1,9 @@
 #include "./utilities/metrics.hpp"
 #include <chrono>
+#include <fstream>
 #include <iostream>
 #include <random>
+#include <string>
 
 int main(int argc, char const *argv[]) {
   std::vector<float> vec1, vec2;
@@ -26,6 +28,16 @@ int main(int argc, char const *argv[]) {
   auto dist = discreteFrechetDist(c1, c2);
 
   std::cout << "dist: " << dist << '\n';
+
+  // std::ofstream file("test_query_730");
+
+  // for (auto i = 0; i < 5; i++) {
+  //   file << "id_" + std::to_string(i + 1) + "\t";
+  //   for (auto j = 0; j < size; j++) {
+  //     file << distribution(generator) << "\t";
+  //   }
+  //   file << "\n";
+  // }
 
   return 0;
 }
