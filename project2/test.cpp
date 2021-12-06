@@ -1,4 +1,5 @@
 #include "./utilities/metrics.hpp"
+#include "./utilities/grid.hpp"
 #include <chrono>
 #include <fstream>
 #include <iostream>
@@ -8,11 +9,11 @@
 int main(int argc, char const *argv[]) {
   std::vector<float> vec1, vec2;
   std::vector<int> tVec;
-  int size = 730;
+  int size = 120;
 
   unsigned seed = std::chrono::steady_clock::now().time_since_epoch().count();
   // std::default_random_engine generator(seed);
-  std::default_random_engine generator(730);
+  std::default_random_engine generator(120);
 
   std::uniform_real_distribution<float> distribution(0, 100);
 
@@ -27,17 +28,22 @@ int main(int argc, char const *argv[]) {
 
   auto dist = discreteFrechetDist(c1, c2);
 
-  std::cout << "dist: " << dist << '\n';
+  std::cout << "dist: " << dist << "\n\n";
 
-  // std::ofstream file("test_query_730");
+  double delta = 2;
 
-  // for (auto i = 0; i < 5; i++) {
-  //   file << "id_" + std::to_string(i + 1) + "\t";
-  //   for (auto j = 0; j < size; j++) {
-  //     file << distribution(generator) << "\t";
-  //   }
-  //   file << "\n";
-  // }
+  Grid grid(delta);
+
+  // snap curves
+  grid.snapTo2DGrid(c1);
+  grid.snapTo2DGrid(c2);
+
+  std::cout << "c1 size after snapping: " << c1.gxVec.size() << "\n\n";
+  c1.printGridCurve();
+  // std::cout << "c2 size after snapping: " << c2.gxVec.size() << "\n\n";
+  // c2.printGridCurve();
+
+  
 
   return 0;
 }
