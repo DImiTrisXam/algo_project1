@@ -50,5 +50,11 @@ int main(int argc, char const *argv[]) {
   // std::cout << "c2 size after padding: " << c2.gxVec.size() << "\n\n";
   // c2.printGridCurve();
 
+  // LSH vector key
+  c1.collapseGridToVector();
+  c1.printKey();
+  // c2.collapseGridToVector();
+  // c2.printKey();
+
   return 0;
 }

@@ -14,6 +14,13 @@ void Curve::padding() {
   }
 }
 
+void Curve::collapseGridToVector() {
+  for (auto i = 0; i < gxVec.size(); i++) {
+    key.push_back(gxVec[i]);
+    key.push_back(gyVec[i]);
+  }
+}
+
 void Curve::PRINT() const {
   std::cerr << "Id: '" << id << "', ";
   for (auto i = 0; i < vec.size(); i++)
@@ -25,5 +32,12 @@ void Curve::printGridCurve() {
   std::cerr << "Id: '" << id << "', ";
   for (auto i = 0; i < vec.size(); i++)
     std::cerr << "(" << gxVec[i] << ", " << gyVec[i] << ") ";
+  std::cerr << "\n";
+}
+
+void Curve::printKey() {
+  std::cerr << "Id: '" << id << "', ";
+  for (auto i = 0; i < key.size(); i++)
+    std::cerr << key[i] << " ";
   std::cerr << "\n";
 }
