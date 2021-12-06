@@ -36,14 +36,19 @@ int main(int argc, char const *argv[]) {
 
   // snap curves
   grid.snapTo2DGrid(c1);
-  grid.snapTo2DGrid(c2);
+  // grid.snapTo2DGrid(c2);
 
   std::cout << "c1 size after snapping: " << c1.gxVec.size() << "\n\n";
-  c1.printGridCurve();
+  // c1.printGridCurve();
   // std::cout << "c2 size after snapping: " << c2.gxVec.size() << "\n\n";
   // c2.printGridCurve();
 
-  
+  c1.padding();
+  std::cout << "c1 size after padding: " << c1.gxVec.size() << "\n\n";
+  c1.printGridCurve();
+  // c2.padding();
+  // std::cout << "c2 size after padding: " << c2.gxVec.size() << "\n\n";
+  // c2.printGridCurve();
 
   return 0;
 }

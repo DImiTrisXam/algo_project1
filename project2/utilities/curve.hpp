@@ -10,6 +10,7 @@ public:
   std::vector<double> gyVec; // grid vector (y-axis)
 
   Curve(std::vector<float>, std::vector<int>, std::string);
+  void padding();
   virtual void PRINT() const; /* DEBUG ONLY */
   void printGridCurve(); /* DEBUG ONLY */
 };
