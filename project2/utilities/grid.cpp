@@ -16,7 +16,7 @@ Grid::Grid(double delta_) : delta(delta_) {
 int Grid::snapTo1DGrid(Curve &c) {
   // snap curve to 1D grid
   for (auto i = 0; i < c.vec.size(); i++) {
-    c.gyVec.push_back(round((c.vec[i] - t) / delta) * delta - t);
+    c.gyVec.push_back(round(c.vec[i] / delta) * delta);
   }
 
   return 0;
