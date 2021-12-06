@@ -35,17 +35,17 @@ int main(int argc, char const *argv[]) {
   Grid grid(delta);
 
   // snap curves
-  grid.snapTo2DGrid(c1);
+  // grid.snapTo2DGrid(c1);
   // grid.snapTo2DGrid(c2);
 
-  std::cout << "c1 size after snapping: " << c1.gxVec.size() << "\n\n";
+  // std::cout << "c1 size after snapping: " << c1.gxVec.size() << "\n\n";
   // c1.printGridCurve();
   // std::cout << "c2 size after snapping: " << c2.gxVec.size() << "\n\n";
   // c2.printGridCurve();
 
-  c1.padding();
-  std::cout << "c1 size after padding: " << c1.gxVec.size() << "\n\n";
-  c1.printGridCurve();
+  // c1.padding();
+  // std::cout << "c1 size after padding: " << c1.gxVec.size() << "\n\n";
+  // c1.printGridCurve();
   // c2.padding();
   // std::cout << "c2 size after padding: " << c2.gxVec.size() << "\n\n";
   // c2.printGridCurve();
@@ -56,11 +56,16 @@ int main(int argc, char const *argv[]) {
   // c2.collapseGridToVector();
   // c2.printKey();
 
+  // snap curves
+  grid.snapTo1DGrid(c1);
+  // grid.snapTo1DGrid(c2);
+
   // LSH vector key for 1D grid
   c1.getMinimaMaxima();
   std::cout << "c1 key size: " << c1.key.size() << "\n\n";
   c1.printKey();
   // c2.collapseGridToVector();
+  // std::cout << "c2 key size: " << c2.key.size() << "\n\n";
   // c2.printKey();
 
   return 0;
