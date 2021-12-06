@@ -13,6 +13,7 @@ public:
   Curve(std::vector<float>, std::vector<int>, std::string);
   void padding();
   void collapseGridToVector();
+  void getMinimaMaxima();
   virtual void PRINT() const; /* DEBUG ONLY */
   void printGridCurve();      /* DEBUG ONLY */
   void printKey();            /* DEBUG ONLY */

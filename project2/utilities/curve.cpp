@@ -1,4 +1,5 @@
 #include "curve.hpp"
+#include <algorithm>
 #include <iostream>
 #include <limits>
 
@@ -19,6 +20,21 @@ void Curve::collapseGridToVector() {
     key.push_back(gxVec[i]);
     key.push_back(gyVec[i]);
   }
+}
+
+void Curve::getMinimaMaxima() {
+  std::vector<double> temp;
+
+  temp.push_back(vec[0]);
+
+  for (int i = 1; i < gyVec.size() - 1; i++) {
+    if (vec[i] != std::min(vec[i - 1], vec[i + 1]) && vec[i] != std::max(vec[i - 1], vec[i + 1]))
+      temp.push_back(vec[i]);
+  }
+
+  temp.push_back(vec[vec.size() - 1]);
+
+  key = temp;
 }
 
 void Curve::PRINT() const {

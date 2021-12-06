@@ -50,8 +50,15 @@ int main(int argc, char const *argv[]) {
   // std::cout << "c2 size after padding: " << c2.gxVec.size() << "\n\n";
   // c2.printGridCurve();
 
-  // LSH vector key
-  c1.collapseGridToVector();
+  // LSH vector key for 2D grid
+  // c1.collapseGridToVector();
+  // c1.printKey();
+  // c2.collapseGridToVector();
+  // c2.printKey();
+
+  // LSH vector key for 1D grid
+  c1.getMinimaMaxima();
+  std::cout << "c1 key size: " << c1.key.size() << "\n\n";
   c1.printKey();
   // c2.collapseGridToVector();
   // c2.printKey();
