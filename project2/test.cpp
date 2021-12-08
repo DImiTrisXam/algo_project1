@@ -27,10 +27,6 @@ int main(int argc, char const *argv[]) {
   Curve c2(vec2, tVec, "id2");
 
   auto dist = discreteFrechetDist(c1, c2);
-
-  std::cout << "dist: " << dist << "\n\n";
-
-  dist = discreteFrechetDistIter(c1, c2);
   
   std::cout << "dist: " << dist << "\n\n";
 
