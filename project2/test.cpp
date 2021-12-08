@@ -1,5 +1,5 @@
-#include "./utilities/metrics.hpp"
 #include "./utilities/grid.hpp"
+#include "./utilities/metrics.hpp"
 #include <chrono>
 #include <fstream>
 #include <iostream>
@@ -9,11 +9,11 @@
 int main(int argc, char const *argv[]) {
   std::vector<float> vec1, vec2;
   std::vector<int> tVec;
-  int size = 120;
+  int size = 730;
 
   unsigned seed = std::chrono::steady_clock::now().time_since_epoch().count();
   // std::default_random_engine generator(seed);
-  std::default_random_engine generator(120);
+  std::default_random_engine generator(730);
 
   std::uniform_real_distribution<float> distribution(0, 100);
 
@@ -30,9 +30,13 @@ int main(int argc, char const *argv[]) {
 
   std::cout << "dist: " << dist << "\n\n";
 
-  double delta = 2;
+  dist = discreteFrechetDistIter(c1, c2);
+  
+  std::cout << "dist: " << dist << "\n\n";
 
-  Grid grid(delta);
+  // double delta = 2;
+
+  // Grid grid(delta);
 
   // snap curves
   // grid.snapTo2DGrid(c1);
@@ -57,13 +61,13 @@ int main(int argc, char const *argv[]) {
   // c2.printKey();
 
   // snap curves
-  grid.snapTo1DGrid(c1);
+  // grid.snapTo1DGrid(c1);
   // grid.snapTo1DGrid(c2);
 
   // LSH vector key for 1D grid
-  c1.getMinimaMaxima();
-  std::cout << "c1 key size: " << c1.key.size() << "\n\n";
-  c1.printKey();
+  // c1.getMinimaMaxima();
+  // std::cout << "c1 key size: " << c1.key.size() << "\n\n";
+  // c1.printKey();
   // c2.collapseGridToVector();
   // std::cout << "c2 key size: " << c2.key.size() << "\n\n";
   // c2.printKey();

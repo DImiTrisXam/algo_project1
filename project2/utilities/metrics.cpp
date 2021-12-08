@@ -92,7 +92,7 @@ double discreteFrechetDist(const Curve &x, const Curve &y) {
 
   auto distArray = new double[m1 * m2]; // array for dynamic programming
 
-  for (auto i = 0; i < m1; ++i) // initialize array
+  for (auto i = 0; i < m1 * m2; ++i) // initialize array
     distArray[i] = -1.0;
 
   std::vector<float> x_1{(float)x.tVec[0], x.vec[0]}; // first element of Curve x
@@ -103,6 +103,64 @@ double discreteFrechetDist(const Curve &x, const Curve &y) {
   // std::cout << "dist[0][0]: " << distArray[0] << '\n';
 
   auto res = discreteFrechetDistRec(distArray, x, y, m1 - 1, m2 - 1); // call recursively
+
+  delete[] distArray;
+
+  return res;
+}
+
+double discreteFrechetDistIter(const Curve &x, const Curve &y) {
+  auto m1 = x.vec.size();
+  auto m2 = y.vec.size();
+
+  auto distArray = new double[m1 * m2]; // array for dynamic programming
+
+  std::vector<float> x_1{(float)x.tVec[0], x.vec[0]}; // first element of Curve x
+  std::vector<float> y_1{(float)y.tVec[0], y.vec[0]}; // first element of Curve y
+
+  distArray[0] = euclidianDist(x_1, y_1); // compute distArray[0][0]
+
+  // std::cout << "dist[0][0]: " << distArray[0] << '\n';
+
+  for (auto i = 0, j = 1; j < m2; ++j) {                // compute first row
+    std::vector<float> x_1{(float)x.tVec[0], x.vec[0]}; // first element of Curve x
+    std::vector<float> y_j{(float)y.tVec[j], y.vec[j]}; // j-th element of Curve y
+
+    // distArray[0 + m1 * j] = distArray[0][j]
+    distArray[m1 * j] = std::max(distArray[m1 * (j - 1)], euclidianDist(x_1, y_j));
+  }
+
+  for (auto i = 0, j = 0; i < m1; ++i) {                // compute first column
+    std::vector<float> x_i{(float)x.tVec[i], x.vec[i]}; // i-th element of Curve x
+    std::vector<float> y_1{(float)y.tVec[0], y.vec[0]}; // first element of Curve y
+
+    // distArray[i] = distArray[i][0]
+    distArray[i] = std::max(distArray[i - 1], euclidianDist(x_i, y_1));
+  }
+
+  for (auto i = 1; i < m1; ++i) { // compute the rest of matrix
+    for (auto j = 1; j < m2; ++j) {
+      // std::cout << "i: " << i << ",j: " << j << '\n';
+
+      std::vector<float> x_i{(float)x.tVec[i], x.vec[i]}; // i-th element of Curve x
+      std::vector<float> y_j{(float)y.tVec[j], y.vec[j]}; // j-th element of Curve y
+
+      // see if distance has already been computed
+      // distArray[i - 1 + m1 * j] = distArray[i-1][j]
+      auto d1 = distArray[i - 1 + m1 * j];
+      // distArray[i - 1 + m1 * (j - 1)] = distArray[i-1][j-1]
+      auto d2 = distArray[i - 1 + m1 * (j - 1)];
+      // distArray[i + m1 * (j - 1)] = distArray[i][j-1]
+      auto d3 = distArray[i + m1 * (j - 1)];
+
+      double min = std::min(d1, std::min(d2, d3));
+
+      // distArray[i + m1 * j] = distArray[i][j]
+      distArray[i + m1 * j] = std::max(min, euclidianDist(x_i, y_j));
+    }
+  }
+
+  auto res = distArray[m1 * m2 - 1];
 
   delete[] distArray;
 
