@@ -1,5 +1,6 @@
 #include "./utilities/grid.hpp"
 #include "./utilities/metrics.hpp"
+#include "./utilities/hash.hpp"
 #include <chrono>
 #include <fstream>
 #include <iostream>
@@ -9,7 +10,8 @@
 int main(int argc, char const *argv[]) {
   std::vector<float> vec1, vec2;
   std::vector<int> tVec;
-  int size = 730;
+  int size = 120;
+  HashTable table(14, 2, 120, 10);
 
   unsigned seed = std::chrono::steady_clock::now().time_since_epoch().count();
   // std::default_random_engine generator(seed);
@@ -30,12 +32,31 @@ int main(int argc, char const *argv[]) {
   
   std::cout << "dist: " << dist << "\n\n";
 
-  // double delta = 2;
+  float averageVariation = 0;
 
-  // Grid grid(delta);
+  for (auto i = 0; i < size-1; i++) {
+    averageVariation += abs(c1.vec[i+1] - c1.vec[i]);
+  }
+
+  averageVariation = averageVariation / size;
+
+  float epsilon = (averageVariation * 160) / 100;
+
+  std::cout << "averageVariation: " << epsilon << "\n\n";
+
+//   c1.filter(epsilon);
+
+//   std::cout << "c1 size after filtering: " << c1.vec.size() << "\n\n";
+
+//   c1.PRINT();
+  
+
+  double delta = 0.1;
+
+  Grid grid(delta);
 
   // snap curves
-  // grid.snapTo2DGrid(c1);
+  grid.snapTo2DGrid(c1);
   // grid.snapTo2DGrid(c2);
 
   // std::cout << "c1 size after snapping: " << c1.gxVec.size() << "\n\n";
@@ -43,7 +64,7 @@ int main(int argc, char const *argv[]) {
   // std::cout << "c2 size after snapping: " << c2.gxVec.size() << "\n\n";
   // c2.printGridCurve();
 
-  // c1.padding();
+  c1.padding();
   // std::cout << "c1 size after padding: " << c1.gxVec.size() << "\n\n";
   // c1.printGridCurve();
   // c2.padding();
@@ -51,8 +72,8 @@ int main(int argc, char const *argv[]) {
   // c2.printGridCurve();
 
   // LSH vector key for 2D grid
-  // c1.collapseGridToVector();
-  // c1.printKey();
+  c1.collapseGridToVector();
+  c1.printKey();
   // c2.collapseGridToVector();
   // c2.printKey();
 
@@ -68,5 +89,10 @@ int main(int argc, char const *argv[]) {
   // std::cout << "c2 key size: " << c2.key.size() << "\n\n";
   // c2.printKey();
 
+  // add curve to table
+  table.add(c1.vec, c1.key, c1.id);
+
+  table.PRINT();
+  
   return 0;
 }

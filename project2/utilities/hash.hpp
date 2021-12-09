@@ -21,6 +21,7 @@ public:
   HashTable(int k, int w, int pSize, unsigned int tableSize = 509);
   ~HashTable();
   virtual void add(std::vector<float> &, std::string &);
+  virtual void add(std::vector<float> &, std::vector<float> &, std::string &);
   bool isEmpty() const;
   unsigned int getCurrentSize() const;
   void eraseAll();

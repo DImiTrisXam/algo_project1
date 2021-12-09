@@ -64,6 +64,15 @@ void HashTable::add(std::vector<float> &vec, std::string &id) {
   containedItems++;
 }
 
+void HashTable::add(std::vector<float> &vec, std::vector<float> &key, std::string &id) {
+  auto newData = new Data(vec, id);
+  if (!newData) // out of heap
+    throw "Unable to insert element with id: '" + id + "' in hashtable. Out of heap memory.";
+  auto index = gHash(key);
+  table[index].push_front(newData);
+  containedItems++;
+}
+
 /*
 * @return: true only if the hashtable is empty.
 */

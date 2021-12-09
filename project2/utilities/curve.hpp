@@ -6,11 +6,12 @@
 class Curve : public Data {
 public:
   std::vector<int> tVec;     // time vector
-  std::vector<double> gxVec; // grid vector (x-axis)
-  std::vector<double> gyVec; // grid vector (y-axis)
-  std::vector<double> key;   // LSH key
+  std::vector<float> gxVec; // grid vector (x-axis)
+  std::vector<float> gyVec; // grid vector (y-axis)
+  std::vector<float> key;   // LSH key
 
   Curve(std::vector<float>, std::vector<int>, std::string);
+  void filter(float);
   void padding();
   void collapseGridToVector();
   void getMinimaMaxima();
