@@ -1,5 +1,8 @@
 #include "utilities.hpp"
+#include "curve.hpp"
+#include "grid.hpp"
 #include <cstdlib>
+#include <cmath>
 #include <cstring>
 #include <fstream>
 #include <iostream>
@@ -213,7 +216,7 @@ int readNumberOfLines(std::string name, int &dim) {
   return lines;
 }
 
-int readInputFile(std::string &name, HashTable **tables, int L) {
+int readInputFile(std::string &name, HashTable **tables, int L, std::string &algorithm, std::string &metric, double delta) {
   std::ifstream file(name);
   std::string line;
 
@@ -224,17 +227,58 @@ int readInputFile(std::string &name, HashTable **tables, int L) {
 
     std::string id;
     std::vector<float> vec;
+    std::vector<int> tVec;
     float temp;
 
     ss >> id;
 
     // std::cout << "id: " << id << "\n";
 
-    while (ss >> temp)
-      vec.push_back(temp);
+    if (algorithm.compare("LSH") == 0 || algorithm.compare("Hypercube") == 0) {
+        while (ss >> temp)
+            vec.push_back(temp);
 
-    for (size_t i = 0; i < L; i++)
-      tables[i]->add(vec, id);
+        for (size_t i = 0; i < L; i++)
+            tables[i]->add(vec, id);
+    } else {
+        while (ss >> temp)
+            vec.push_back(temp);
+        
+        for (auto i = 0; i < vec.size(); i++) {
+            tVec.push_back(temp);
+        }
+
+        Curve c(vec, tVec, id);
+
+        for (size_t i = 0; i < L; i++) {
+            Grid grid(delta);
+            
+            if (metric.compare("discrete") == 0) {
+                grid.snapTo2DGrid(c); // snap curve
+                c.collapseGridToVector();
+                c.padding();
+            } else {
+                float averageVariation = 0;
+                
+                for (auto i = 0; i < vec.size()-1; i++) {
+                    averageVariation += abs(c.vec[i+1] - c.vec[i]);
+                }
+                
+                averageVariation = averageVariation / vec.size();
+                float epsilon = (averageVariation * 160) / 100;
+
+                c.filter(epsilon);
+                grid.snapTo1DGrid(c); // snap curve
+                c.getMinimaMaxima();
+                c.padding();
+            }
+            
+            
+            tables[i]->add(c.vec, c.key, c.id);
+        }
+    }
+
+    
   }
 
   std::cout << "DONE\n";

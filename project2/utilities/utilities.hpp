@@ -13,7 +13,7 @@ struct Neighbor {
 bool parseSearchArgs(int, const char **, std::string &, std::string &, std::string &, std::string &, int &, int &, int &, int &, std::string &, double &);
 bool parseClusterArgs(int, const char **, std::string &, std::string &, std::string &, std::string &, std::string &, bool &, bool &);
 int readNumberOfLines(std::string, int &);
-int readInputFile(std::string &, HashTable **, int);
+int readInputFile(std::string &, HashTable **, int, std::string &, std::string &, double);
 std::vector<Data *> *readQueryFile(std::string &);
 void printOutputFile(std::ofstream &, const std::string, const std::string &, std::vector<Neighbor> &, std::vector<Neighbor> &, std::chrono::nanoseconds, std::chrono::nanoseconds);
 bool parseConfigFile(std::string &, int &, int &, int &, int &, int &, int &);

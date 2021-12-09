@@ -56,12 +56,12 @@ int main(int argc, char const *argv[]) {
     for (auto i = 0; i < L; i++)
       tables[i] = new HashTable(k, w, dim, tableSize);
 
-    readInputFile(iFile__, tables, L); // put the input in the hash tables
+    readInputFile(iFile__, tables, L, algorithm, metric, delta); // put the input in the hash tables
   } else if (algorithm.compare("Hypercube") == 0) {
     tableSize = pow(2, k);
     cube = (HashTable *)new Hypercube(k, w, dim, tableSize);
 
-    readInputFile(iFile__, &cube, 1); // put the input in the hypercube
+    readInputFile(iFile__, &cube, 1, algorithm, metric, delta); // put the input in the hypercube
   }
 
   std::ofstream ofile(oFile__);
@@ -86,8 +86,10 @@ int main(int argc, char const *argv[]) {
       // time trueDistanceN function
       auto start = std::chrono::high_resolution_clock::now();
 
-      if (algorithm.compare("LSH") == 0 || algorithm.compare("Frechet") == 0) {
+      if (algorithm.compare("LSH") == 0) {
         trueDistVec = trueDistanceN(*query, N, tables, L, euclidianDist);
+      } else if (algorithm.compare("Frechet") == 0) {
+        trueDistVec = trueDistanceN(*query, N, tables, L, discreteFrechetDist);
       } else if (algorithm.compare("Hypercube") == 0) {
         trueDistVec = trueDistanceN(*query, N, cube, euclidianDist);
       }
@@ -99,8 +101,10 @@ int main(int argc, char const *argv[]) {
       // time approximateKNN function
       start = std::chrono::high_resolution_clock::now();
 
-      if (algorithm.compare("LSH") == 0 || algorithm.compare("Frechet") == 0) {
+      if (algorithm.compare("LSH") == 0) {
         knnVec = approximateKNN(*query, N, tables, L, euclidianDist);
+      } else if (algorithm.compare("Frechet") == 0) {
+        knnVec = approximateKNN(*query, N, tables, L, discreteFrechetDist);
       } else if (algorithm.compare("Hypercube") == 0) {
         knnVec = approximateKNN(*query, N, cube, M, probes, k, euclidianDist);
       }
@@ -109,7 +113,7 @@ int main(int argc, char const *argv[]) {
 
       auto tLSH = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
 
-      printOutputFile(ofile, algorithm, query->id, trueDistVec, knnVec, tLSH, tTrue);
+    //   printOutputFile(ofile, algorithm, query->id, trueDistVec, knnVec, tLSH, tTrue);
     }
 
     for (const Data *data : *queries)

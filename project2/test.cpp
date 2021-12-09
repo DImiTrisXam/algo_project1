@@ -51,7 +51,7 @@ int main(int argc, char const *argv[]) {
 //   c1.PRINT();
   
 
-  double delta = 0.1;
+  double delta = 2;
 
   Grid grid(delta);
 
@@ -59,23 +59,23 @@ int main(int argc, char const *argv[]) {
   grid.snapTo2DGrid(c1);
   // grid.snapTo2DGrid(c2);
 
-  // std::cout << "c1 size after snapping: " << c1.gxVec.size() << "\n\n";
+  std::cout << "c1 size after snapping: " << c1.gxVec.size() << "\n\n";
   // c1.printGridCurve();
   // std::cout << "c2 size after snapping: " << c2.gxVec.size() << "\n\n";
   // c2.printGridCurve();
 
+  // LSH vector key for 2D grid
+  c1.collapseGridToVector();
+  // c2.collapseGridToVector();
+  // c2.printKey();
+
   c1.padding();
-  // std::cout << "c1 size after padding: " << c1.gxVec.size() << "\n\n";
+  std::cout << "c1 size after padding: " << c1.key.size() << "\n\n";
+  c1.printKey();
   // c1.printGridCurve();
   // c2.padding();
   // std::cout << "c2 size after padding: " << c2.gxVec.size() << "\n\n";
   // c2.printGridCurve();
-
-  // LSH vector key for 2D grid
-  c1.collapseGridToVector();
-  c1.printKey();
-  // c2.collapseGridToVector();
-  // c2.printKey();
 
   // snap curves
   // grid.snapTo1DGrid(c1);
@@ -90,9 +90,9 @@ int main(int argc, char const *argv[]) {
   // c2.printKey();
 
   // add curve to table
-  table.add(c1.vec, c1.key, c1.id);
+//   table.add(c1.vec, c1.key, c1.id);
 
-  table.PRINT();
+//   table.PRINT();
   
   return 0;
 }

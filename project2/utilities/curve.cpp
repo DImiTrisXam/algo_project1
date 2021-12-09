@@ -20,9 +20,8 @@ void Curve::filter(float epsilon) {
 void Curve::padding() {
   const auto M = std::numeric_limits<float>::max();
 
-  for (auto i = gxVec.size(); i < vec.size(); i++) {
-    gxVec.push_back(M);
-    gyVec.push_back(M);
+  for (auto i = 0; i < 2*(vec.size() - gxVec.size()); i++) {
+    key.push_back(M);
   }
 }
 
