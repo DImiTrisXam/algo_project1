@@ -3,7 +3,7 @@
 #include <iostream>
 #include <limits>
 
-std::vector<Neighbor> trueDistanceN(Data &query, int k, HashTable **tables, int L, const std::function<double(const std::vector<float> &, const std::vector<float> &)> &metric) {
+std::vector<Neighbor> trueDistanceN(Data &query, int k, HashTable **tables, int L, const std::function<double(const Data &, const Data &)> &metric) {
   std::vector<Neighbor> b;                              // k best neighbors
   std::vector<Neighbor> temp;                           // helper vector to reverse b
   PriorityQueue pq;                                     // priority queue size k
@@ -23,7 +23,7 @@ std::vector<Neighbor> trueDistanceN(Data &query, int k, HashTable **tables, int 
     for (auto j = 0; j < size; j++) {
       for (const auto &p : table[j]) { // for each item in bucket
         // distance between candidate and query
-        auto dist = metric(query.vec, p->vec);
+        auto dist = metric(query, *p);
 
         if (dist < bDist) { // if better than k-th best distance
           n.id = p->id;
@@ -50,7 +50,7 @@ std::vector<Neighbor> trueDistanceN(Data &query, int k, HashTable **tables, int 
   return b;
 }
 
-std::vector<Neighbor> approximateKNN(Data &query, int k, HashTable **tables, int L, const std::function<double(const std::vector<float> &, const std::vector<float> &)> &metric) {
+std::vector<Neighbor> approximateKNN(Data &query, int k, HashTable **tables, int L, const std::function<double(const Data &, const Data &)> &metric) {
   std::vector<Neighbor> b;                              // k best neighbors
   std::vector<Neighbor> temp;                           // helper vector to reverse b
   PriorityQueue pq;                                     // priority queue size k
@@ -68,7 +68,7 @@ std::vector<Neighbor> approximateKNN(Data &query, int k, HashTable **tables, int
 
     for (const auto &p : buck) { // for each item in bucket
       // distance between candidate and query
-      auto dist = metric(query.vec, p->vec);
+      auto dist = metric(query, *p);
 
       if (dist < bDist) { // if better than k-th best distance
         n.id = p->id;
@@ -94,7 +94,7 @@ std::vector<Neighbor> approximateKNN(Data &query, int k, HashTable **tables, int
   return b;
 }
 
-std::vector<std::string> approximateRangeSearch(Data &query, double r, HashTable **tables, int L, const std::function<double(const std::vector<float> &, const std::vector<float> &)> &metric) {
+std::vector<std::string> approximateRangeSearch(Data &query, double r, HashTable **tables, int L, const std::function<double(const Data &, const Data &)> &metric) {
   std::vector<std::string> rNeighbors;
 
   for (size_t i = 0; i < L; i++) { // for every table
@@ -102,7 +102,7 @@ std::vector<std::string> approximateRangeSearch(Data &query, double r, HashTable
 
     for (const auto &p : buck) { // for each item in bucket
       // distance between candidate and query
-      double dist = metric(query.vec, p->vec);
+      double dist = metric(query, *p);
 
       if (dist < r) { // if smaller than radius
         rNeighbors.push_back(p->id);

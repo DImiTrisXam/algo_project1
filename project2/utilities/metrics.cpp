@@ -4,8 +4,10 @@
 #include <cstdlib>
 #include <iostream>
 
-double euclidianDist(const std::vector<float> &x, const std::vector<float> &y) {
+double euclidianDist(const Data &a, const Data &b) {
   double sum = 0, diff;
+  auto x = a.vec;
+  auto y = b.vec;
 
   if (x.size() != y.size())
     return -1;
@@ -18,8 +20,10 @@ double euclidianDist(const std::vector<float> &x, const std::vector<float> &y) {
   return sqrt(sum);
 }
 
-int manhattanDist(const std::vector<float> &x, const std::vector<float> &y) {
+int manhattanDist(const Data &a, const Data &b) {
   int sum = 0;
+  auto x = a.vec;
+  auto y = b.vec;
 
   if (x.size() != y.size())
     return -1;
@@ -42,9 +46,11 @@ int hammingDist(int n1, int n2) {
   return dist;
 }
 
-double discreteFrechetDist(const Curve &x, const Curve &y) {
-  auto m1 = x.vec.size();
-  auto m2 = y.vec.size();
+double discreteFrechetDist(const Data &a, const Data &b) {
+  auto x = (Curve *) &a;
+  auto y = (Curve *) &b;
+  auto m1 = x->vec.size();
+  auto m2 = y->vec.size();
 
   auto distArray = new double[m1 * m2]; // array for dynamic programming
 
@@ -52,8 +58,11 @@ double discreteFrechetDist(const Curve &x, const Curve &y) {
     for (auto j = 0; j < m2; ++j) {
       // std::cout << "i: " << i << ",j: " << j << '\n';
 
-      std::vector<float> x_i{(float)x.tVec[i], x.vec[i]}; // i-th element of Curve x
-      std::vector<float> y_j{(float)y.tVec[j], y.vec[j]}; // j-th element of Curve y
+      std::vector<float> temp1{(float)x->tVec[i], x->vec[i]}; // i-th element of Curve x
+      std::vector<float> temp2{(float)y->tVec[j], y->vec[j]}; // j-th element of Curve y
+
+      Data x_i(temp1, "temp1");
+      Data y_j(temp2, "temp2");
 
       if (i == 0 && j == 0) // if first cell
         distArray[0] = euclidianDist(x_i, y_j);

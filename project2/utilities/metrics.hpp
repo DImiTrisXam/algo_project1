@@ -4,9 +4,9 @@
 #include <vector>
 #include "curve.hpp"
 
-double euclidianDist(const std::vector<float> &, const std::vector<float> &);
-int manhattanDist(const std::vector<float> &, const std::vector<float> &);
+double euclidianDist(const Data &, const Data &);
+int manhattanDist(const Data &, const Data &);
 int hammingDist(int, int);
-double discreteFrechetDist(const Curve &, const Curve &);
+double discreteFrechetDist(const Data &, const Data &);
 
 #endif
