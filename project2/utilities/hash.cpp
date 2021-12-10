@@ -1,4 +1,4 @@
-#include "hash.hpp"
+#include "curve.hpp"
 #include <chrono>
 #include <climits>
 #include <cmath>
@@ -64,8 +64,15 @@ void HashTable::add(std::vector<float> &vec, std::string &id) {
   containedItems++;
 }
 
-void HashTable::add(std::vector<float> &vec, std::vector<float> &key, std::string &id) {
-  auto newData = new Data(vec, id);
+void HashTable::add(std::vector<float> &vec, std::vector<int> &tVec, std::vector<float> &key, std::string &id) {
+  Data *newData;
+
+  try {
+    newData = (Data *)new Curve(vec, tVec, id);
+  } catch (const std::bad_alloc &e) {
+    std::cout << "Allocation failed in HashTable::add(): " << e.what() << '\n';
+  }
+
   if (!newData) // out of heap
     throw "Unable to insert element with id: '" + id + "' in hashtable. Out of heap memory.";
   auto index = gHash(key);

@@ -1,8 +1,8 @@
 #include "utilities.hpp"
 #include "curve.hpp"
 #include "grid.hpp"
-#include <cstdlib>
 #include <cmath>
+#include <cstdlib>
 #include <cstring>
 #include <fstream>
 #include <iostream>
@@ -216,9 +216,10 @@ int readNumberOfLines(std::string name, int &dim) {
   return lines;
 }
 
-int readInputFile(std::string &name, HashTable **tables, int L, std::string &algorithm, std::string &metric, double delta) {
+int readInputFile(std::string &name, HashTable **tables, int L, std::string &algorithm, std::string &metric, double delta, Grid **grids) {
   std::ifstream file(name);
   std::string line;
+  std::vector<int> tVec;
 
   std::cout << "Processing input file... ";
 
@@ -227,7 +228,6 @@ int readInputFile(std::string &name, HashTable **tables, int L, std::string &alg
 
     std::string id;
     std::vector<float> vec;
-    std::vector<int> tVec;
     float temp;
 
     ss >> id;
@@ -235,50 +235,45 @@ int readInputFile(std::string &name, HashTable **tables, int L, std::string &alg
     // std::cout << "id: " << id << "\n";
 
     if (algorithm.compare("LSH") == 0 || algorithm.compare("Hypercube") == 0) {
-        while (ss >> temp)
-            vec.push_back(temp);
+      while (ss >> temp)
+        vec.push_back(temp);
 
-        for (size_t i = 0; i < L; i++)
-            tables[i]->add(vec, id);
+      for (auto i = 0; i < L; i++)
+        tables[i]->add(vec, id);
     } else {
-        while (ss >> temp)
-            vec.push_back(temp);
-        
-        for (auto i = 0; i < vec.size(); i++) {
-            tVec.push_back(temp);
-        }
+      while (ss >> temp)
+        vec.push_back(temp);
 
+      if (tVec.empty()) { // do it once
+        for (auto i = 0; i < vec.size(); i++)
+          tVec.push_back(i + 1);
+      }
+
+      for (auto i = 0; i < L; i++) {
         Curve c(vec, tVec, id);
 
-        for (size_t i = 0; i < L; i++) {
-            Grid grid(delta);
-            
-            if (metric.compare("discrete") == 0) {
-                grid.snapTo2DGrid(c); // snap curve
-                c.collapseGridToVector();
-                c.padding();
-            } else {
-                float averageVariation = 0;
-                
-                for (auto i = 0; i < vec.size()-1; i++) {
-                    averageVariation += abs(c.vec[i+1] - c.vec[i]);
-                }
-                
-                averageVariation = averageVariation / vec.size();
-                float epsilon = (averageVariation * 160) / 100;
+        if (metric.compare("discrete") == 0) {
+          grids[i]->snapTo2DGrid(c); // snap curve
+          c.collapseGridToVector();
+          c.padding();
+        } else {
+          float averageVariation = 0;
 
-                c.filter(epsilon);
-                grid.snapTo1DGrid(c); // snap curve
-                c.getMinimaMaxima();
-                c.padding();
-            }
-            
-            
-            tables[i]->add(c.vec, c.key, c.id);
+          for (auto i = 0; i < vec.size() - 1; i++)
+            averageVariation += abs(c.vec[i + 1] - c.vec[i]);
+
+          averageVariation = averageVariation / vec.size();
+          float epsilon = (averageVariation * 160) / 100;
+
+          c.filter(epsilon);
+          grids[i]->snapTo1DGrid(c); // snap curve
+          c.getMinimaMaxima();
+          c.padding();
         }
-    }
 
-    
+        tables[i]->add(c.vec, c.tVec, c.key, c.id);
+      }
+    }
   }
 
   std::cout << "DONE\n";
@@ -286,7 +281,7 @@ int readInputFile(std::string &name, HashTable **tables, int L, std::string &alg
   return 0;
 }
 
-std::vector<Data *> *readQueryFile(std::string &qfile_) {
+std::vector<Data *> *readQueryFile(std::string &qfile_, bool curve) {
   std::ifstream qfile(qfile_);
 
   if (!qfile.good())
@@ -303,14 +298,30 @@ std::vector<Data *> *readQueryFile(std::string &qfile_) {
 
     std::string id;
     std::vector<float> vec;
+    std::vector<int> tVec;
     float temp;
+    Data *query;
 
     ss >> id;
 
-    while (ss >> temp)
-      vec.push_back(temp);
+    if (!curve) {
+      while (ss >> temp)
+        vec.push_back(temp);
 
-    Data *query = new Data(vec, id);
+      query = new Data(vec, id);
+    } else {
+      while (ss >> temp)
+        vec.push_back(temp);
+
+      for (auto i = 0; i < vec.size(); i++)
+        tVec.push_back(i + 1);
+
+      try {
+        query = (Data *)new Curve(vec, tVec, id);
+      } catch (const std::bad_alloc &e) {
+        std::cout << "Allocation failed in readQueryFile: " << e.what() << '\n';
+      }
+    }
 
     queries->push_back(query);
   }

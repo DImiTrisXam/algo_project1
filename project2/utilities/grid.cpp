@@ -29,6 +29,8 @@ int Grid::snapTo2DGrid(Curve &c) {
     c.gyVec.push_back((round((c.vec[i] - t) / delta) * delta) - t);
   }
 
+  // std::cout << "snapTo2DGrid sizes: " << c.gxVec.size() << ", " << c.gyVec.size() << "\n";
+
   // remove consecutive duplicates
   std::vector<float> temp1;
   std::vector<float> temp2;

@@ -71,7 +71,7 @@ int main(int argc, char const *argv[]) {
 
   c1.padding();
   std::cout << "c1 size after padding: " << c1.key.size() << "\n\n";
-  c1.printKey();
+  // c1.printKey();
   // c1.printGridCurve();
   // c2.padding();
   // std::cout << "c2 size after padding: " << c2.gxVec.size() << "\n\n";

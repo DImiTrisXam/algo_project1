@@ -1,26 +1,31 @@
 #include "curve.hpp"
 #include <algorithm>
+#include <cmath>
 #include <iostream>
 #include <limits>
-#include <cmath>
 
 Curve::Curve(std::vector<float> vec, std::vector<int> tvec, std::string id) : Data(vec, id), tVec(tvec) {
 }
 
+Curve::~Curve() {
+  // std::cout << "Curve deleted\n";
+}
+
 void Curve::filter(float epsilon) {
-  
-  for (auto i = 1; i < vec.size()-1; i+=1) {
-      if (abs(vec[i] - vec[i-1]) <= epsilon && abs(vec[i] - vec[i+1]) <= epsilon) {
-          vec.erase(vec.begin() + i);
-      }
+
+  for (auto i = 1; i < vec.size() - 1; i += 1) {
+    if (abs(vec[i] - vec[i - 1]) <= epsilon && abs(vec[i] - vec[i + 1]) <= epsilon) {
+      vec.erase(vec.begin() + i);
+    }
   }
-  
 }
 
 void Curve::padding() {
   const auto M = std::numeric_limits<float>::max();
 
-  for (auto i = 0; i < 2*(vec.size() - gxVec.size()); i++) {
+  // std::cout << "Padding loop size: " << vec.size() << ", " << gxVec.size() << "\n";
+
+  for (auto i = 0; i < 2 * (vec.size() - gxVec.size()); i++) {
     key.push_back(M);
   }
 }

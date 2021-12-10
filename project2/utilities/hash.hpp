@@ -9,8 +9,8 @@ class Data {
 public:
   std::vector<float> vec; // dianisma
   std::string id;
-  int cluster;       // which cluster data point is in
-  double minDist;    // distance to nearest cluster
+  int cluster;    // which cluster data point is in
+  double minDist; // distance to nearest cluster
 
   Data(std::vector<float>, std::string);
   void PRINT() const; /* DEBUG ONLY */
@@ -21,7 +21,7 @@ public:
   HashTable(int k, int w, int pSize, unsigned int tableSize = 509);
   ~HashTable();
   virtual void add(std::vector<float> &, std::string &);
-  virtual void add(std::vector<float> &, std::vector<float> &, std::string &);
+  virtual void add(std::vector<float> &, std::vector<int> &, std::vector<float> &, std::string &);
   bool isEmpty() const;
   unsigned int getCurrentSize() const;
   void eraseAll();

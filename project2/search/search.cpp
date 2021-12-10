@@ -1,3 +1,4 @@
+#include "../utilities/grid.hpp"
 #include "../utilities/metrics.hpp"
 #include "../utilities/utilities.hpp"
 #include "cubeSearch.hpp"
@@ -47,21 +48,31 @@ int main(int argc, char const *argv[]) {
   int tableSize;
   int w = 2; // window for hash table
   HashTable **tables;
+  Grid **grids;
   HashTable *cube;
 
   if (algorithm.compare("LSH") == 0 || algorithm.compare("Frechet") == 0) {
     tableSize = numOfInputs / 8;
     tables = new HashTable *[L];
 
-    for (auto i = 0; i < L; i++)
+    if (algorithm.compare("Frechet") == 0)
+      grids = new Grid *[L];
+
+    for (auto i = 0; i < L; i++) {
       tables[i] = new HashTable(k, w, dim, tableSize);
 
-    readInputFile(iFile__, tables, L, algorithm, metric, delta); // put the input in the hash tables
+      if (algorithm.compare("Frechet") == 0)
+        grids[i] = new Grid(delta);
+    }
+
+    std::cout << "numOfInputs: " << numOfInputs << ", dim: " << dim << "\n";
+
+    readInputFile(iFile__, tables, L, algorithm, metric, delta, grids); // put the input in the hash tables
   } else if (algorithm.compare("Hypercube") == 0) {
     tableSize = pow(2, k);
     cube = (HashTable *)new Hypercube(k, w, dim, tableSize);
 
-    readInputFile(iFile__, &cube, 1, algorithm, metric, delta); // put the input in the hypercube
+    readInputFile(iFile__, &cube, 1, algorithm, metric, delta, grids); // put the input in the hypercube
   }
 
   std::ofstream ofile(oFile__);
@@ -69,7 +80,11 @@ int main(int argc, char const *argv[]) {
   std::vector<Data *> *queries;
 
   while (true) {
-    queries = readQueryFile(qFile__);
+    if (algorithm.compare("LSH") == 0 || algorithm.compare("Hypercube") == 0) {
+      queries = readQueryFile(qFile__, false);
+    } else if (algorithm.compare("Frechet") == 0) {
+      queries = readQueryFile(qFile__, true);
+    }
 
     if (!queries) {
       std::cout << "Invalid query file. Exiting program...\n";
@@ -113,11 +128,11 @@ int main(int argc, char const *argv[]) {
 
       auto tLSH = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
 
-    //   printOutputFile(ofile, algorithm, query->id, trueDistVec, knnVec, tLSH, tTrue);
+      // printOutputFile(ofile, algorithm, query->id, trueDistVec, knnVec, tLSH, tTrue);
     }
 
-    for (const Data *data : *queries)
-      delete data;
+    // for (const Data *data : *queries)
+    //   delete data;
     delete queries;
 
     std::cout << "DONE\nPress X to terminate or Press Y to continue with new query file: ";
@@ -133,9 +148,16 @@ int main(int argc, char const *argv[]) {
   }
 
   if (algorithm.compare("LSH") == 0 || algorithm.compare("Frechet") == 0) {
+    if (algorithm.compare("Frechet") == 0) {
+      // release grid memory
+      for (auto i = 0; i < L; i++)
+        delete grids[i];
+      delete[] grids;
+    }
+
     // release hash table memory
-    for (auto i = 0; i < L; i++)
-      delete tables[i];
+    // for (auto i = 0; i < L; i++)
+    //   delete tables[i];
     delete[] tables;
   } else if (algorithm.compare("Hypercube") == 0) {
     // release hypercube memory
