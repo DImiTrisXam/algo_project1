@@ -3,6 +3,7 @@
 #include "../utilities/utilities.hpp"
 #include "cubeSearch.hpp"
 #include "lshSearch.hpp"
+#include <algorithm>
 #include <cmath>
 #include <fstream>
 #include <iostream>
@@ -78,6 +79,8 @@ int main(int argc, char const *argv[]) {
   std::ofstream ofile(oFile__);
   std::string answer;
   std::vector<Data *> *queries;
+  double tTrueAver = 0, tLSHAver = 0; // average times
+  std::vector<double> approximationFactors;
 
   while (true) {
     if (algorithm.compare("LSH") == 0 || algorithm.compare("Hypercube") == 0) {
@@ -111,7 +114,7 @@ int main(int argc, char const *argv[]) {
 
       auto end = std::chrono::high_resolution_clock::now();
 
-      auto tTrue = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+      tTrueAver += std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count() * 1e-9;
 
       // time approximateKNN function
       start = std::chrono::high_resolution_clock::now();
@@ -126,10 +129,20 @@ int main(int argc, char const *argv[]) {
 
       end = std::chrono::high_resolution_clock::now();
 
-      auto tLSH = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+      tLSHAver += std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count() * 1e-9;
 
-      // printOutputFile(ofile, algorithm, query->id, trueDistVec, knnVec, tLSH, tTrue);
+      approximationFactors.push_back(knnVec[knnVec.size() - 1].dist / trueDistVec[trueDistVec.size() - 1].dist);
+
+      printOutputFile(ofile, algorithm, metric, query->id, trueDistVec, knnVec);
     }
+
+    tTrueAver = tTrueAver / numOfInputs;
+    tLSHAver = tLSHAver / numOfInputs;
+
+    // Maximum Approximation Factor
+    auto MAF = *std::max_element(approximationFactors.begin(), approximationFactors.end());
+
+    printStatistics(ofile, tLSHAver, tTrueAver, MAF);
 
     // for (const Data *data : *queries)
     //   delete data;

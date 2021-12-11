@@ -331,18 +331,35 @@ std::vector<Data *> *readQueryFile(std::string &qfile_, bool curve) {
   return queries;
 }
 
-void printOutputFile(std::ofstream &file, const std::string lshORcube, const std::string &qid, std::vector<Neighbor> &trueDistVec,
-                     std::vector<Neighbor> &knnVec, std::chrono::nanoseconds tLSH, std::chrono::nanoseconds tTrue) {
-  file << "Query: " << qid << '\n';
+void printOutputFile(std::ofstream &file, std::string &algorithm, std::string &metric, const std::string &qid, std::vector<Neighbor> &trueDistVec,
+                     std::vector<Neighbor> &knnVec) {
+  file << "Query: " << qid << '\n'
+       << "Algorithm: ";
+
+  if (algorithm.compare("LSH") == 0) {
+    file << "LSH_Vector" << '\n';
+  } else if (algorithm.compare("Hypercube") == 0) {
+    file << "Hypercube" << '\n';
+  } else {
+    if (metric.compare("discrete") == 0) {
+      file << "LSH_Frechet_Discrete" << '\n';
+    } else {
+      file << "LSH_Frechet_Continuous" << '\n';
+    }
+  }
 
   for (auto i = 0; i < knnVec.size(); i++) {
-    file << "Nearest neighbor-" << i + 1 << ": " << knnVec[i].id << '\n'
-         << "distance" << lshORcube << ": " << knnVec[i].dist << '\n'
+    file << "Approximate Nearest neighbor: " << knnVec[i].id << '\n'
+         << "distanceApproximate: " << knnVec[i].dist << '\n'
          << "distanceTrue: " << trueDistVec[i].dist << '\n';
   }
+}
+
+void printStatistics(std::ofstream &file, double tLSH, double tTrue, double MAF) {
   // multiply nanoseconds with 10^-9 to print seconds
-  file << "t" << lshORcube << ": " << tLSH.count() * 1e-9 << " seconds\n"
-       << "tTrue: " << tTrue.count() * 1e-9 << " seconds\n";
+  file << "\ntApproximateAverage: " << tLSH << " seconds\n"
+       << "tTrueAverage: " << tTrue << " seconds\n"
+       << "MAF: " << MAF << "\n";
 }
 
 bool parseConfigFile(std::string &name, int &K, int &L, int &k, int &M, int &d, int &probes) {
