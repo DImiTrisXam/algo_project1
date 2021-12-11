@@ -13,7 +13,7 @@ public:
   double minDist; // distance to nearest cluster
 
   Data(std::vector<float>, std::string);
-  void PRINT() const; /* DEBUG ONLY */
+  virtual void PRINT() const; /* DEBUG ONLY */
 };
 
 class HashTable {

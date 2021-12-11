@@ -1,7 +1,30 @@
 #include "lshSearch.hpp"
 #include "../utilities/metrics.hpp"
+#include <cstring>
 #include <iostream>
 #include <limits>
+#include <typeinfo>
+
+void snapQueryToGrid(Curve &c, Grid **grids, int i, std::string &metric) {
+  if (metric.compare("discrete") == 0) {
+    grids[i]->snapTo2DGrid(c); // snap curve
+    c.collapseGridToVector();
+    c.padding();
+  } else {
+    float averageVariation = 0;
+
+    for (auto i = 0; i < c.vec.size() - 1; i++)
+      averageVariation += abs(c.vec[i + 1] - c.vec[i]);
+
+    averageVariation = averageVariation / c.vec.size();
+    float epsilon = (averageVariation * 160) / 100;
+
+    c.filter(epsilon);
+    grids[i]->snapTo1DGrid(c); // snap curve
+    c.getMinimaMaxima();
+    c.padding();
+  }
+}
 
 std::vector<Neighbor> trueDistanceN(Data &query, int k, HashTable **tables, int L, const std::function<double(const Data &, const Data &)> &metric) {
   std::vector<Neighbor> b;                              // k best neighbors
@@ -50,7 +73,7 @@ std::vector<Neighbor> trueDistanceN(Data &query, int k, HashTable **tables, int 
   return b;
 }
 
-std::vector<Neighbor> approximateKNN(Data &query, int k, HashTable **tables, int L, const std::function<double(const Data &, const Data &)> &metric) {
+std::vector<Neighbor> approximateKNN(Data &query, int k, HashTable **tables, Grid **grids, int L, std::string &discrete, const std::function<double(const Data &, const Data &)> &metric) {
   std::vector<Neighbor> b;                              // k best neighbors
   std::vector<Neighbor> temp;                           // helper vector to reverse b
   PriorityQueue pq;                                     // priority queue size k
@@ -63,7 +86,15 @@ std::vector<Neighbor> approximateKNN(Data &query, int k, HashTable **tables, int
   for (size_t i = 0; i < k; i++) // initialize priority queue
     pq.push(n);
 
-  for (auto i = 0; i < L; i++) { // for every table
+  auto type1 = typeid(query).name();
+  auto type2 = typeid(Curve).name();
+
+  for (auto i = 0; i < L; i++) {     // for every table
+    if (strcmp(type1, type2) == 0) { // if curve
+      auto c = (Curve &)query;
+      snapQueryToGrid(c, grids, i, discrete);
+    }
+
     auto buck = tables[i]->getNeighborCandidates(query);
 
     for (const auto &p : buck) { // for each item in bucket

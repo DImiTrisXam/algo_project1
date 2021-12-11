@@ -2,9 +2,11 @@
 #include <chrono>
 #include <climits>
 #include <cmath>
+#include <cstring>
 #include <iostream>
 #include <limits>
 #include <random>
+#include <typeinfo>
 
 const unsigned int M = UINT_MAX - 4;
 const double inf = std::numeric_limits<double>::infinity();
@@ -170,7 +172,17 @@ size_t HashTable::gHash(std::vector<float> &p) const {
 * Returns a list of items that are candidates for closest neighbor.
 */
 std::list<Data *> &HashTable::getNeighborCandidates(Data &query) {
-  size_t index = gHash(query.vec);
+  auto type1 = typeid(query).name();
+  auto type2 = typeid(Curve).name();
+  size_t index;
+
+  if (strcmp(type1, type2) == 0) { // if curve
+    auto c = (Curve &)query;
+    index = gHash(c.key);
+    // std::cout << "index: " << index << '\n';
+  } else {
+    index = gHash(query.vec);
+  }
 
   return table[index];
 }

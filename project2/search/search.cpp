@@ -120,9 +120,9 @@ int main(int argc, char const *argv[]) {
       start = std::chrono::high_resolution_clock::now();
 
       if (algorithm.compare("LSH") == 0) {
-        knnVec = approximateKNN(*query, N, tables, L, euclidianDist);
+        knnVec = approximateKNN(*query, N, tables, grids, L, metric, euclidianDist);
       } else if (algorithm.compare("Frechet") == 0) {
-        knnVec = approximateKNN(*query, N, tables, L, discreteFrechetDist);
+        knnVec = approximateKNN(*query, N, tables, grids, L, metric, discreteFrechetDist);
       } else if (algorithm.compare("Hypercube") == 0) {
         knnVec = approximateKNN(*query, N, cube, M, probes, k, euclidianDist);
       }
