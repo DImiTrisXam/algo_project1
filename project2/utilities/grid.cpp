@@ -25,8 +25,8 @@ int Grid::snapTo1DGrid(Curve &c) {
 int Grid::snapTo2DGrid(Curve &c) {
   // snap curve to 2D grid
   for (auto i = 0; i < c.vec.size(); i++) {
-    c.gxVec.push_back((round((c.tVec[i] - t) / delta) * delta) - t);
-    c.gyVec.push_back((round((c.vec[i] - t) / delta) * delta) - t);
+    c.gxVec.push_back((round((c.tVec[i] - t) / delta) * delta) + t);
+    c.gyVec.push_back((round((c.vec[i] - t) / delta) * delta) + t);
   }
 
   // std::cout << "snapTo2DGrid sizes: " << c.gxVec.size() << ", " << c.gyVec.size() << "\n";
