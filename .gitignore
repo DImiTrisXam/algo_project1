@@ -7,6 +7,10 @@ project*/bin
 project*/build
 project*/output*
 
+Fred/bin
+Fred/build
+Fred/test
+
 test
 
 # Prerequisites
