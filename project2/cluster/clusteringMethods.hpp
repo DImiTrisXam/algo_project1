@@ -6,11 +6,13 @@
 #include <unordered_map>
 #include <vector>
 
-struct Centroid {
-  std::vector<float> vec;
+struct Centroid : public Data {
   std::vector<float> vecSum; // sum of all points in cluster of centroid
   std::vector<int> indexes;  // indexes of all the points in cluster of centroid
   double silhouette;         // silhouette of centroid's cluster
+
+  Centroid(std::vector<float> &, std::string);
+  ~Centroid();
 };
 
 class Cluster {
@@ -25,14 +27,14 @@ class Cluster {
   int readInputFile(std::string &);
   int printOutputFile(std::string &, bool, std::chrono::nanoseconds);
   int simpleInitialization();
-  int kppInitialization(const std::function<double(const std::vector<float> &, const std::vector<float> &)> &);
-  bool LloydsAssignment(const std::function<double(const std::vector<float> &, const std::vector<float> &)> &);
-  bool reverseAssignment(int, std::string &, int, int, int, int, int, const std::function<double(const std::vector<float> &, const std::vector<float> &)> &);
+  int kppInitialization(const std::function<double(const Data &, const Data &)> &);
+  bool LloydsAssignment(const std::function<double(const Data &, const Data &)> &);
+  bool reverseAssignment(int, std::string &, int, int, int, int, int, const std::function<double(const Data &, const Data &)> &);
   int updateCentroid();
-  int Silhouette(const std::function<double(const std::vector<float> &, const std::vector<float> &)> &);
+  int Silhouette(const std::function<double(const Data &, const Data &)> &);
 
 public:
-  int begin(std::string &, std::string &, bool, int, int, int, int, int, const std::function<double(const std::vector<float> &, const std::vector<float> &)> &);
+  int begin(std::string &, std::string &, bool, int, int, int, int, int, const std::function<double(const Data &, const Data &)> &);
   Cluster(int, std::string, std::string &);
   ~Cluster();
 };
