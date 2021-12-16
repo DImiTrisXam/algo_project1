@@ -43,6 +43,9 @@ $(BIN)/%.o: $(CLUSTER_DIR)/%.cpp $(CLUSTER_INC_FILES)
 test: create_directories test.cpp $(UTIL_OBJ_FILES)
 	$(CPP) test.cpp $(UTIL_OBJ_FILES) -o test
 
+tests: create_directories ./tests/testBinaryTree.cpp $(UTIL_OBJ_FILES)
+	$(CPP) ./tests/testBinaryTree.cpp $(UTIL_OBJ_FILES) -o testBinaryTree -lcunit
+
 .PHONY: clean
 
 clean:

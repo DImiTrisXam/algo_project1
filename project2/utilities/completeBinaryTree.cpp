@@ -118,7 +118,9 @@ bool CompleteBinaryTree::Node::isLeaf() {
 CompleteBinaryTree::Node *CompleteBinaryTree::createNode() {
   Node *node = new Node;
   node->curve = nullptr;
-  node->right = node->left = nullptr;
+  node->index = -1;
+  node->right = nullptr;
+  node->left = nullptr;
 
   return node;
 }
@@ -126,16 +128,15 @@ CompleteBinaryTree::Node *CompleteBinaryTree::createNode() {
 CompleteBinaryTree::Node *CompleteBinaryTree::createNode(Data *curve) {
   Node *node = new Node;
   node->curve = (Curve *)curve;
-  node->right = node->left = nullptr;
+  node->index = -1;
+  node->right = nullptr;
+  node->left = nullptr;
 
   return node;
 }
 
-int CompleteBinaryTree::countNumNodes(Node *node) {
-  if (root == nullptr)
-    return 0;
-
-  return 1 + countNumNodes(node->left) + countNumNodes(node->right);
+size_t CompleteBinaryTree::numOfNodes() {
+  return counter;
 }
 
 // Check if the tree is a complete binary tree
@@ -170,8 +171,8 @@ Data *CompleteBinaryTree::computeMeanCurve() {
   return computeMeanCurveRec(root);
 }
 
-void CompleteBinaryTree::createTreeFromVector(Node *node, Node *parent, double h, bool leftChild) {
-  if (h == 0) // if you have reached a leaf
+void CompleteBinaryTree::createTreeFromVectorEven(Node *node, Node *parent, double h, bool leftChild) {
+  if (h == -1) // if you have reached a leaf
     return;
 
   if (currentIndex == leafs->size())
@@ -184,10 +185,12 @@ void CompleteBinaryTree::createTreeFromVector(Node *node, Node *parent, double h
       parent->left = node;
     else
       parent->right = node;
+    
+    counter++;
   }
 
-  createTreeFromVector(node->left, node, h - 1, true);
-  createTreeFromVector(node->right, node, h - 1, false);
+  createTreeFromVectorEven(node->left, node, h - 1, true);
+  createTreeFromVectorEven(node->right, node, h - 1, false);
 
   if (node->isLeaf()) {
     node->index = currentIndex;
@@ -196,6 +199,64 @@ void CompleteBinaryTree::createTreeFromVector(Node *node, Node *parent, double h
 
     node->curve = (*leafs)[node->index];
   }
+}
+
+void CompleteBinaryTree::changeIndexesRec(Node *node) {
+  if (node == nullptr)
+    return;
+
+  changeIndexesRec(node->left);
+  changeIndexesRec(node->right);
+
+  if (node->isLeaf()) {
+    node->index = currentIndex;
+    // std::cout << node->index << " ";
+    currentIndex++;
+
+    node->curve = (*leafs)[node->index];
+  }
+
+  return;
+}
+
+void CompleteBinaryTree::changeIndexes() {
+  changeIndexesRec(root);
+
+  return;
+}
+
+void CompleteBinaryTree::createTreeFromVectorOdd(double height) {
+    for (auto i = 0; i <= height; i++)
+        createTreeFromVectorOddRec(root, nullptr,i,false);
+    
+    changeIndexes();
+}
+
+void CompleteBinaryTree::createTreeFromVectorOddRec(Node *node, Node *parent,int level, bool leftChild) {
+    if (counter == 2*leafs->size()-1) {
+        return;
+    }
+    if (node == nullptr) { // if leaf
+        node = createNode();
+
+        if (leftChild)
+            parent->left = node;
+        else
+            parent->right = node;
+
+        counter++;
+        
+        return;
+    }
+    
+    if (level == 0) {
+      return;
+    }
+    else if (level > 0) {
+       createTreeFromVectorOddRec(node->left, node, level -1, true);
+       createTreeFromVectorOddRec(node->right, node, level -1, false);
+       return;
+    }
 }
 
 void CompleteBinaryTree::eraseAll(Node *node) {
@@ -232,10 +293,49 @@ void CompleteBinaryTree::PRINT() {
   return;
 }
 
-CompleteBinaryTree::CompleteBinaryTree(std::vector<Data *> &leafs_) : leafs(&leafs_), currentIndex(0), numOfNodes(1) {
+void  CompleteBinaryTree::print2DUtil(Node *node, int space)
+{
+    // Base case
+    if (node == nullptr)
+        return;
+ 
+    // Increase distance between levels
+    space += 10;
+ 
+    // Process right child first
+    print2DUtil(node->right, space);
+ 
+    // Print current node after space
+    // count
+    // std::cout<<std::endl;
+    for (int i = 10; i < space; i++)
+        std::cout<<" "; 
+    std::cout<<node->index<<"\n";
+ 
+    // Process left child
+    print2DUtil(node->left, space);
+}
+ 
+// Wrapper over print2DUtil()
+void  CompleteBinaryTree::print2D()
+{
+    // Pass initial space count as 0
+    print2DUtil(root, 0);
+}
+
+CompleteBinaryTree::CompleteBinaryTree(std::vector<Data *> &leafs_) : leafs(&leafs_), currentIndex(0), counter(1) {
   root = createNode();
-  auto maxHeight = ceil(leafs->size());
-  createTreeFromVector(root, nullptr, maxHeight, false);
+  root->index = 12;
+  auto maxHeight = ceil(log2(leafs->size()));
+  std::cout << "height " << maxHeight << "\n";
+    if (leafs->size() % 2 == 0){
+      createTreeFromVectorEven(root, nullptr, maxHeight, false);
+    }
+    else {
+        createTreeFromVectorOdd(maxHeight);
+    }
+
+  
 
   std::cout << "CompleteBinaryTree created\n";
 }
