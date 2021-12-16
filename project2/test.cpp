@@ -1,3 +1,4 @@
+#include "./utilities/completeBinaryTree.hpp"
 #include "./utilities/grid.hpp"
 #include "./utilities/hash.hpp"
 #include "./utilities/metrics.hpp"
@@ -11,109 +12,8 @@
 #include <typeinfo>
 #include <utility>
 
-std::list<std::pair<size_t, size_t>> optimalTraversal(const Data &a, const Data &b) {
-  auto x = (const Curve &)a;
-  auto y = (const Curve &)b;
-  auto m1 = x.vec.size();
-  auto m2 = y.vec.size();
-  double *distArray;
-
-  try {
-    distArray = new double[m1 * m2]; // array for dynamic programming
-  } catch (const std::bad_alloc &e) {
-    std::cout << "Allocation failed in discreteFrechetDist: " << e.what() << '\n';
-  }
-
-  // if (!distArray) // out of heap
-  //   throw "Unable to allocate array in discreteFrechetDist. Out of heap memory.";
-
-  for (auto i = 0; i < m1; ++i) { // compute distance matrix
-    for (auto j = 0; j < m2; ++j) {
-      // std::cout << "i: " << i << ",j: " << j << '\n';
-
-      std::vector<float> temp1{(float)x.tVec[i], x.vec[i]}; // i-th element of Curve x
-      std::vector<float> temp2{(float)y.tVec[j], y.vec[j]}; // j-th element of Curve y
-
-      Data x_i(temp1, "temp1");
-      Data y_j(temp2, "temp2");
-
-      if (i == 0 && j == 0) // if first cell
-        distArray[0] = euclidianDist(x_i, y_j);
-      else if (i == 0 && j > 0) { // if first row
-        // distArray[j] = distArray[0][j]
-        distArray[j] = std::max(distArray[j - 1], euclidianDist(x_i, y_j));
-      } else if (i > 0 && j == 0) { // if first column
-        // distArray[i* m2] = distArray[i][0]
-        distArray[i * m2] = std::max(distArray[(i - 1) * m2], euclidianDist(x_i, y_j));
-      } else if (i > 0 && j > 0) { // anything else
-        // distArray[(i - 1) * m2 + j] = distArray[i-1][j]
-        auto d1 = distArray[(i - 1) * m2 + j];
-        // distArray[(i - 1) * m2 + j - 1] = distArray[i-1][j-1]
-        auto d2 = distArray[(i - 1) * m2 + j - 1];
-        // distArray[i * m2 + j - 1] = distArray[i][j-1]
-        auto d3 = distArray[i * m2 + j - 1];
-
-        double min = std::min(d1, std::min(d2, d3));
-
-        // distArray[i * m2 + j] = distArray[i][j]
-        distArray[i * m2 + j] = std::max(min, euclidianDist(x_i, y_j));
-      }
-    }
-  }
-
-  std::list<std::pair<size_t, size_t>> traversal;
-
-  auto P_i = m1 - 1;
-  auto Q_i = m2 - 1;
-
-  std::pair<size_t, size_t> tuple(P_i, Q_i);
-
-  traversal.push_front(tuple);
-
-  while (P_i > 0 && Q_i > 0) {
-    auto d1 = distArray[(P_i - 1) * m2 + Q_i];     // distArray[P_i - 1][Q_i]
-    auto d2 = distArray[P_i * m2 + Q_i - 1];       // distArray[P_i][Q_i-1]
-    auto d3 = distArray[(P_i - 1) * m2 + Q_i - 1]; // distArray[P_i-1][Q_i-1]
-    auto min = std::min(d1, std::min(d2, d3));
-
-    if (min == d1) {
-      std::pair<size_t, size_t> tuple(--P_i, Q_i);
-      traversal.push_front(tuple);
-    } else if (min == d2) {
-      std::pair<size_t, size_t> tuple(P_i, --Q_i);
-      traversal.push_front(tuple);
-    } else {
-      std::pair<size_t, size_t> tuple(--P_i, --Q_i);
-      traversal.push_front(tuple);
-    }
-  }
-
-  delete[] distArray;
-
-  return traversal;
-}
-
-Curve *meanDiscreteFrechetCurve(const Data &a, const Data &b) {
-  auto traversal = optimalTraversal(a, b);
-
-  auto x = (const Curve &)a;
-  auto y = (const Curve &)b;
-  std::vector<float> vec;
-  std::vector<int> tVec;
-  int i = 0;
-
-  for (const auto tuple : traversal) {
-    vec.push_back((x.vec[tuple.first] + y.vec[tuple.second]) / 2);
-    tVec.push_back(++i);
-  }
-
-  Curve *mean = new Curve(vec, tVec, "mean");
-
-  return mean;
-}
-
 int main(int argc, char const *argv[]) {
-  std::vector<float> vec1, vec2;
+  std::vector<float> vec1, vec2, vec3, vec4;
   std::vector<int> tVec;
   int size = 120;
   HashTable table(14, 2, 120, 10);
@@ -124,14 +24,14 @@ int main(int argc, char const *argv[]) {
 
   std::uniform_real_distribution<float> distribution(0, 100);
 
-  for (auto i = 0; i < size; i++) {
-    vec1.push_back(distribution(generator));
-    vec2.push_back(distribution(generator));
-    tVec.push_back(i + 1);
-  }
+  // for (auto i = 0; i < size; i++) {
+  //   vec1.push_back(distribution(generator));
+  //   vec2.push_back(distribution(generator));
+  //   tVec.push_back(i + 1);
+  // }
 
-  Curve c1(vec1, tVec, "id1");
-  Curve c2(vec2, tVec, "id2");
+  // Curve c1(vec1, tVec, "id1");
+  // Curve c2(vec2, tVec, "id2");
 
   // auto d1 = new Data(vec1, "id1");
   // auto d2 = new Curve(vec1, tVec, "id1");
@@ -153,23 +53,23 @@ int main(int argc, char const *argv[]) {
   //   std::cout << "AAAAAAAAAA\n";
   // }
 
-  auto start = std::chrono::high_resolution_clock::now();
+  // auto start = std::chrono::high_resolution_clock::now();
 
-  auto dist = discreteFrechetDist(c1, c2);
+  // auto dist = discreteFrechetDist(c1, c2);
 
-  auto end = std::chrono::high_resolution_clock::now();
-  auto time = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+  // auto end = std::chrono::high_resolution_clock::now();
+  // auto time = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
 
-  std::cout << "dist: " << dist << ", time: " << time.count() * 1e-9 << " seconds\n\n";
+  // std::cout << "dist: " << dist << ", time: " << time.count() * 1e-9 << " seconds\n\n";
 
-  start = std::chrono::high_resolution_clock::now();
+  // start = std::chrono::high_resolution_clock::now();
 
-  auto traversal = optimalTraversal(c1, c2);
+  // auto traversal = optimalTraversal(c1, c2);
 
-  end = std::chrono::high_resolution_clock::now();
-  time = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+  // end = std::chrono::high_resolution_clock::now();
+  // time = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
 
-  std::cout << "traversal: " << traversal.size() << ", time: " << time.count() * 1e-9 << " seconds\n\n";
+  // std::cout << "traversal: " << traversal.size() << ", time: " << time.count() * 1e-9 << " seconds\n\n";
 
   // for (const auto tuple : traversal) {
   //   std::cout << "(" << tuple.first << "," << tuple.second << ")"
@@ -177,18 +77,18 @@ int main(int argc, char const *argv[]) {
   // }
   // std::cout << "\n";
 
-  start = std::chrono::high_resolution_clock::now();
+  // start = std::chrono::high_resolution_clock::now();
 
-  Curve *c = meanDiscreteFrechetCurve(c1, c2);
+  // Curve *c = meanDiscreteFrechetCurve(c1, c2);
 
-  end = std::chrono::high_resolution_clock::now();
-  time = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+  // end = std::chrono::high_resolution_clock::now();
+  // time = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
 
-  std::cout << "Mean curve time: " << time.count() * 1e-9 << " seconds\n\n";
+  // std::cout << "Mean curve time: " << time.count() * 1e-9 << " seconds\n\n";
 
   // c->PRINT();
 
-  delete c;
+  // delete c;
 
   // float averageVariation = 0;
 
@@ -250,6 +150,42 @@ int main(int argc, char const *argv[]) {
   // table.add(c1.vec, c1.tVec, c1.key, c1.id);
 
   // table.PRINT();
+
+  CompleteBinaryTree *tree;
+  std::vector<Data *> curves;
+
+  for (auto i = 0; i < size; i++) {
+    vec1.push_back(distribution(generator));
+    vec2.push_back(distribution(generator));
+    vec3.push_back(distribution(generator));
+    vec4.push_back(distribution(generator));
+    tVec.push_back(i + 1);
+  }
+
+  auto c1 = (Data *) new Curve(vec1, tVec, "id1");
+  auto c2 = (Data *) new Curve(vec2, tVec, "id2");
+  auto c3 = (Data *) new Curve(vec3, tVec, "id3");
+  auto c4 = (Data *) new Curve(vec4, tVec, "id4");
+
+  curves.push_back(c1);
+  curves.push_back(c2);
+  curves.push_back(c3);
+  curves.push_back(c4);
+
+  auto start = std::chrono::high_resolution_clock::now();
+
+  tree = new CompleteBinaryTree(curves);
+
+  auto mean = tree->computeMeanCurve();
+
+  auto end = std::chrono::high_resolution_clock::now();
+  auto time = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+
+  std::cout << "time: " << time.count() * 1e-9 << " seconds\n\n";
+
+  tree->PRINT();
+
+  delete tree;
 
   return 0;
 }
