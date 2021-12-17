@@ -71,6 +71,8 @@ bool parseClusterArgs(int argc, const char **argv, std::string &input_file, std:
       output_file = argv[++i];
     } else if (!strcmp(argv[i], "-update")) {
       update = argv[++i];
+      update += " ";
+      update += argv[++i];
     } else if (!strcmp(argv[i], "-assignment")) {
       assignment = argv[++i];
     } else if (!strcmp(argv[i], "-complete")) {

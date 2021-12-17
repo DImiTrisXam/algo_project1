@@ -3,6 +3,7 @@
 #include "../search/lshSearch.hpp"
 #include "../utilities/metrics.hpp"
 #include "../utilities/utilities.hpp"
+#include "../utilities/completeBinaryTree.hpp"
 #include <algorithm>
 #include <chrono>
 #include <cstdlib>
@@ -12,107 +13,6 @@
 #include <random>
 #include <sstream>
 #include <string>
-
-std::list<std::pair<size_t, size_t>> optimalTraversal(const Data &a, const Data &b) {
-  auto x = (const Curve &)a;
-  auto y = (const Curve &)b;
-  auto m1 = x.vec.size();
-  auto m2 = y.vec.size();
-  double *distArray;
-
-  try {
-    distArray = new double[m1 * m2]; // array for dynamic programming
-  } catch (const std::bad_alloc &e) {
-    std::cout << "Allocation failed in discreteFrechetDist: " << e.what() << '\n';
-  }
-
-  // if (!distArray) // out of heap
-  //   throw "Unable to allocate array in discreteFrechetDist. Out of heap memory.";
-
-  for (auto i = 0; i < m1; ++i) { // compute distance matrix
-    for (auto j = 0; j < m2; ++j) {
-      // std::cout << "i: " << i << ",j: " << j << '\n';
-
-      std::vector<float> temp1{(float)x.tVec[i], x.vec[i]}; // i-th element of Curve x
-      std::vector<float> temp2{(float)y.tVec[j], y.vec[j]}; // j-th element of Curve y
-
-      Data x_i(temp1, "temp1");
-      Data y_j(temp2, "temp2");
-
-      if (i == 0 && j == 0) // if first cell
-        distArray[0] = euclidianDist(x_i, y_j);
-      else if (i == 0 && j > 0) { // if first row
-        // distArray[j] = distArray[0][j]
-        distArray[j] = std::max(distArray[j - 1], euclidianDist(x_i, y_j));
-      } else if (i > 0 && j == 0) { // if first column
-        // distArray[i* m2] = distArray[i][0]
-        distArray[i * m2] = std::max(distArray[(i - 1) * m2], euclidianDist(x_i, y_j));
-      } else if (i > 0 && j > 0) { // anything else
-        // distArray[(i - 1) * m2 + j] = distArray[i-1][j]
-        auto d1 = distArray[(i - 1) * m2 + j];
-        // distArray[(i - 1) * m2 + j - 1] = distArray[i-1][j-1]
-        auto d2 = distArray[(i - 1) * m2 + j - 1];
-        // distArray[i * m2 + j - 1] = distArray[i][j-1]
-        auto d3 = distArray[i * m2 + j - 1];
-
-        double min = std::min(d1, std::min(d2, d3));
-
-        // distArray[i * m2 + j] = distArray[i][j]
-        distArray[i * m2 + j] = std::max(min, euclidianDist(x_i, y_j));
-      }
-    }
-  }
-
-  std::list<std::pair<size_t, size_t>> traversal;
-
-  auto P_i = m1 - 1;
-  auto Q_i = m2 - 1;
-
-  std::pair<size_t, size_t> tuple(P_i, Q_i);
-
-  traversal.push_front(tuple);
-
-  while (P_i > 0 && Q_i > 0) {
-    auto d1 = distArray[(P_i - 1) * m2 + Q_i];     // distArray[P_i - 1][Q_i]
-    auto d2 = distArray[P_i * m2 + Q_i - 1];       // distArray[P_i][Q_i-1]
-    auto d3 = distArray[(P_i - 1) * m2 + Q_i - 1]; // distArray[P_i-1][Q_i-1]
-    auto min = std::min(d1, std::min(d2, d3));
-
-    if (min == d1) {
-      std::pair<size_t, size_t> tuple(--P_i, Q_i);
-      traversal.push_front(tuple);
-    } else if (min == d2) {
-      std::pair<size_t, size_t> tuple(P_i, --Q_i);
-      traversal.push_front(tuple);
-    } else {
-      std::pair<size_t, size_t> tuple(--P_i, --Q_i);
-      traversal.push_front(tuple);
-    }
-  }
-
-  delete[] distArray;
-
-  return traversal;
-}
-
-Curve *meanDiscreteFrechetCurve(const Data &a, const Data &b) {
-  auto traversal = optimalTraversal(a, b);
-
-  auto x = (const Curve &)a;
-  auto y = (const Curve &)b;
-  std::vector<float> vec;
-  std::vector<int> tVec;
-  int i = 0;
-
-  for (const auto tuple : traversal) {
-    vec.push_back((x.vec[tuple.first] + y.vec[tuple.second]) / 2);
-    tVec.push_back(++i);
-  }
-
-  Curve *mean = new Curve(vec, tVec, "mean");
-
-  return mean;
-}
 
 Centroid::Centroid(std::vector<float> &vec, std::string id) : Data(vec, id) {
 }
@@ -166,16 +66,26 @@ int Cluster::readInputFile(std::string &name) {
 
 int Cluster::printOutputFile(std::string &name, bool complete, std::chrono::nanoseconds t) {
   std::ofstream file(name);
-  std::string line;
 
   std::cout << "Printing to output file... ";
 
-  if (method.compare("Classic") == 0) {
-    file << "Algorithm: Lloyds\n";
-  } else if (method.compare("LSH") == 0) {
-    file << "Algorithm: Range Search LSH\n";
-  } else if (method.compare("Hypercube") == 0) {
-    file << "Algorithm: Range Search Hypercube\n";
+  if (assignMethod.compare("Classic") == 0) {
+    file << "Algorithm: AClassic";
+  } else if (assignMethod.compare("LSH") == 0) {
+    file << "Algorithm: ALSH";
+  } else if (assignMethod.compare("Hypercube") == 0) {
+    file << "Algorithm: AHypercube";
+  } else if (assignMethod.compare("LSH_Frechet") == 0) {
+    file << "Algorithm: ALSH_Frechet";
+  } else {
+    return -1;
+  }
+
+  
+  if (updateMethod.compare("Mean Frechet") == 0) {
+    file << "UMean Frechet\n";
+  } else if (updateMethod.compare("Mean Vector") == 0) {
+    file << "UMean Vector\n";
   } else {
     return -1;
   }
@@ -340,7 +250,10 @@ static HashTable **indexPointsLSH(std::string &inputFile, int L, int k, int w, i
     tables[i] = new HashTable(k, 2, dim, tableSize);
   }
 
-  readInputFile(inputFile, tables, L); // put the input in the hash tables
+  std::string algorithm = "LSH";
+  std::string metric;
+
+  readInputFile(inputFile, tables, L, algorithm, metric, 0, nullptr); // put the input in the hash tables
 
   return tables;
 }
@@ -350,8 +263,10 @@ static HashTable **indexPointsHypercube(std::string &inputFile, int k, int w, in
 
   HashTable **cube = (HashTable **)new Hypercube *[1];
   cube[0] = (HashTable *)new Hypercube(k, w, dim, tableSize);
+  std::string algorithm = "Hypercube";
+  std::string metric;
 
-  readInputFile(inputFile, cube, 1); // put the input in the hypercube
+  readInputFile(inputFile, cube, 1, algorithm, metric, 0, nullptr); // put the input in the hypercube
 
   return cube;
 }
@@ -364,10 +279,10 @@ bool Cluster::reverseAssignment(int iter, std::string &inputFile, int L, int k, 
   static HashTable **indexedPoints;
 
   if (iter == 0) {
-    if (method.compare("LSH") == 0) {
+    if (assignMethod.compare("LSH") == 0) {
       int tableSize = points.size() / 8;
       indexedPoints = indexPointsLSH(inputFile, L, k, w, dim, tableSize);
-    } else if (method.compare("Hypercube") == 0) {
+    } else if (assignMethod.compare("Hypercube") == 0) {
       int tableSize = pow(2, d);
       indexedPoints = indexPointsHypercube(inputFile, d, w, dim, tableSize);
     }
@@ -397,10 +312,10 @@ bool Cluster::reverseAssignment(int iter, std::string &inputFile, int L, int k, 
     std::vector<std::string> centroidPoints;
     Data *query = new Data(centroids[i]->vec, "centroid");
 
-    if (method.compare("LSH") == 0) {
+    if (assignMethod.compare("LSH") == 0) {
       centroidPoints = approximateRangeSearch(*query, radius, indexedPoints, L, metric); // Reverse assignment through range search with LSH
       // std::cout << "LSH result size " << centroidPoints.size() << ", radius: " << radius << std::endl;
-    } else if (method.compare("Hypercube") == 0) {
+    } else if (assignMethod.compare("Hypercube") == 0) {
       centroidPoints = approximateRangeSearch(*query, radius, *indexedPoints, M, probes, d, metric); // Reverse assignment through range search with hypercube projection
       // std::cout << "Hypercube result size: " << centroidPoints.size() << ", radius: " << radius << std::endl;
     }
@@ -572,9 +487,11 @@ int Cluster::begin(std::string &outputFile, std::string &inputFile, bool complet
   // std::cout << "maxIterations: " << maxIterations << "\n";
 
   for (i = 0; i < maxIterations; i++) {
-    if (method.compare("Classic") == 0) {
+    if (assignMethod.compare("Classic") == 0) {
       flag = LloydsAssignment(metric);
-    } else if (method.compare("LSH") == 0 || method.compare("Hypercube") == 0) {
+    } else if (assignMethod.compare("LSH") == 0 || assignMethod.compare("Hypercube") == 0) {
+      flag = reverseAssignment(i, inputFile, L, k, M, d, probes, metric);
+    } else if (assignMethod.compare("LSH_Frechet") == 0) {
       flag = reverseAssignment(i, inputFile, L, k, M, d, probes, metric);
     } else {
       return -1;
@@ -601,8 +518,16 @@ int Cluster::begin(std::string &outputFile, std::string &inputFile, bool complet
   return 0;
 }
 
-Cluster::Cluster(int K_, std::string met, std::string &inputFile) : K(K_), method(met) {
+Cluster::Cluster(int K_,std::string amet,std::string umet, std::string &inputFile) : K(K_), assignMethod(amet), updateMethod(umet) {
   readInputFile(inputFile);
 }
 
-Cluster::~Cluster() {}
+Cluster::~Cluster() {
+    for (auto &p : points) {
+        delete p;
+    }
+    
+    for (auto &c : centroids) {
+        delete c;
+    }
+}

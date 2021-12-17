@@ -1,1 +1,1 @@
-clear && make cluster -s && ./build/cluster -i datasets/nasdaq2017_LQ.csv -c cluster/cluster.conf -o outputCluster.txt -update Mean -assignment Classic -complete -silhouette
+clear && make cluster -s && ./build/cluster -i datasets/nasd_input.csv -c cluster/cluster.conf -o outputCluster.txt -update Mean Vector -assignment Classic

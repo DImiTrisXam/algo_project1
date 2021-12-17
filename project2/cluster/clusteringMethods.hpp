@@ -20,7 +20,8 @@ class Cluster {
   std::unordered_map<std::string, size_t> idToIndexMap;
   std::vector<Centroid *> centroids;
   int K;              // number of clusters
-  std::string method; // method of assignment (Lloyd's algorithm, LSH, Hypercube)
+  std::string assignMethod; // method of assignment (Classic, LSH, Hypercube, LSH_Frechet)
+  std::string updateMethod; // method of assignment (Mean Frechet, Mean Vector)
   double overallSilhouette;
 
   void printCentroids();
@@ -35,7 +36,7 @@ class Cluster {
 
 public:
   int begin(std::string &, std::string &, bool, int, int, int, int, int, const std::function<double(const Data &, const Data &)> &);
-  Cluster(int, std::string, std::string &);
+  Cluster(int, std::string, std::string, std::string &);
   ~Cluster();
 };
 
