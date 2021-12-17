@@ -14,7 +14,7 @@
 #include <sstream>
 #include <string>
 
-Centroid::Centroid(std::vector<float> &vec, std::string id) : Data(vec, id) {
+Centroid::Centroid(std::vector<float> &vec, std::vector<int> &tVec,std::string id) : Curve(vec,tVec, id) {
 }
 
 Centroid::~Centroid() {
@@ -132,26 +132,33 @@ int Cluster::printOutputFile(std::string &name, bool complete, std::chrono::nano
 }
 
 // random initialization of K clusters
-int Cluster::simpleInitialization() {
-  srand(time(0)); // need to set the random seed
+// int Cluster::simpleInitialization() {
+//   srand(time(0)); // need to set the random seed
 
-  for (auto i = 0; i < K; ++i) {
-    auto index = rand() % points.size();
-    Centroid *c = new Centroid(points[index]->vec, "centroid");
+//   for (auto i = 0; i < K; ++i) {
+//     auto index = rand() % points.size();
+//     Centroid *c = new Centroid(points[index]->vec, "centroid");
 
-    centroids.push_back(c);
-  }
+//     centroids.push_back(c);
+//   }
 
-  return 0;
-}
+//   return 0;
+// }
 
 // kmeans++ initialization
 int Cluster::kppInitialization(const std::function<double(const Data &, const Data &)> &metric) {
   unsigned seed = std::chrono::steady_clock::now().time_since_epoch().count();
   std::default_random_engine generator(seed);
   std::uniform_int_distribution<int> distribution(0, points.size() - 1);
+
+  std::vector<int> tVec;
+
+  for (auto i = 0; i < points[0]->vec.size(); i++) {
+    tVec.push_back(i + 1);
+  }
+
   // choose first centroid randomly
-  Centroid *c = new Centroid(points[distribution(generator)]->vec, "centroid");
+  Centroid *c = new Centroid(points[distribution(generator)]->vec, tVec, "centroid");
   // c->vec = points[distribution(generator)]->vec;
 
   centroids.push_back(c);
@@ -198,7 +205,7 @@ int Cluster::kppInitialization(const std::function<double(const Data &, const Da
 
     // find r with binary search where: x > P[r - 1] && x <= P[r]
     size_t r = std::lower_bound(P.begin(), P.end(), x) - P.begin();
-    c = new Centroid(points[r]->vec, "centroid");
+    c = new Centroid(points[r]->vec, tVec,"centroid");
 
     // c->vec = points[r]->vec;
     centroids.push_back(c);
@@ -399,8 +406,20 @@ int Cluster::updateCentroid() {
   // Compute the new centroids
   for (auto i = 0; i < centroids.size(); ++i) {
     if (centroids[i]->indexes.size() != 0) { // if points have been assigned to cluster
-      for (auto j = 0; j < dim; j++) {
-        centroids[i]->vec[j] = centroids[i]->vecSum[j] / (float)centroids[i]->indexes.size();
+      if (updateMethod.compare("Mean Vector") == 0) {
+          for (auto j = 0; j < dim; j++) {
+            centroids[i]->vec[j] = centroids[i]->vecSum[j] / (float)centroids[i]->indexes.size();
+        }
+      } else {
+          std::vector<Data *> assingedPoints;
+          for (auto &index : centroids[i]->indexes) {
+              assingedPoints.push_back(points[index]);
+          }
+          
+          CompleteBinaryTree *tree  = new CompleteBinaryTree(assingedPoints);
+          auto mean = (Curve *) tree->computeMeanCurve();
+          centroids[i]->vec = mean->vec;
+          centroids[i]->tVec = mean->tVec;
       }
     }
   }

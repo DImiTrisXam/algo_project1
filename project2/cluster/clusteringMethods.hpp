@@ -1,17 +1,17 @@
 #ifndef __CLUSTER__
 #define __CLUSTER__
 
-#include "../utilities/hash.hpp"
+#include "../utilities/curve.hpp"
 #include <chrono>
 #include <unordered_map>
 #include <vector>
 
-struct Centroid : public Data {
+struct Centroid : public Curve {
   std::vector<float> vecSum; // sum of all points in cluster of centroid
   std::vector<int> indexes;  // indexes of all the points in cluster of centroid
   double silhouette;         // silhouette of centroid's cluster
 
-  Centroid(std::vector<float> &, std::string);
+  Centroid(std::vector<float> &, std::vector<int> &, std::string);
   ~Centroid();
 };
 
