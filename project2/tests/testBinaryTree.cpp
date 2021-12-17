@@ -1,25 +1,10 @@
-#include "../utilities/completeBinaryTree.hpp"
-#include "../utilities/grid.hpp"
-#include "../utilities/curve.hpp"
-#include "../utilities/metrics.hpp"
-#include <chrono>
-#include <cstring>
-#include <fstream>
-#include <iostream>
-#include <list>
-#include <random>
-#include <string>
-#include <typeinfo>
-#include <utility>
-#include <CUnit/CUnit.h>
+#include "test.hpp"
 
-int main(int argc, char const *argv[]) {
+void testBinaryTree() {
   std::vector<float> vec1, vec2, vec3, vec4, vec5;
   std::vector<int> tVec;
   int size = 5;
 
-  unsigned seed = std::chrono::steady_clock::now().time_since_epoch().count();
-  // std::default_random_engine generator(seed);
   std::default_random_engine generator(730);
 
   std::uniform_real_distribution<float> distribution(0, 100);
@@ -50,11 +35,9 @@ int main(int argc, char const *argv[]) {
 
   tree = new CompleteBinaryTree(curves);
 
-//   auto mean = tree->computeMeanCurve();
-
   CU_ASSERT(tree->numOfNodes() == 2*curves.size()-1);
 
   delete tree;
 
-  return 0;
+  return;
 }
