@@ -21,11 +21,11 @@ void testBinaryTree() {
     tVec.push_back(i + 1);
   }
 
-  auto c1 = (Data *) new Curve(vec1, tVec, "id1");
-  auto c2 = (Data *) new Curve(vec2, tVec, "id2");
-  auto c3 = (Data *) new Curve(vec3, tVec, "id3");
-  auto c4 = (Data *) new Curve(vec4, tVec, "id4");
-  auto c5 = (Data *) new Curve(vec4, tVec, "id5");
+  auto c1 = (Data *)new Curve(vec1, tVec, "id1");
+  auto c2 = (Data *)new Curve(vec2, tVec, "id2");
+  auto c3 = (Data *)new Curve(vec3, tVec, "id3");
+  auto c4 = (Data *)new Curve(vec4, tVec, "id4");
+  auto c5 = (Data *)new Curve(vec4, tVec, "id5");
 
   curves.push_back(c1);
   curves.push_back(c2);
@@ -35,7 +35,7 @@ void testBinaryTree() {
 
   tree = new CompleteBinaryTree(curves);
 
-  CU_ASSERT(tree->numOfNodes() == 2*curves.size()-1);
+  CU_ASSERT(tree->numOfNodes() == 2 * curves.size() - 1);
 
   delete tree;
 

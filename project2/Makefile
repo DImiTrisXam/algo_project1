@@ -43,10 +43,10 @@ $(BIN)/%.o: $(CLUSTER_DIR)/%.cpp $(CLUSTER_INC_FILES)
 test: create_directories test.cpp $(UTIL_OBJ_FILES)
 	$(CPP) test.cpp $(UTIL_OBJ_FILES) -o test
 
-tests: create_directories ./tests/runTests.cpp ./tests/testBinaryTree.cpp ./tests/testHashTable.cpp ./tests/testDiscFrechet.cpp ./tests/test.hpp $(UTIL_OBJ_FILES)
-	$(CPP) ./tests/runTests.cpp ./tests/testBinaryTree.cpp ./tests/testHashTable.cpp ./tests/testDiscFrechet.cpp $(UTIL_OBJ_FILES) -o runTests -lcunit
+tests: create_directories ./tests/* $(UTIL_OBJ_FILES)
+	$(CPP) ./tests/*.cpp $(UTIL_OBJ_FILES) -o runTests -lcunit
 
 .PHONY: clean
 
 clean:
-	rm -r -f $(BIN) $(BUILD) output* test
+	rm -r -f $(BIN) $(BUILD) output* test runTests

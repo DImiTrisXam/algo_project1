@@ -18,9 +18,8 @@ void testDiscFrechet() {
   auto c1 = new Curve(vec1, tVec, "id1");
   auto c2 = new Curve(vec2, tVec, "id2");
 
-
   double dist = discreteFrechetDist(*c1, *c2);
-  double res = 56.056221008300781;
+  double res = 56.05622100830078;
 
   CU_ASSERT(dist == res);
 

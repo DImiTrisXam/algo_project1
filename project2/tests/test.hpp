@@ -1,7 +1,8 @@
 #include "../utilities/completeBinaryTree.hpp"
-#include "../utilities/grid.hpp"
 #include "../utilities/curve.hpp"
+#include "../utilities/grid.hpp"
 #include "../utilities/metrics.hpp"
+#include <CUnit/CUnit.h>
 #include <chrono>
 #include <cstring>
 #include <fstream>
@@ -11,7 +12,6 @@
 #include <string>
 #include <typeinfo>
 #include <utility>
-#include <CUnit/CUnit.h>
 
 void testBinaryTree();
 void testHashTable();

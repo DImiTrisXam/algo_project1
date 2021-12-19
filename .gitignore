@@ -12,6 +12,7 @@ Fred/build
 Fred/test
 
 test
+runTests
 
 # Prerequisites
 *.d
