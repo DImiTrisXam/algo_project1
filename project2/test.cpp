@@ -14,9 +14,9 @@
 
 int main(int argc, char const *argv[]) {
   std::vector<float> vec1, vec2, vec3, vec4, vec5;
-  std::vector<int> tVec;
-  int size = 120;
-  HashTable table(14, 2, 120, 10);
+  std::vector<float> tVec;
+  int size = 730;
+  // HashTable table(14, 2, 120, 10);
 
   unsigned seed = std::chrono::steady_clock::now().time_since_epoch().count();
   // std::default_random_engine generator(seed);
@@ -163,11 +163,11 @@ int main(int argc, char const *argv[]) {
     tVec.push_back(i + 1);
   }
 
-  auto c1 = (Data *) new Curve(vec1, tVec, "id1");
-  auto c2 = (Data *) new Curve(vec2, tVec, "id2");
-  auto c3 = (Data *) new Curve(vec3, tVec, "id3");
-  auto c4 = (Data *) new Curve(vec4, tVec, "id4");
-  auto c5 = (Data *) new Curve(vec4, tVec, "id5");
+  auto c1 = (Data *)new Curve(vec1, tVec, "id1");
+  auto c2 = (Data *)new Curve(vec2, tVec, "id2");
+  auto c3 = (Data *)new Curve(vec3, tVec, "id3");
+  auto c4 = (Data *)new Curve(vec4, tVec, "id4");
+  auto c5 = (Data *)new Curve(vec4, tVec, "id5");
 
   curves.push_back(c1);
   curves.push_back(c2);
@@ -179,15 +179,16 @@ int main(int argc, char const *argv[]) {
 
   tree = new CompleteBinaryTree(curves);
 
-//   auto mean = tree->computeMeanCurve();
+  auto mean = tree->computeMeanCurve();
 
   auto end = std::chrono::high_resolution_clock::now();
   auto time = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
 
+  // std::cout << "mean size: " << mean->vec.size() << ", time: " << time.count() * 1e-9 << " seconds\n\n";
   std::cout << "time: " << time.count() * 1e-9 << " seconds\n\n";
 
-//   tree->PRINT();
-    tree->print2D();
+  // tree->PRINT();
+  tree->print2D();
 
   delete tree;
 

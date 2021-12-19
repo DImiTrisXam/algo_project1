@@ -1,7 +1,10 @@
 #include "completeBinaryTree.hpp"
 #include "metrics.hpp"
+#include <chrono>
 #include <cmath>
 #include <iostream>
+#include <random>
+#include <set>
 #include <string>
 
 //////////////////////// Mean curve functions ////////////////////////
@@ -16,18 +19,18 @@ std::list<std::pair<size_t, size_t>> optimalTraversal(const Data &a, const Data 
   try {
     distArray = new double[m1 * m2]; // array for dynamic programming
   } catch (const std::bad_alloc &e) {
-    std::cout << "Allocation failed in discreteFrechetDist: " << e.what() << '\n';
+    std::cout << "Allocation failed in optimalTraversal: " << e.what() << '\n';
   }
 
   // if (!distArray) // out of heap
-  //   throw "Unable to allocate array in discreteFrechetDist. Out of heap memory.";
+  //   throw "Unable to allocate array in optimalTraversal. Out of heap memory.";
 
   for (auto i = 0; i < m1; ++i) { // compute distance matrix
     for (auto j = 0; j < m2; ++j) {
       // std::cout << "i: " << i << ",j: " << j << '\n';
 
-      std::vector<float> temp1{(float)x.tVec[i], x.vec[i]}; // i-th element of Curve x
-      std::vector<float> temp2{(float)y.tVec[j], y.vec[j]}; // j-th element of Curve y
+      std::vector<float> temp1{x.tVec[i], x.vec[i]}; // i-th element of Curve x
+      std::vector<float> temp2{y.tVec[j], y.vec[j]}; // j-th element of Curve y
 
       Data x_i(temp1, "temp1");
       Data y_j(temp2, "temp2");
@@ -94,17 +97,73 @@ Curve *meanDiscreteFrechetCurve(const Data &a, const Data &b) {
   auto x = (const Curve &)a;
   auto y = (const Curve &)b;
   std::vector<float> vec;
-  std::vector<int> tVec;
-  int i = 0;
+  std::vector<float> tVec;
 
   for (const auto tuple : traversal) {
     vec.push_back((x.vec[tuple.first] + y.vec[tuple.second]) / 2);
-    tVec.push_back(++i);
+    tVec.push_back((x.tVec[tuple.first] + y.tVec[tuple.second]) / 2);
   }
 
-  Curve *mean = new Curve(vec, tVec, "mean");
+  // std::cout << "mean curve size: " << vec.size() << "\n";
 
-  return mean;
+  return new Curve(vec, tVec, "mean");
+}
+
+Curve *reduceMeanCurveSize(Curve &c) {
+  std::vector<float> temp1; // for y axis
+  std::vector<float> temp2; // for x axis (time)
+
+  temp1.push_back(c.vec[0]);
+  temp2.push_back(c.tVec[0]);
+
+  // get minima maxima
+  for (int i = 1; i < c.vec.size() - 1; i++) {
+    if (c.vec[i] >= std::min(c.vec[i - 1], c.vec[i + 1]) && c.vec[i] <= std::max(c.vec[i - 1], c.vec[i + 1])) {
+      temp1.push_back(c.vec[i]);
+      temp2.push_back(c.tVec[i]);
+    }
+  }
+
+  temp1.push_back(c.vec[c.vec.size() - 1]);
+  temp2.push_back(c.tVec[c.vec.size() - 1]);
+
+  c.vec = temp1;
+  c.tVec = temp2;
+
+  // std::cout << "reduced mean curve size: " << c.vec.size() << "\n";
+
+  return &c;
+}
+
+Curve *fitMeanCurveToSize(Curve &c, size_t size) {
+  auto diff = c.vec.size() - size;
+  std::set<size_t> indexes;
+  unsigned seed = std::chrono::steady_clock::now().time_since_epoch().count();
+  std::default_random_engine generator(seed);
+
+  std::uniform_int_distribution<size_t> distribution(0, diff);
+
+  while (indexes.size() < diff) { // choose #diff indexes
+    indexes.insert(distribution(generator));
+  }
+
+  std::vector<float> temp1; // for y axis
+  std::vector<float> temp2; // for x axis (time)
+
+  // choose #size random points from curve
+  for (auto i = 0; i < c.vec.size(); i++) {
+    if (indexes.find(i) == indexes.end()) { // if you don't find index
+      temp1.push_back(c.vec[i]);
+      temp2.push_back(c.tVec[i]);
+    }
+  }
+
+  c.vec = temp1;
+  c.tVec = temp2;
+
+  // std::cout << "fit mean curve size: " << c.vec.size() << "\n";
+
+  return &c;
 }
 
 //////////////////////////////// Node ////////////////////////////////
@@ -159,16 +218,33 @@ Data *CompleteBinaryTree::computeMeanCurveRec(Node *node) {
     Data *rightCurve;
 
     if (node->right != nullptr)
-      rightCurve = computeMeanCurveRec(node->left);
+      rightCurve = computeMeanCurveRec(node->right);
     else
       return leftCurve;
 
-    return meanDiscreteFrechetCurve(*leftCurve, *rightCurve);
+    auto mean = meanDiscreteFrechetCurve(*leftCurve, *rightCurve);
+    auto dim = (*leafs)[0]->vec.size();
+
+    // if (mean->vec.size() > 2 * dim) // if size of mean curve is too big
+    //   return reduceMeanCurveSize(*mean);
+    // else
+    //   return mean;
+    return fitMeanCurveToSize(*mean, dim);
   }
 }
 
 Data *CompleteBinaryTree::computeMeanCurve() {
-  return computeMeanCurveRec(root);
+  auto mean = (Curve *)computeMeanCurveRec(root);
+
+  auto dim = (*leafs)[0]->vec.size();
+
+  if (mean->vec.size() > dim)
+    return fitMeanCurveToSize(*mean, dim);
+  else if (mean->vec.size() < dim) {
+    std::cout << "SHIT\n";
+    return mean;
+  } else
+    return mean;
 }
 
 void CompleteBinaryTree::createTreeFromVectorEven(Node *node, Node *parent, double h, bool leftChild) {
@@ -185,7 +261,7 @@ void CompleteBinaryTree::createTreeFromVectorEven(Node *node, Node *parent, doub
       parent->left = node;
     else
       parent->right = node;
-    
+
     counter++;
   }
 
@@ -226,37 +302,36 @@ void CompleteBinaryTree::changeIndexes() {
 }
 
 void CompleteBinaryTree::createTreeFromVectorOdd(double height) {
-    for (auto i = 0; i <= height; i++)
-        createTreeFromVectorOddRec(root, nullptr,i,false);
-    
-    changeIndexes();
+  for (auto i = 0; i <= height; i++)
+    createTreeFromVectorOddRec(root, nullptr, i, false);
+
+  changeIndexes();
 }
 
-void CompleteBinaryTree::createTreeFromVectorOddRec(Node *node, Node *parent,int level, bool leftChild) {
-    if (counter == 2*leafs->size()-1) {
-        return;
-    }
-    if (node == nullptr) { // if leaf
-        node = createNode();
+void CompleteBinaryTree::createTreeFromVectorOddRec(Node *node, Node *parent, int level, bool leftChild) {
+  if (counter == 2 * leafs->size() - 1)
+    return;
 
-        if (leftChild)
-            parent->left = node;
-        else
-            parent->right = node;
+  if (node == nullptr) { // if leaf
+    node = createNode();
 
-        counter++;
-        
-        return;
-    }
-    
-    if (level == 0) {
-      return;
-    }
-    else if (level > 0) {
-       createTreeFromVectorOddRec(node->left, node, level -1, true);
-       createTreeFromVectorOddRec(node->right, node, level -1, false);
-       return;
-    }
+    if (leftChild)
+      parent->left = node;
+    else
+      parent->right = node;
+
+    counter++;
+
+    return;
+  }
+
+  if (level == 0)
+    return;
+  else if (level > 0) {
+    createTreeFromVectorOddRec(node->left, node, level - 1, true);
+    createTreeFromVectorOddRec(node->right, node, level - 1, false);
+    return;
+  }
 }
 
 void CompleteBinaryTree::eraseAll(Node *node) {
@@ -293,51 +368,45 @@ void CompleteBinaryTree::PRINT() {
   return;
 }
 
-void  CompleteBinaryTree::print2DUtil(Node *node, int space)
-{
-    // Base case
-    if (node == nullptr)
-        return;
- 
-    // Increase distance between levels
-    space += 10;
- 
-    // Process right child first
-    print2DUtil(node->right, space);
- 
-    // Print current node after space
-    // count
-    // std::cout<<std::endl;
-    for (int i = 10; i < space; i++)
-        std::cout<<" "; 
-    std::cout<<node->index<<"\n";
- 
-    // Process left child
-    print2DUtil(node->left, space);
+void CompleteBinaryTree::print2DUtil(Node *node, int space) {
+  // Base case
+  if (node == nullptr)
+    return;
+
+  // Increase distance between levels
+  space += 10;
+
+  // Process right child first
+  print2DUtil(node->right, space);
+
+  // Print current node after space
+  // count
+  // std::cout<<std::endl;
+  for (int i = 10; i < space; i++)
+    std::cout << " ";
+  std::cout << node->index << "\n";
+
+  // Process left child
+  print2DUtil(node->left, space);
 }
- 
+
 // Wrapper over print2DUtil()
-void  CompleteBinaryTree::print2D()
-{
-    // Pass initial space count as 0
-    print2DUtil(root, 0);
+void CompleteBinaryTree::print2D() {
+  // Pass initial space count as 0
+  print2DUtil(root, 0);
 }
 
 CompleteBinaryTree::CompleteBinaryTree(std::vector<Data *> &leafs_) : leafs(&leafs_), currentIndex(0), counter(1) {
   root = createNode();
-  root->index = 12;
   auto maxHeight = ceil(log2(leafs->size()));
-  std::cout << "height " << maxHeight << "\n";
-    if (leafs->size() % 2 == 0){
-      createTreeFromVectorEven(root, nullptr, maxHeight, false);
-    }
-    else {
-        createTreeFromVectorOdd(maxHeight);
-    }
+  // std::cout << "height " << maxHeight << "\n";
 
-  
+  if (leafs->size() % 2 == 0) // if even curves
+    createTreeFromVectorEven(root, nullptr, maxHeight, false);
+  else // if odd curves
+    createTreeFromVectorOdd(maxHeight);
 
-  std::cout << "CompleteBinaryTree created\n";
+  // std::cout << "CompleteBinaryTree created\n";
 }
 
 CompleteBinaryTree::~CompleteBinaryTree() {
@@ -346,5 +415,5 @@ CompleteBinaryTree::~CompleteBinaryTree() {
     delete root;
   }
 
-  std::cout << "CompleteBinaryTree destroyed\n";
+  // std::cout << "CompleteBinaryTree destroyed\n";
 }

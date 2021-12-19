@@ -66,7 +66,7 @@ void HashTable::add(std::vector<float> &vec, std::string &id) {
   containedItems++;
 }
 
-void HashTable::add(std::vector<float> &vec, std::vector<int> &tVec, std::vector<float> &key, std::string &id) {
+void HashTable::add(std::vector<float> &vec, std::vector<float> &tVec, std::vector<float> &key, std::string &id) {
   Data *newData;
 
   try {

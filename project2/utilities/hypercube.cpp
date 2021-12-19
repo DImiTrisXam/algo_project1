@@ -22,9 +22,6 @@ short Hypercube::f(size_t index, std::unordered_map<size_t, short> &hMap) {
   unsigned seed = std::chrono::steady_clock::now().time_since_epoch().count();
   std::default_random_engine generator(seed);
   
-  // std::random_device rd; //Will be used to obtain a seed for the random number engine
-  // std::mt19937 gen(rd());
-  
   std::uniform_int_distribution<short> distribution(0, 1);
   randNum = distribution(generator);
   hMap[index] = randNum;

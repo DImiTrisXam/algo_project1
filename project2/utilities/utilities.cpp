@@ -221,7 +221,7 @@ int readNumberOfLines(std::string name, int &dim) {
 int readInputFile(std::string &name, HashTable **tables, int L, std::string &algorithm, std::string &metric, double delta, Grid **grids) {
   std::ifstream file(name);
   std::string line;
-  std::vector<int> tVec;
+  std::vector<float> tVec;
 
   std::cout << "Processing input file... ";
 
@@ -300,7 +300,7 @@ std::vector<Data *> *readQueryFile(std::string &qfile_, bool curve) {
 
     std::string id;
     std::vector<float> vec;
-    std::vector<int> tVec;
+    std::vector<float> tVec;
     float temp;
     Data *query;
 

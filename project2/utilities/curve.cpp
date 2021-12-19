@@ -4,7 +4,7 @@
 #include <iostream>
 #include <limits>
 
-Curve::Curve(std::vector<float> vec, std::vector<int> tvec, std::string id) : Data(vec, id), tVec(tvec) {
+Curve::Curve(std::vector<float> vec, std::vector<float> tvec, std::string id) : Data(vec, id), tVec(tvec) {
 }
 
 Curve::~Curve() {

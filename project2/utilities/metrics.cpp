@@ -66,8 +66,8 @@ double discreteFrechetDist(const Data &a, const Data &b) {
     for (auto j = 0; j < m2; ++j) {
       // std::cout << "i: " << i << ",j: " << j << '\n';
 
-      std::vector<float> temp1{(float)x.tVec[i], x.vec[i]}; // i-th element of Curve x
-      std::vector<float> temp2{(float)y.tVec[j], y.vec[j]}; // j-th element of Curve y
+      std::vector<float> temp1{x.tVec[i], x.vec[i]}; // i-th element of Curve x
+      std::vector<float> temp2{y.tVec[j], y.vec[j]}; // j-th element of Curve y
 
       Data x_i(temp1, "temp1");
       Data y_j(temp2, "temp2");
