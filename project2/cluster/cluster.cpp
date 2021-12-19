@@ -46,7 +46,18 @@ int main(int argc, char const *argv[]) {
             << "number_of_probes: " << probes << "\n\n";
 
   Cluster cl = Cluster(K, assignment, update, iFile__, complete, silhouette);
-  cl.begin(oFile__, iFile__, L, k, M, d, probes, euclidianDist);
+
+  if (update.compare("Mean Frechet") == 0) {
+    if (cl.begin(oFile__, iFile__, L, k, M, d, probes, discreteFrechetDist) == -1) {
+      std::cout << "Wrong combination of update and assignment methods\n";
+      return -1;
+    }
+  } else {
+    if (cl.begin(oFile__, iFile__, L, k, M, d, probes, euclidianDist) == -1) {
+      std::cout << "Wrong combination of update and assignment methods\n";
+      return -1;
+    }
+  }
 
   return 0;
 }

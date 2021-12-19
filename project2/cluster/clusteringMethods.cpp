@@ -494,11 +494,20 @@ int Cluster::Silhouette(const std::function<double(const Data &, const Data &)> 
 }
 
 int Cluster::begin(std::string &outputFile, std::string &inputFile, int L, int k, int M, int d, int probes, const std::function<double(const Data &, const Data &)> &metric) {
+  // check for right combinations of update and assignment
+  if (updateMethod.compare("Mean Frechet") == 0) {
+    if (assignMethod.compare("LSH") == 0 || assignMethod.compare("Hypercube") == 0)
+      return -1;
+  } else if (updateMethod.compare("Mean Vector") == 0) {
+    if (assignMethod.compare("LSH_Frechet") == 0)
+      return -1;
+  } else
+    return -1;
+
   auto maxIterations = points.size();
 
   auto start = std::chrono::high_resolution_clock::now();
 
-  // simpleInitialization();
   kppInitialization(metric);
 
   size_t i = 0;
@@ -539,16 +548,15 @@ int Cluster::begin(std::string &outputFile, std::string &inputFile, int L, int k
   return 0;
 }
 
-Cluster::Cluster(int K_, std::string amet, std::string umet, std::string &inputFile, bool comp, bool sil) : K(K_), assignMethod(amet), updateMethod(umet), complete(comp), silhouette(sil) {
+Cluster::Cluster(int K_, std::string amet, std::string umet, std::string &inputFile, bool comp, bool sil)
+    : K(K_), assignMethod(amet), updateMethod(umet), complete(comp), silhouette(sil) {
   readInputFile(inputFile);
 }
 
 Cluster::~Cluster() {
-  for (auto &p : points) {
+  for (auto &p : points)
     delete p;
-  }
 
-  for (auto &c : centroids) {
+  for (auto &c : centroids)
     delete c;
-  }
 }
