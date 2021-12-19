@@ -120,12 +120,14 @@ int Cluster::printOutputFile(std::string &name, bool complete, std::chrono::nano
   // multiply nanoseconds with 10^-9 to print seconds
   file << "clustering_time: " << t.count() * 1e-9 << '\n';
 
-  file << "Silhouette: [" << centroids[0]->silhouette;
+  if (silhouette) {
+    file << "Silhouette: [" << centroids[0]->silhouette;
 
-  for (auto i = 1; i < centroids.size(); i++) {
-    file << ", " << centroids[i]->silhouette;
+    for (auto i = 1; i < centroids.size(); i++) {
+      file << ", " << centroids[i]->silhouette;
+    }
+    file << ", " << overallSilhouette << "]\n";
   }
-  file << ", " << overallSilhouette << "]\n";
 
   std::cout << "DONE\n";
 }
@@ -491,7 +493,7 @@ int Cluster::Silhouette(const std::function<double(const Data &, const Data &)> 
   return 0;
 }
 
-int Cluster::begin(std::string &outputFile, std::string &inputFile, bool complete, int L, int k, int M, int d, int probes, const std::function<double(const Data &, const Data &)> &metric) {
+int Cluster::begin(std::string &outputFile, std::string &inputFile, int L, int k, int M, int d, int probes, const std::function<double(const Data &, const Data &)> &metric) {
   auto maxIterations = points.size();
 
   auto start = std::chrono::high_resolution_clock::now();
@@ -525,18 +527,19 @@ int Cluster::begin(std::string &outputFile, std::string &inputFile, bool complet
   auto time = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
 
   std::cout << "Iterations: " << i << "\n";
-  std::cout << "Computing Silhouette... ";
 
-  // Silhouette(metric);
-
-  std::cout << "DONE\n";
+  if (silhouette) {
+    std::cout << "Computing Silhouette... ";
+    Silhouette(metric);
+    std::cout << "DONE\n";
+  }
 
   printOutputFile(outputFile, complete, time);
 
   return 0;
 }
 
-Cluster::Cluster(int K_, std::string amet, std::string umet, std::string &inputFile) : K(K_), assignMethod(amet), updateMethod(umet) {
+Cluster::Cluster(int K_, std::string amet, std::string umet, std::string &inputFile, bool comp, bool sil) : K(K_), assignMethod(amet), updateMethod(umet), complete(comp), silhouette(sil) {
   readInputFile(inputFile);
 }
 

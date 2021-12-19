@@ -19,10 +19,11 @@ class Cluster {
   std::vector<Data *> points;
   std::unordered_map<std::string, size_t> idToIndexMap;
   std::vector<Centroid *> centroids;
-  int K;              // number of clusters
+  int K;                    // number of clusters
   std::string assignMethod; // method of assignment (Classic, LSH, Hypercube, LSH_Frechet)
   std::string updateMethod; // method of assignment (Mean Frechet, Mean Vector)
   double overallSilhouette;
+  bool complete, silhouette; // for printing
 
   void printCentroids();
   int readInputFile(std::string &);
@@ -35,8 +36,8 @@ class Cluster {
   int Silhouette(const std::function<double(const Data &, const Data &)> &);
 
 public:
-  int begin(std::string &, std::string &, bool, int, int, int, int, int, const std::function<double(const Data &, const Data &)> &);
-  Cluster(int, std::string, std::string, std::string &);
+  int begin(std::string &, std::string &, int, int, int, int, int, const std::function<double(const Data &, const Data &)> &);
+  Cluster(int, std::string, std::string, std::string &, bool, bool);
   ~Cluster();
 };
 

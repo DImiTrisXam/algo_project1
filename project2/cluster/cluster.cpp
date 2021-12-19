@@ -45,8 +45,8 @@ int main(int argc, char const *argv[]) {
             << "number_of_hypercube_dimensions: " << d << "\n"
             << "number_of_probes: " << probes << "\n\n";
 
-  Cluster cl = Cluster(K, assignment, update, iFile__);
-  cl.begin(oFile__, iFile__, complete, L, k, M, d, probes, euclidianDist);
+  Cluster cl = Cluster(K, assignment, update, iFile__, complete, silhouette);
+  cl.begin(oFile__, iFile__, L, k, M, d, probes, euclidianDist);
 
   return 0;
 }
