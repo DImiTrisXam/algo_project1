@@ -1,9 +1,9 @@
 #include "clusteringMethods.hpp"
 #include "../search/cubeSearch.hpp"
 #include "../search/lshSearch.hpp"
+#include "../utilities/completeBinaryTree.hpp"
 #include "../utilities/metrics.hpp"
 #include "../utilities/utilities.hpp"
-#include "../utilities/completeBinaryTree.hpp"
 #include <algorithm>
 #include <chrono>
 #include <cstdlib>
@@ -14,7 +14,7 @@
 #include <sstream>
 #include <string>
 
-Centroid::Centroid(std::vector<float> &vec, std::vector<int> &tVec,std::string id) : Curve(vec,tVec, id) {
+Centroid::Centroid(std::vector<float> &vec, std::vector<float> &tVec, std::string id) : Curve(vec, tVec, id) {
 }
 
 Centroid::~Centroid() {
@@ -81,7 +81,6 @@ int Cluster::printOutputFile(std::string &name, bool complete, std::chrono::nano
     return -1;
   }
 
-  
   if (updateMethod.compare("Mean Frechet") == 0) {
     file << "UMean Frechet\n";
   } else if (updateMethod.compare("Mean Vector") == 0) {
@@ -151,7 +150,7 @@ int Cluster::kppInitialization(const std::function<double(const Data &, const Da
   std::default_random_engine generator(seed);
   std::uniform_int_distribution<int> distribution(0, points.size() - 1);
 
-  std::vector<int> tVec;
+  std::vector<float> tVec;
 
   for (auto i = 0; i < points[0]->vec.size(); i++) {
     tVec.push_back(i + 1);
@@ -205,7 +204,7 @@ int Cluster::kppInitialization(const std::function<double(const Data &, const Da
 
     // find r with binary search where: x > P[r - 1] && x <= P[r]
     size_t r = std::lower_bound(P.begin(), P.end(), x) - P.begin();
-    c = new Centroid(points[r]->vec, tVec,"centroid");
+    c = new Centroid(points[r]->vec, tVec, "centroid");
 
     // c->vec = points[r]->vec;
     centroids.push_back(c);
@@ -407,19 +406,19 @@ int Cluster::updateCentroid() {
   for (auto i = 0; i < centroids.size(); ++i) {
     if (centroids[i]->indexes.size() != 0) { // if points have been assigned to cluster
       if (updateMethod.compare("Mean Vector") == 0) {
-          for (auto j = 0; j < dim; j++) {
-            centroids[i]->vec[j] = centroids[i]->vecSum[j] / (float)centroids[i]->indexes.size();
+        for (auto j = 0; j < dim; j++) {
+          centroids[i]->vec[j] = centroids[i]->vecSum[j] / (float)centroids[i]->indexes.size();
         }
       } else {
-          std::vector<Data *> assingedPoints;
-          for (auto &index : centroids[i]->indexes) {
-              assingedPoints.push_back(points[index]);
-          }
-          
-          CompleteBinaryTree *tree  = new CompleteBinaryTree(assingedPoints);
-          auto mean = (Curve *) tree->computeMeanCurve();
-          centroids[i]->vec = mean->vec;
-          centroids[i]->tVec = mean->tVec;
+        std::vector<Data *> assingedPoints;
+        for (auto &index : centroids[i]->indexes) {
+          assingedPoints.push_back(points[index]);
+        }
+
+        CompleteBinaryTree *tree = new CompleteBinaryTree(assingedPoints);
+        auto mean = (Curve *)tree->computeMeanCurve();
+        centroids[i]->vec = mean->vec;
+        centroids[i]->tVec = mean->tVec;
       }
     }
   }
@@ -537,16 +536,16 @@ int Cluster::begin(std::string &outputFile, std::string &inputFile, bool complet
   return 0;
 }
 
-Cluster::Cluster(int K_,std::string amet,std::string umet, std::string &inputFile) : K(K_), assignMethod(amet), updateMethod(umet) {
+Cluster::Cluster(int K_, std::string amet, std::string umet, std::string &inputFile) : K(K_), assignMethod(amet), updateMethod(umet) {
   readInputFile(inputFile);
 }
 
 Cluster::~Cluster() {
-    for (auto &p : points) {
-        delete p;
-    }
-    
-    for (auto &c : centroids) {
-        delete c;
-    }
+  for (auto &p : points) {
+    delete p;
+  }
+
+  for (auto &c : centroids) {
+    delete c;
+  }
 }

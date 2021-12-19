@@ -11,7 +11,7 @@ struct Centroid : public Curve {
   std::vector<int> indexes;  // indexes of all the points in cluster of centroid
   double silhouette;         // silhouette of centroid's cluster
 
-  Centroid(std::vector<float> &, std::vector<int> &, std::string);
+  Centroid(std::vector<float> &, std::vector<float> &, std::string);
   ~Centroid();
 };
 
