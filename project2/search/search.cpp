@@ -9,18 +9,18 @@
 #include <iostream>
 #include <vector>
 
-static void use(void) {
-  // how to use the program
-  std::cout << "\nUsage: -i <input file>\n"
-            << "\n       -q <query file>\n"
-            << "\n       -k <int>\n"
-            << "\n       -L <int>\n"
-            << "\n       -o <output file>\n"
-            << "\n       -N <number of nearest>\n"
-            << "\n       -R <radius>\n";
+// static void use(void) {
+//   // how to use the program
+//   std::cout << "\nUsage: -i <input file>\n"
+//             << "\n       -q <query file>\n"
+//             << "\n       -k <int>\n"
+//             << "\n       -L <int>\n"
+//             << "\n       -o <output file>\n"
+//             << "\n       -N <number of nearest>\n"
+//             << "\n       -R <radius>\n";
 
-  exit(1);
-}
+//   exit(1);
+// }
 
 int main(int argc, char const *argv[]) {
   std::string iFile__; // input file name

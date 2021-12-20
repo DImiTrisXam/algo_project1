@@ -5,16 +5,16 @@
 #include <fstream>
 #include <iostream>
 
-void use(void) {
-  // how to use the program
-  std::cout << "\nUsage: -i <input file>\n"
-            << "\n       -c <configuration file>\n"
-            << "\n       -o <output file>\n"
-            << "\n       -complete <optional>\n"
-            << "\n       -m <method: Classic OR LSH or Hypercube>\n";
+// void use(void) {
+//   // how to use the program
+//   std::cout << "\nUsage: -i <input file>\n"
+//             << "\n       -c <configuration file>\n"
+//             << "\n       -o <output file>\n"
+//             << "\n       -complete <optional>\n"
+//             << "\n       -m <method: Classic OR LSH or Hypercube>\n";
 
-  exit(1);
-}
+//   exit(1);
+// }
 
 int main(int argc, char const *argv[]) {
   std::string iFile__; // input file name
@@ -46,15 +46,15 @@ int main(int argc, char const *argv[]) {
             << "number_of_probes: " << probes << "\n\n";
 
   Cluster cl = Cluster(K, assignment, update, iFile__, complete, silhouette);
-
-  if (update.compare("Mean Frechet") == 0) {
+  
+  if (update.compare("Mean Frechet") == 0) { // if curve representation
     if (cl.begin(oFile__, iFile__, L, k, M, d, probes, discreteFrechetDist) == -1) {
-      std::cout << "Wrong combination of update and assignment methods\n";
+      std::cout << "\nERROR: Wrong combination of update and assignment methods\n";
       return -1;
     }
-  } else {
+  } else { // if vector representation
     if (cl.begin(oFile__, iFile__, L, k, M, d, probes, euclidianDist) == -1) {
-      std::cout << "Wrong combination of update and assignment methods\n";
+      std::cout << "\nERROR: Wrong combination of update and assignment methods\n";
       return -1;
     }
   }

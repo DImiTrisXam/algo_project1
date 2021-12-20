@@ -1,1 +1,1 @@
-clear && make cluster -s && ./build/cluster -i datasets/nasd_input.csv -c cluster/cluster.conf -o outputCluster.txt -update Mean Vector -assignment Classic
+clear && make cluster -s && ./build/cluster -i test_input_120.txt -c cluster/cluster.conf -o outputCluster.txt -update Mean Frechet -assignment LSH_Frechet

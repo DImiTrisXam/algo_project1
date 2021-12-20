@@ -125,10 +125,19 @@ std::vector<Neighbor> approximateKNN(Data &query, int k, HashTable **tables, Gri
   return b;
 }
 
-std::vector<std::string> approximateRangeSearch(Data &query, double r, HashTable **tables, int L, const std::function<double(const Data &, const Data &)> &metric) {
+std::vector<std::string> approximateRangeSearch(Data &query, double r, HashTable **tables, Grid **grids,int L, const std::function<double(const Data &, const Data &)> &metric) {
   std::vector<std::string> rNeighbors;
 
-  for (size_t i = 0; i < L; i++) { // for every table
+  auto type1 = typeid(query).name();
+  auto type2 = typeid(Curve).name();
+  std::string discrete = "discrete";
+
+  for (size_t i = 0; i < L; i++) {   // for every table
+    if (strcmp(type1, type2) == 0) { // if curve
+      auto c = (Curve &)query;
+      snapQueryToGrid(c, grids, i, discrete);
+    }
+    
     auto buck = tables[i]->getNeighborCandidates(query);
 
     for (const auto &p : buck) { // for each item in bucket
