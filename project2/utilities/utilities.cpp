@@ -252,7 +252,7 @@ int readInputFile(std::string &name, HashTable **tables, int L, std::string &alg
       }
 
       for (auto i = 0; i < L; i++) {
-        Curve c(vec, tVec, id);
+        Curve_ c(vec, tVec, id);
 
         if (metric.compare("discrete") == 0) {
           grids[i]->snapTo2DGrid(c); // snap curve
@@ -319,7 +319,7 @@ std::vector<Data *> *readQueryFile(std::string &qfile_, bool curve) {
         tVec.push_back(i + 1);
 
       try {
-        query = (Data *)new Curve(vec, tVec, id);
+        query = (Data *)new Curve_(vec, tVec, id);
       } catch (const std::bad_alloc &e) {
         std::cout << "Allocation failed in readQueryFile: " << e.what() << '\n';
       }

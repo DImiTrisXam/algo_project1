@@ -14,7 +14,7 @@
 #include <sstream>
 #include <string>
 
-Centroid::Centroid(std::vector<float> &vec, std::vector<float> &tVec, std::string id) : Curve(vec, tVec, id) {
+Centroid::Centroid(std::vector<float> &vec, std::vector<float> &tVec, std::string id) : Curve_(vec, tVec, id) {
 }
 
 Centroid::~Centroid() {
@@ -65,7 +65,7 @@ int Cluster::readInputFile(std::string &name) {
           tVec.push_back(i + 1);
       }
 
-      d = new Curve(vec, tVec, id);
+      d = new Curve_(vec, tVec, id);
     }
 
     points.push_back(d);
@@ -457,7 +457,7 @@ int Cluster::updateCentroid() {
 
         CompleteBinaryTree *tree = new CompleteBinaryTree(assingedPoints);
 
-        auto mean = (Curve *)tree->computeMeanCurve();
+        auto mean = (Curve_ *)tree->computeMeanCurve();
         centroids[i]->vec = mean->vec;
         centroids[i]->tVec = mean->tVec;
 

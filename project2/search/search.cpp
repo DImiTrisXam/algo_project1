@@ -107,7 +107,7 @@ int main(int argc, char const *argv[]) {
       if (algorithm.compare("LSH") == 0) {
         trueDistVec = trueDistanceN(*query, N, tables, L, euclidianDist);
       } else if (algorithm.compare("Frechet") == 0) {
-        trueDistVec = trueDistanceN(*query, N, tables, L, discreteFrechetDist);
+        trueDistVec =  metric.compare("discrete") == 0 ? trueDistanceN(*query, N, tables, L, discreteFrechetDist) : trueDistanceN(*query, N, tables, L);
       } else if (algorithm.compare("Hypercube") == 0) {
         trueDistVec = trueDistanceN(*query, N, cube, euclidianDist);
       }
@@ -122,7 +122,7 @@ int main(int argc, char const *argv[]) {
       if (algorithm.compare("LSH") == 0) {
         knnVec = approximateKNN(*query, N, tables, grids, L, metric, euclidianDist);
       } else if (algorithm.compare("Frechet") == 0) {
-        knnVec = approximateKNN(*query, N, tables, grids, L, metric, discreteFrechetDist);
+        knnVec =  metric.compare("discrete") == 0 ? approximateKNN(*query, N, tables, grids, L, metric, discreteFrechetDist) : approximateKNN(*query, N, tables, grids, L, metric);
       } else if (algorithm.compare("Hypercube") == 0) {
         knnVec = approximateKNN(*query, N, cube, M, probes, k, euclidianDist);
       }

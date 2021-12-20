@@ -40,7 +40,7 @@ public:
   ~CompleteBinaryTree();
 };
 
-Curve *meanDiscreteFrechetCurve(const Data &, const Data &);
+Curve_ *meanDiscreteFrechetCurve(const Data &, const Data &);
 std::list<std::pair<size_t, size_t>> optimalTraversal(const Data &, const Data &);
 
 #endif

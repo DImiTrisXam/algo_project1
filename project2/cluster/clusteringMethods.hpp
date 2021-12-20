@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <vector>
 
-struct Centroid : public Curve {
+struct Centroid : public Curve_ {
   std::vector<float> vecSum; // sum of all points in cluster of centroid
   std::vector<int> indexes;  // indexes of all the points in cluster of centroid
   double silhouette;         // silhouette of centroid's cluster

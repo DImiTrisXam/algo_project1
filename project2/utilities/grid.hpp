@@ -8,8 +8,8 @@ class Grid {
   double t;
 
 public:
-  int snapTo1DGrid(Curve &);
-  int snapTo2DGrid(Curve &);
+  int snapTo1DGrid(Curve_ &);
+  int snapTo2DGrid(Curve_ &);
   Grid(double);
 };
 
