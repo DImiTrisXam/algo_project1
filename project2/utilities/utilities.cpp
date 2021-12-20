@@ -1,5 +1,5 @@
 #include "utilities.hpp"
-#include "curve.hpp"
+#include "curve_.hpp"
 #include "grid.hpp"
 #include <cmath>
 #include <cstdlib>

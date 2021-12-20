@@ -460,8 +460,6 @@ int Cluster::updateCentroid() {
         auto mean = (Curve_ *)tree->computeMeanCurve();
         centroids[i]->vec = mean->vec;
         centroids[i]->tVec = mean->tVec;
-
-        delete tree;
       }
     }
   }

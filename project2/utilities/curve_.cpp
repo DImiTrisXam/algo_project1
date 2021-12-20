@@ -1,4 +1,4 @@
-#include "curve.hpp"
+#include "curve_.hpp"
 #include <algorithm>
 #include <cmath>
 #include <iostream>

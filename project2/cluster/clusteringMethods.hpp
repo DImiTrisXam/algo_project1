@@ -1,7 +1,7 @@
 #ifndef __CLUSTER__
 #define __CLUSTER__
 
-#include "../utilities/curve.hpp"
+#include "../utilities/curve_.hpp"
 #include "../utilities/grid.hpp"
 #include <chrono>
 #include <unordered_map>

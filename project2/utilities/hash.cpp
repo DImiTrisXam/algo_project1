@@ -1,4 +1,4 @@
-#include "curve.hpp"
+#include "curve_.hpp"
 #include <chrono>
 #include <climits>
 #include <cmath>

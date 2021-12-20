@@ -1,7 +1,7 @@
 #ifndef __TREE__
 #define __TREE__
 
-#include "curve.hpp"
+#include "curve_.hpp"
 
 class CompleteBinaryTree {
   struct Node {

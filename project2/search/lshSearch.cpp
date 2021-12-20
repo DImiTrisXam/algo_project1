@@ -1,8 +1,8 @@
 #include "lshSearch.hpp"
-#include "../utilities/metrics.hpp"
-#include "../Fred/include/point.hpp"
 #include "../Fred/include/curve.hpp"
 #include "../Fred/include/frechet.hpp"
+#include "../Fred/include/point.hpp"
+#include "../utilities/metrics.hpp"
 #include <cstring>
 #include <iostream>
 #include <limits>
@@ -29,7 +29,7 @@ void snapQueryToGrid(Curve_ &c, Grid **grids, int i, std::string &metric) {
   }
 }
 
-std::vector<Neighbor> trueDistanceN(Data &query, int k, HashTable **tables, int L, const std::function<double(const Data &, const Data &)> &metric = nullptr) {
+std::vector<Neighbor> trueDistanceN(Data &query, int k, HashTable **tables, int L, const std::function<double(const Data &, const Data &)> &metric) {
   std::vector<Neighbor> b;                              // k best neighbors
   std::vector<Neighbor> temp;                           // helper vector to reverse b
   PriorityQueue pq;                                     // priority queue size k
@@ -50,25 +50,28 @@ std::vector<Neighbor> trueDistanceN(Data &query, int k, HashTable **tables, int 
       for (const auto &p : table[j]) { // for each item in bucket
         // distance between candidate and query
         double dist;
-        if (!metric){
-            Points qPoints(1);
-            Points pPoints(1);
-           for(auto q : query.vec){
-                Point p = Point(1);
-                p.set(0, q);
-                qPoints.add(p);
-            }
-            for(auto _p : *p){
-                Point pp = Point(1);
-                pp.set(0, _p);
-                pPoints.add(pp);
-            }
-            Curve_ qCurve = Curve_(qPoints);
-            Curve_ pCurve = Curve_(pPoints);
-            dist = Frechet::Continuous::distance(qCurve, pCurve).value;
-           
-        } else 
-            dist = metric(query, *p);
+        if (!metric) {
+          Points qPoints(1);
+          Points pPoints(1);
+
+          for (auto q : query.vec) {
+            Point p = Point(1);
+            p.set(0, q);
+            qPoints.add(p);
+          }
+
+          for (auto &_p : p->vec) {
+            Point pp = Point(1);
+            pp.set(0, _p);
+            pPoints.add(pp);
+          }
+
+          Curve qCurve = Curve(qPoints);
+          Curve pCurve = Curve(pPoints);
+          dist = Frechet::Continuous::distance(qCurve, pCurve).value;
+
+        } else
+          dist = metric(query, *p);
 
         if (dist < bDist) { // if better than k-th best distance
           n.id = p->id;
@@ -95,7 +98,7 @@ std::vector<Neighbor> trueDistanceN(Data &query, int k, HashTable **tables, int 
   return b;
 }
 
-std::vector<Neighbor> approximateKNN(Data &query, int k, HashTable **tables, Grid **grids, int L, std::string &discrete, const std::function<double(const Data &, const Data &)> &metric = nullptr) {
+std::vector<Neighbor> approximateKNN(Data &query, int k, HashTable **tables, Grid **grids, int L, std::string &discrete, const std::function<double(const Data &, const Data &)> &metric) {
   std::vector<Neighbor> b;                              // k best neighbors
   std::vector<Neighbor> temp;                           // helper vector to reverse b
   PriorityQueue pq;                                     // priority queue size k
@@ -120,27 +123,27 @@ std::vector<Neighbor> approximateKNN(Data &query, int k, HashTable **tables, Gri
     auto buck = tables[i]->getNeighborCandidates(query);
 
     for (const auto &p : buck) { // for each item in bucket
-      // distance between candidate and query
-        double dist;
-        if (discrete.compare("continuous") == 0){
-            Points qPoints(1);
-            Points pPoints(1);
-            for(auto q : query.vec){
-                Point p = Point(1);
-                p.set(0, q);
-                qPoints.add(p);
-            }
-            for(auto _p : *p){
-                Point pp = Point(1);
-                pp.set(0, _p);
-                pPoints.add(pp);
-            }
-            Curve_ qCurve = Curve_(qPoints);
-            Curve_ pCurve = Curve_(pPoints);
-            dist = Frechet::Continuous::distance(qCurve, pCurve).value;
-            
-        } else 
-            dist = metric(query, *p);
+                                 // distance between candidate and query
+      double dist;
+      if (discrete.compare("continuous") == 0) {
+        Points qPoints(1);
+        Points pPoints(1);
+        for (auto q : query.vec) {
+          Point p = Point(1);
+          p.set(0, q);
+          qPoints.add(p);
+        }
+        for (auto _p : p->vec) {
+          Point pp = Point(1);
+          pp.set(0, _p);
+          pPoints.add(pp);
+        }
+        Curve qCurve = Curve(qPoints);
+        Curve pCurve = Curve(pPoints);
+        dist = Frechet::Continuous::distance(qCurve, pCurve).value;
+
+      } else
+        dist = metric(query, *p);
 
       if (dist < bDist) { // if better than k-th best distance
         n.id = p->id;
@@ -166,7 +169,7 @@ std::vector<Neighbor> approximateKNN(Data &query, int k, HashTable **tables, Gri
   return b;
 }
 
-std::vector<std::string> approximateRangeSearch(Data &query, double r, HashTable **tables, Grid **grids,int L, const std::function<double(const Data &, const Data &)> &metric) {
+std::vector<std::string> approximateRangeSearch(Data &query, double r, HashTable **tables, Grid **grids, int L, const std::function<double(const Data &, const Data &)> &metric) {
   std::vector<std::string> rNeighbors;
 
   auto type1 = typeid(query).name();
@@ -178,7 +181,7 @@ std::vector<std::string> approximateRangeSearch(Data &query, double r, HashTable
       auto c = (Curve_ &)query;
       snapQueryToGrid(c, grids, i, discrete);
     }
-    
+
     auto buck = tables[i]->getNeighborCandidates(query);
 
     for (const auto &p : buck) { // for each item in bucket

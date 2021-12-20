@@ -2,7 +2,7 @@
 #define __METRICS__
 
 #include <vector>
-#include "curve.hpp"
+#include "curve_.hpp"
 
 double euclidianDist(const Data &, const Data &);
 int manhattanDist(const Data &, const Data &);

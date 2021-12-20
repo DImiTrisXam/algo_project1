@@ -1,7 +1,7 @@
 #ifndef __GRID__
 #define __GRID__
 
-#include "curve.hpp"
+#include "curve_.hpp"
 
 class Grid {
   double delta;
