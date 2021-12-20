@@ -455,13 +455,11 @@ int Cluster::updateCentroid() {
         for (auto index : centroids[i]->indexes)
           assingedPoints.push_back(points[index]);
 
-        CompleteBinaryTree *tree = new CompleteBinaryTree(assingedPoints);
+        auto tree = new CompleteBinaryTree(assingedPoints);
 
         auto mean = (Curve *)tree->computeMeanCurve();
         centroids[i]->vec = mean->vec;
         centroids[i]->tVec = mean->tVec;
-
-        delete tree;
       }
     }
   }
@@ -584,6 +582,8 @@ int Cluster::begin(std::string &outputFile, std::string &inputFile, int L, int k
       break;
 
     updateCentroid();
+
+    std::cout << "Iteration: " << i << "\n";
   }
 
   auto end = std::chrono::high_resolution_clock::now();
