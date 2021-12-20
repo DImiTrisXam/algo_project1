@@ -39,6 +39,7 @@ void Cluster::printCentroids() {
 int Cluster::readInputFile(std::string &name) {
   std::ifstream file(name);
   std::string line;
+  std::vector<float> tVec;
 
   std::cout << "Processing input file... ";
 
@@ -54,7 +55,18 @@ int Cluster::readInputFile(std::string &name) {
     while (ss >> temp)
       vec.push_back(temp);
 
-    Data *d = new Data(vec, id);
+    Data *d;
+
+    if (updateMethod.compare("Mean Vector") == 0)
+      d = new Data(vec, id);
+    else {
+      if (tVec.empty()) { // do it once
+        for (auto i = 0; i < vec.size(); i++)
+          tVec.push_back(i + 1);
+      }
+
+      d = new Curve(vec, tVec, id);
+    }
 
     points.push_back(d);
 
@@ -132,20 +144,6 @@ int Cluster::printOutputFile(std::string &name, bool complete, std::chrono::nano
   std::cout << "DONE\n";
 }
 
-// random initialization of K clusters
-// int Cluster::simpleInitialization() {
-//   srand(time(0)); // need to set the random seed
-
-//   for (auto i = 0; i < K; ++i) {
-//     auto index = rand() % points.size();
-//     Centroid *c = new Centroid(points[index]->vec, "centroid");
-
-//     centroids.push_back(c);
-//   }
-
-//   return 0;
-// }
-
 // kmeans++ initialization
 int Cluster::kppInitialization(const std::function<double(const Data &, const Data &)> &metric) {
   unsigned seed = std::chrono::steady_clock::now().time_since_epoch().count();
@@ -220,9 +218,12 @@ bool Cluster::LloydsAssignment(const std::function<double(const Data &, const Da
   bool ret = true;
   auto dim = points[0]->vec.size(); // dimension of data
 
-  for (auto &c : centroids) {               // for every centroid
-    c->vecSum = std::vector<float>(dim, 0); // initialize to all zeroes
-    c->indexes.clear();                     // remove previous iteration's indexes
+  for (auto &c : centroids) { // for every centroid
+    if (updateMethod.compare("Mean Vector") == 0) {
+      c->vecSum = std::vector<float>(dim, 0); // initialize to all zeroes
+    }
+
+    c->indexes.clear(); // remove previous iteration's indexes
   }
 
   for (auto i = 0; i < points.size(); i++) { // for every point
@@ -242,20 +243,22 @@ bool Cluster::LloydsAssignment(const std::function<double(const Data &, const Da
 
     centroids[index]->indexes.push_back(i); // add point to cluster
 
-    for (auto j = 0; j < dim; j++) // add point to the sum
-      centroids[index]->vecSum[j] += points[i]->vec[j];
+    // if (updateMethod.compare("Mean Vector") == 0) {
+    //   for (auto j = 0; j < dim; j++) // add point to the sum
+    //     centroids[index]->vecSum[j] += points[i]->vec[j];
+    // }
   }
 
   return ret;
 }
 
 static HashTable **indexPointsLSH(std::string &inputFile, int L, int k, int w, int dim, int tableSize) {
-  std::cout << "indexPointsLSH called" << std::endl;
+  // std::cout << "indexPointsLSH called" << std::endl;
 
   auto **tables = new HashTable *[L];
 
   for (size_t i = 0; i < L; i++) {
-    tables[i] = new HashTable(k, 2, dim, tableSize);
+    tables[i] = new HashTable(k, w, dim, tableSize);
   }
 
   std::string algorithm = "LSH";
@@ -263,11 +266,26 @@ static HashTable **indexPointsLSH(std::string &inputFile, int L, int k, int w, i
 
   readInputFile(inputFile, tables, L, algorithm, metric, 0, nullptr); // put the input in the hash tables
 
+  // std::cout << "table size: " << tables[0]->getCurrentSize() << "\n";
+
+  return tables;
+}
+
+static HashTable **indexPointsLSH_Frechet(HashTable **tables, Grid **grids, std::string &inputFile, int L) {
+  // std::cout << "indexPointsLSH_Frechet called" << std::endl;
+
+  std::string algorithm = "Frechet";
+  std::string metric = "discrete";
+
+  readInputFile(inputFile, tables, L, algorithm, metric, 2, grids); // put the input in the hash tables
+
+  // std::cout << "table size: " << tables[0]->getCurrentSize() << "\n";
+
   return tables;
 }
 
 static HashTable **indexPointsHypercube(std::string &inputFile, int k, int w, int dim, int tableSize) {
-  std::cout << "indexPointsHypercube called" << std::endl;
+  // std::cout << "indexPointsHypercube called" << std::endl;
 
   HashTable **cube = (HashTable **)new Hypercube *[1];
   cube[0] = (HashTable *)new Hypercube(k, w, dim, tableSize);
@@ -293,18 +311,23 @@ bool Cluster::reverseAssignment(int iter, std::string &inputFile, int L, int k, 
     } else if (assignMethod.compare("Hypercube") == 0) {
       int tableSize = pow(2, d);
       indexedPoints = indexPointsHypercube(inputFile, d, w, dim, tableSize);
+    } else {
+      indexedPoints = indexPointsLSH_Frechet(tables, grids, inputFile, L);
     }
 
-    for (auto &c : centroids) {               // for every centroid
-      c->vecSum = std::vector<float>(dim, 0); // initialize to all zeroes
+    if (updateMethod.compare("Mean Vector") == 0) {
+      for (auto &c : centroids) {               // for every centroid
+        c->vecSum = std::vector<float>(dim, 0); // initialize to all zeroes
+      }
     }
   }
 
   auto minDist = std::numeric_limits<double>::infinity();
+
   for (auto i = 0; i < centroids.size(); i++) {
     for (auto j = i + 1; j < centroids.size(); j++) {
       auto centroid1 = (Data *)centroids[i];
-      auto centroid2 = (Data *)centroids[i];
+      auto centroid2 = (Data *)centroids[j];
       double distance = metric(*centroid1, *centroid2);
 
       if (distance < minDist)
@@ -318,14 +341,17 @@ bool Cluster::reverseAssignment(int iter, std::string &inputFile, int L, int k, 
 
   for (int i = 0; i < centroids.size(); i++) {
     std::vector<std::string> centroidPoints;
-    Data *query = new Data(centroids[i]->vec, "centroid");
+    auto query = (Data *)centroids[i];
 
     if (assignMethod.compare("LSH") == 0) {
-      centroidPoints = approximateRangeSearch(*query, radius, indexedPoints, L, metric); // Reverse assignment through range search with LSH
+      centroidPoints = approximateRangeSearch(*query, radius, indexedPoints, nullptr, L, metric); // Reverse assignment through range search with LSH
       // std::cout << "LSH result size " << centroidPoints.size() << ", radius: " << radius << std::endl;
     } else if (assignMethod.compare("Hypercube") == 0) {
       centroidPoints = approximateRangeSearch(*query, radius, *indexedPoints, M, probes, d, metric); // Reverse assignment through range search with hypercube projection
       // std::cout << "Hypercube result size: " << centroidPoints.size() << ", radius: " << radius << std::endl;
+    } else {
+      centroidPoints = approximateRangeSearch(*query, radius, indexedPoints, grids, L, metric); // Reverse assignment through range search with LSH
+      // std::cout << "LSH result size " << centroidPoints.size() << ", radius: " << radius << std::endl;
     }
 
     // resolve points' ids to indexes in "points" vector
@@ -339,8 +365,10 @@ bool Cluster::reverseAssignment(int iter, std::string &inputFile, int L, int k, 
           points[index]->cluster = i;             // update cluster of point
           centroids[i]->indexes.push_back(index); // add point to cluster
 
-          for (auto j = 0; j < dim; j++) // add point to the sum
-            centroids[i]->vecSum[j] += points[index]->vec[j];
+          // if (updateMethod.compare("Mean Vector") == 0) {
+          //   for (auto j = 0; j < dim; j++) // add point to the sum
+          //     centroids[i]->vecSum[j] += points[index]->vec[j];
+          // }
 
           unassignedCounter--;
         } else { // point already assigned to a centroid, compare distances and choose min
@@ -350,11 +378,13 @@ bool Cluster::reverseAssignment(int iter, std::string &inputFile, int L, int k, 
           double newDistance = metric(*centroid, *points[index]);
 
           if (newDistance < oldDistance) {
-            std::vector<int> vec = centroids[points[index]->cluster]->indexes; //remove index from old centroid
+            std::vector<int> vec = centroids[points[index]->cluster]->indexes; // remove index from old centroid
             vec.erase(std::remove(vec.begin(), vec.end(), index), vec.end());
 
-            for (auto j = 0; j < dim; j++) // remove point from the sum of old cluster
-              centroids[i]->vecSum[j] -= points[index]->vec[j];
+            // if (updateMethod.compare("Mean Vector") == 0) {
+            //   for (auto j = 0; j < dim; j++) // remove point from the sum of old cluster
+            //     centroids[i]->vecSum[j] -= points[index]->vec[j];
+            // }
 
             points[index]->cluster = i;             // update cluster of point
             centroids[i]->indexes.push_back(index); // add point to cluster
@@ -392,8 +422,10 @@ bool Cluster::reverseAssignment(int iter, std::string &inputFile, int L, int k, 
         points[i]->cluster = centroidIndex;             // update cluster of point
         centroids[centroidIndex]->indexes.push_back(i); // add point to cluster
 
-        for (auto j = 0; j < dim; j++) // add point to the sum
-          centroids[centroidIndex]->vecSum[j] += points[i]->vec[j];
+        // if (updateMethod.compare("Mean Vector") == 0) {
+        //   for (auto j = 0; j < dim; j++) // add point to the sum
+        //     centroids[centroidIndex]->vecSum[j] += points[i]->vec[j];
+        // }
       }
     }
   }
@@ -408,22 +440,33 @@ int Cluster::updateCentroid() {
   for (auto i = 0; i < centroids.size(); ++i) {
     if (centroids[i]->indexes.size() != 0) { // if points have been assigned to cluster
       if (updateMethod.compare("Mean Vector") == 0) {
+        // std::cout << centroids[i]->indexes.size() << ", ";
+        for (auto index : centroids[i]->indexes) {
+          for (auto j = 0; j < dim; j++) // add point to the sum
+            centroids[i]->vecSum[j] += points[index]->vec[j];
+        }
+
         for (auto j = 0; j < dim; j++) {
           centroids[i]->vec[j] = centroids[i]->vecSum[j] / (float)centroids[i]->indexes.size();
         }
       } else {
         std::vector<Data *> assingedPoints;
-        for (auto &index : centroids[i]->indexes) {
+
+        for (auto index : centroids[i]->indexes)
           assingedPoints.push_back(points[index]);
-        }
 
         CompleteBinaryTree *tree = new CompleteBinaryTree(assingedPoints);
+
         auto mean = (Curve *)tree->computeMeanCurve();
         centroids[i]->vec = mean->vec;
         centroids[i]->tVec = mean->tVec;
+
+        delete tree;
       }
     }
   }
+
+  // std::cout << "\n";
 
   return 0;
 }
@@ -498,6 +541,19 @@ int Cluster::begin(std::string &outputFile, std::string &inputFile, int L, int k
   if (updateMethod.compare("Mean Frechet") == 0) {
     if (assignMethod.compare("LSH") == 0 || assignMethod.compare("Hypercube") == 0)
       return -1;
+
+    int dim = points[0]->vec.size(); // dimension of data
+    int w = 2;                       // window for hash table
+    double delta = 2;
+    int tableSize = points.size() / 8;
+
+    tables = new HashTable *[L];
+    grids = new Grid *[L];
+
+    for (auto i = 0; i < L; i++) {
+      tables[i] = new HashTable(k, w, dim, tableSize);
+      grids[i] = new Grid(delta);
+    }
   } else if (updateMethod.compare("Mean Vector") == 0) {
     if (assignMethod.compare("LSH_Frechet") == 0)
       return -1;
@@ -518,18 +574,16 @@ int Cluster::begin(std::string &outputFile, std::string &inputFile, int L, int k
   for (i = 0; i < maxIterations; i++) {
     if (assignMethod.compare("Classic") == 0) {
       flag = LloydsAssignment(metric);
-    } else if (assignMethod.compare("LSH") == 0 || assignMethod.compare("Hypercube") == 0) {
-      flag = reverseAssignment(i, inputFile, L, k, M, d, probes, metric);
-    } else if (assignMethod.compare("LSH_Frechet") == 0) {
+    } else if (assignMethod.compare("LSH") == 0 || assignMethod.compare("Hypercube") == 0 || assignMethod.compare("LSH_Frechet") == 0) {
       flag = reverseAssignment(i, inputFile, L, k, M, d, probes, metric);
     } else {
       return -1;
     }
 
-    updateCentroid();
-
     if (flag)
       break;
+
+    updateCentroid();
   }
 
   auto end = std::chrono::high_resolution_clock::now();
@@ -539,7 +593,12 @@ int Cluster::begin(std::string &outputFile, std::string &inputFile, int L, int k
 
   if (silhouette) {
     std::cout << "Computing Silhouette... ";
+    // auto start = std::chrono::high_resolution_clock::now();
     Silhouette(metric);
+    // auto end = std::chrono::high_resolution_clock::now();
+    // auto time = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+
+    // std::cout << "Silhouette time: " << time.count() * 1e-9 << " ";
     std::cout << "DONE\n";
   }
 
@@ -549,7 +608,7 @@ int Cluster::begin(std::string &outputFile, std::string &inputFile, int L, int k
 }
 
 Cluster::Cluster(int K_, std::string amet, std::string umet, std::string &inputFile, bool comp, bool sil)
-    : K(K_), assignMethod(amet), updateMethod(umet), complete(comp), silhouette(sil) {
+    : K(K_), assignMethod(amet), updateMethod(umet), complete(comp), silhouette(sil), tables(nullptr), grids(nullptr) {
   readInputFile(inputFile);
 }
 

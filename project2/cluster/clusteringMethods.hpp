@@ -2,6 +2,7 @@
 #define __CLUSTER__
 
 #include "../utilities/curve.hpp"
+#include "../utilities/grid.hpp"
 #include <chrono>
 #include <unordered_map>
 #include <vector>
@@ -24,6 +25,9 @@ class Cluster {
   std::string updateMethod; // method of assignment (Mean Frechet, Mean Vector)
   double overallSilhouette;
   bool complete, silhouette; // for printing
+  // for LSH_Frechet
+  HashTable **tables;
+  Grid **grids;
 
   void printCentroids();
   int readInputFile(std::string &);
