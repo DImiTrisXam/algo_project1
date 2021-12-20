@@ -1,11 +1,14 @@
 #include "lshSearch.hpp"
+#include "../Fred/include/curve.hpp"
+#include "../Fred/include/frechet.hpp"
+#include "../Fred/include/point.hpp"
 #include "../utilities/metrics.hpp"
 #include <cstring>
 #include <iostream>
 #include <limits>
 #include <typeinfo>
 
-void snapQueryToGrid(Curve &c, Grid **grids, int i, std::string &metric) {
+void snapQueryToGrid(Curve_ &c, Grid **grids, int i, std::string &metric) {
   if (metric.compare("discrete") == 0) {
     grids[i]->snapTo2DGrid(c); // snap curve
     c.collapseGridToVector();
@@ -46,7 +49,29 @@ std::vector<Neighbor> trueDistanceN(Data &query, int k, HashTable **tables, int 
     for (auto j = 0; j < size; j++) {
       for (const auto &p : table[j]) { // for each item in bucket
         // distance between candidate and query
-        auto dist = metric(query, *p);
+        double dist;
+        if (!metric) {
+          Points qPoints(1);
+          Points pPoints(1);
+
+          for (auto q : query.vec) {
+            Point p = Point(1);
+            p.set(0, q);
+            qPoints.add(p);
+          }
+
+          for (auto &_p : p->vec) {
+            Point pp = Point(1);
+            pp.set(0, _p);
+            pPoints.add(pp);
+          }
+
+          Curve qCurve = Curve(qPoints);
+          Curve pCurve = Curve(pPoints);
+          dist = Frechet::Continuous::distance(qCurve, pCurve).value;
+
+        } else
+          dist = metric(query, *p);
 
         if (dist < bDist) { // if better than k-th best distance
           n.id = p->id;
@@ -87,19 +112,38 @@ std::vector<Neighbor> approximateKNN(Data &query, int k, HashTable **tables, Gri
     pq.push(n);
 
   auto type1 = typeid(query).name();
-  auto type2 = typeid(Curve).name();
+  auto type2 = typeid(Curve_).name();
 
   for (auto i = 0; i < L; i++) {     // for every table
     if (strcmp(type1, type2) == 0) { // if curve
-      auto c = (Curve &)query;
+      auto c = (Curve_ &)query;
       snapQueryToGrid(c, grids, i, discrete);
     }
 
     auto buck = tables[i]->getNeighborCandidates(query);
 
     for (const auto &p : buck) { // for each item in bucket
-      // distance between candidate and query
-      auto dist = metric(query, *p);
+                                 // distance between candidate and query
+      double dist;
+      if (discrete.compare("continuous") == 0) {
+        Points qPoints(1);
+        Points pPoints(1);
+        for (auto q : query.vec) {
+          Point p = Point(1);
+          p.set(0, q);
+          qPoints.add(p);
+        }
+        for (auto _p : p->vec) {
+          Point pp = Point(1);
+          pp.set(0, _p);
+          pPoints.add(pp);
+        }
+        Curve qCurve = Curve(qPoints);
+        Curve pCurve = Curve(pPoints);
+        dist = Frechet::Continuous::distance(qCurve, pCurve).value;
+
+      } else
+        dist = metric(query, *p);
 
       if (dist < bDist) { // if better than k-th best distance
         n.id = p->id;
@@ -125,19 +169,19 @@ std::vector<Neighbor> approximateKNN(Data &query, int k, HashTable **tables, Gri
   return b;
 }
 
-std::vector<std::string> approximateRangeSearch(Data &query, double r, HashTable **tables, Grid **grids,int L, const std::function<double(const Data &, const Data &)> &metric) {
+std::vector<std::string> approximateRangeSearch(Data &query, double r, HashTable **tables, Grid **grids, int L, const std::function<double(const Data &, const Data &)> &metric) {
   std::vector<std::string> rNeighbors;
 
   auto type1 = typeid(query).name();
-  auto type2 = typeid(Curve).name();
+  auto type2 = typeid(Curve_).name();
   std::string discrete = "discrete";
 
   for (size_t i = 0; i < L; i++) {   // for every table
     if (strcmp(type1, type2) == 0) { // if curve
-      auto c = (Curve &)query;
+      auto c = (Curve_ &)query;
       snapQueryToGrid(c, grids, i, discrete);
     }
-    
+
     auto buck = tables[i]->getNeighborCandidates(query);
 
     for (const auto &p : buck) { // for each item in bucket

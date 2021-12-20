@@ -3,15 +3,15 @@
 
 #include "hash.hpp"
 
-class Curve : public Data {
+class Curve_ : public Data {
 public:
   std::vector<float> tVec;    // time vector
   std::vector<float> gxVec; // grid vector (x-axis)
   std::vector<float> gyVec; // grid vector (y-axis)
   std::vector<float> key;   // LSH key
 
-  Curve(std::vector<float>, std::vector<float>, std::string);
-  ~Curve();
+  Curve_(std::vector<float>, std::vector<float>, std::string);
+  ~Curve_();
   void filter(float);
   void padding();
   void collapseGridToVector();

@@ -19,11 +19,11 @@ void testHashTable() {
     tVec.push_back(i + 1);
   }
 
-  auto c1 = new Curve(vec1, tVec, "id1");
-  auto c2 = new Curve(vec2, tVec, "id2");
-  auto c3 = new Curve(vec3, tVec, "id3");
-  auto c4 = new Curve(vec4, tVec, "id4");
-  auto c5 = new Curve(vec4, tVec, "id5");
+  auto c1 = new Curve_(vec1, tVec, "id1");
+  auto c2 = new Curve_(vec2, tVec, "id2");
+  auto c3 = new Curve_(vec3, tVec, "id3");
+  auto c4 = new Curve_(vec4, tVec, "id4");
+  auto c5 = new Curve_(vec4, tVec, "id5");
 
   table.add(c1->vec, c1->tVec, c1->key, c1->id);
   table.add(c2->vec, c2->tVec, c2->key, c2->id);

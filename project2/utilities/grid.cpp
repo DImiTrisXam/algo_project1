@@ -13,7 +13,7 @@ Grid::Grid(double delta_) : delta(delta_) {
   t = distribution(generator); // pick random t
 }
 
-int Grid::snapTo1DGrid(Curve &c) {
+int Grid::snapTo1DGrid(Curve_ &c) {
   // snap curve to 1D grid
   for (auto i = 0; i < c.vec.size(); i++) {
     c.gyVec.push_back(floor((c.vec[i] + t) / delta) * delta);
@@ -22,7 +22,7 @@ int Grid::snapTo1DGrid(Curve &c) {
   return 0;
 }
 
-int Grid::snapTo2DGrid(Curve &c) {
+int Grid::snapTo2DGrid(Curve_ &c) {
   // snap curve to 2D grid
   for (auto i = 0; i < c.vec.size(); i++) {
     c.gxVec.push_back((round((c.tVec[i] - t) / delta) * delta) + t);

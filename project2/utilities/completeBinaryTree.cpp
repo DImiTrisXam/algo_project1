@@ -10,8 +10,8 @@
 //////////////////////// Mean curve functions ////////////////////////
 
 std::list<std::pair<size_t, size_t>> optimalTraversal(const Data &a, const Data &b) {
-  auto x = (const Curve &)a;
-  auto y = (const Curve &)b;
+  auto x = (const Curve_ &)a;
+  auto y = (const Curve_ &)b;
   auto m1 = x.vec.size();
   auto m2 = y.vec.size();
   double *distArray;
@@ -29,8 +29,8 @@ std::list<std::pair<size_t, size_t>> optimalTraversal(const Data &a, const Data 
     for (auto j = 0; j < m2; ++j) {
       // std::cout << "i: " << i << ",j: " << j << '\n';
 
-      std::vector<float> temp1{x.tVec[i], x.vec[i]}; // i-th element of Curve x
-      std::vector<float> temp2{y.tVec[j], y.vec[j]}; // j-th element of Curve y
+      std::vector<float> temp1{x.tVec[i], x.vec[i]}; // i-th element of Curve_ x
+      std::vector<float> temp2{y.tVec[j], y.vec[j]}; // j-th element of Curve_ y
 
       Data x_i(temp1, "temp1");
       Data y_j(temp2, "temp2");
@@ -91,11 +91,11 @@ std::list<std::pair<size_t, size_t>> optimalTraversal(const Data &a, const Data 
   return traversal;
 }
 
-Curve *meanDiscreteFrechetCurve(const Data &a, const Data &b) {
+Curve_ *meanDiscreteFrechetCurve(const Data &a, const Data &b) {
   auto traversal = optimalTraversal(a, b);
 
-  auto x = (const Curve &)a;
-  auto y = (const Curve &)b;
+  auto x = (const Curve_ &)a;
+  auto y = (const Curve_ &)b;
   std::vector<float> vec;
   std::vector<float> tVec;
 
@@ -106,10 +106,10 @@ Curve *meanDiscreteFrechetCurve(const Data &a, const Data &b) {
 
   // std::cout << "mean curve size: " << vec.size() << "\n";
 
-  return new Curve(vec, tVec, "mean");
+  return new Curve_(vec, tVec, "mean");
 }
 
-Curve *reduceMeanCurveSize(Curve &c) {
+Curve_ *reduceMeanCurveSize(Curve_ &c) {
   std::vector<float> temp1; // for y axis
   std::vector<float> temp2; // for x axis (time)
 
@@ -135,7 +135,7 @@ Curve *reduceMeanCurveSize(Curve &c) {
   return &c;
 }
 
-Curve *fitMeanCurveToSize(Curve &c, size_t size) {
+Curve_ *fitMeanCurveToSize(Curve_ &c, size_t size) {
   auto diff = c.vec.size() - size;
   std::set<size_t> indexes;
   unsigned seed = std::chrono::steady_clock::now().time_since_epoch().count();
@@ -186,7 +186,7 @@ CompleteBinaryTree::Node *CompleteBinaryTree::createNode() {
 
 CompleteBinaryTree::Node *CompleteBinaryTree::createNode(Data *curve) {
   Node *node = new Node;
-  node->curve = (Curve *)curve;
+  node->curve = (Curve_ *)curve;
   node->index = -1;
   node->right = nullptr;
   node->left = nullptr;
@@ -234,7 +234,7 @@ Data *CompleteBinaryTree::computeMeanCurveRec(Node *node) {
 }
 
 Data *CompleteBinaryTree::computeMeanCurve() {
-  auto mean = (Curve *)computeMeanCurveRec(root);
+  auto mean = (Curve_ *)computeMeanCurveRec(root);
 
   auto dim = (*leafs)[0]->vec.size();
 

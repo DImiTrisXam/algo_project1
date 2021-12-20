@@ -1,13 +1,13 @@
 #ifndef __CLUSTER__
 #define __CLUSTER__
 
-#include "../utilities/curve.hpp"
+#include "../utilities/curve_.hpp"
 #include "../utilities/grid.hpp"
 #include <chrono>
 #include <unordered_map>
 #include <vector>
 
-struct Centroid : public Curve {
+struct Centroid : public Curve_ {
   std::vector<float> vecSum; // sum of all points in cluster of centroid
   std::vector<int> indexes;  // indexes of all the points in cluster of centroid
   double silhouette;         // silhouette of centroid's cluster

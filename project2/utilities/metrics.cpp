@@ -47,8 +47,8 @@ int hammingDist(int n1, int n2) {
 }
 
 double discreteFrechetDist(const Data &a, const Data &b) {
-  auto x = (const Curve &)a;
-  auto y = (const Curve &)b;
+  auto x = (const Curve_ &)a;
+  auto y = (const Curve_ &)b;
   auto m1 = x.vec.size();
   auto m2 = y.vec.size();
   double *distArray;
@@ -66,8 +66,8 @@ double discreteFrechetDist(const Data &a, const Data &b) {
     for (auto j = 0; j < m2; ++j) {
       // std::cout << "i: " << i << ",j: " << j << '\n';
 
-      std::vector<float> temp1{x.tVec[i], x.vec[i]}; // i-th element of Curve x
-      std::vector<float> temp2{y.tVec[j], y.vec[j]}; // j-th element of Curve y
+      std::vector<float> temp1{x.tVec[i], x.vec[i]}; // i-th element of Curve_ x
+      std::vector<float> temp2{y.tVec[j], y.vec[j]}; // j-th element of Curve_ y
 
       Data x_i(temp1, "temp1");
       Data y_j(temp2, "temp2");

@@ -1,4 +1,4 @@
-#include "curve.hpp"
+#include "curve_.hpp"
 #include <chrono>
 #include <climits>
 #include <cmath>
@@ -70,7 +70,7 @@ void HashTable::add(std::vector<float> &vec, std::vector<float> &tVec, std::vect
   Data *newData;
 
   try {
-    newData = (Data *)new Curve(vec, tVec, id);
+    newData = (Data *)new Curve_(vec, tVec, id);
   } catch (const std::bad_alloc &e) {
     std::cout << "Allocation failed in HashTable::add(): " << e.what() << '\n';
   }
@@ -173,11 +173,11 @@ size_t HashTable::gHash(std::vector<float> &p) const {
 */
 std::list<Data *> &HashTable::getNeighborCandidates(Data &query) {
   auto type1 = typeid(query).name();
-  auto type2 = typeid(Curve).name();
+  auto type2 = typeid(Curve_).name();
   size_t index;
 
   if (strcmp(type1, type2) == 0) { // if curve
-    auto c = (Curve &)query;
+    auto c = (Curve_ &)query;
     index = gHash(c.key);
     // std::cout << "index: " << index << '\n';
   } else {

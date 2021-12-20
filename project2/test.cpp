@@ -30,12 +30,12 @@ int main(int argc, char const *argv[]) {
   //   tVec.push_back(i + 1);
   // }
 
-  // Curve c1(vec1, tVec, "id1");
-  // Curve c2(vec2, tVec, "id2");
+  // Curve_ c1(vec1, tVec, "id1");
+  // Curve_ c2(vec2, tVec, "id2");
 
   // auto d1 = new Data(vec1, "id1");
-  // auto d2 = new Curve(vec1, tVec, "id1");
-  // auto d3 = (Data *)new Curve(vec1, tVec, "id1");
+  // auto d2 = new Curve_(vec1, tVec, "id1");
+  // auto d3 = (Data *)new Curve_(vec1, tVec, "id1");
 
   // std::cout << typeid(*d1).name() << "\n";
   // std::cout << typeid(*d2).name() << "\n";
@@ -43,7 +43,7 @@ int main(int argc, char const *argv[]) {
 
   // auto type1 = typeid(*d2).name();
   // auto type2 = typeid(*d3).name();
-  // auto type3 = typeid(Curve).name();
+  // auto type3 = typeid(Curve_).name();
 
   // if (strcmp(type1, type2) == 0) {
   //   std::cout << "WOOOOOOOOO\n";
@@ -79,7 +79,7 @@ int main(int argc, char const *argv[]) {
 
   // start = std::chrono::high_resolution_clock::now();
 
-  // Curve *c = meanDiscreteFrechetCurve(c1, c2);
+  // Curve_ *c = meanDiscreteFrechetCurve(c1, c2);
 
   // end = std::chrono::high_resolution_clock::now();
   // time = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
@@ -163,11 +163,11 @@ int main(int argc, char const *argv[]) {
     tVec.push_back(i + 1);
   }
 
-  auto c1 = (Data *)new Curve(vec1, tVec, "id1");
-  auto c2 = (Data *)new Curve(vec2, tVec, "id2");
-  auto c3 = (Data *)new Curve(vec3, tVec, "id3");
-  auto c4 = (Data *)new Curve(vec4, tVec, "id4");
-  auto c5 = (Data *)new Curve(vec4, tVec, "id5");
+  auto c1 = (Data *)new Curve_(vec1, tVec, "id1");
+  auto c2 = (Data *)new Curve_(vec2, tVec, "id2");
+  auto c3 = (Data *)new Curve_(vec3, tVec, "id3");
+  auto c4 = (Data *)new Curve_(vec4, tVec, "id4");
+  auto c5 = (Data *)new Curve_(vec4, tVec, "id5");
 
   curves.push_back(c1);
   curves.push_back(c2);
