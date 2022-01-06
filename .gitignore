@@ -7,6 +7,8 @@ project*/bin
 project*/build
 project*/output*
 
+project3/__pycache__
+
 Fred/bin
 Fred/build
 Fred/test
