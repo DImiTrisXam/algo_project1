@@ -8,6 +8,7 @@ project*/build
 project*/output*
 
 project3/__pycache__
+project3/test.ipynb
 
 Fred/bin
 Fred/build
