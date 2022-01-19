@@ -123,3 +123,50 @@ def train_model_LSTM_increment(dataframe, N, percent, scaler, look_back=1):
         model.fit(X_train, y_train, epochs=10, batch_size=32)
 
     return model
+
+
+def train_model_LSTM_hyperparams(X_train, y_train, layers=4, units_=50, epochs_=10, batch_size_=32):
+    """train LSTM model with different hyperparameters"""
+
+    model = Sequential()
+    # Adding the first LSTM layer and some Dropout regularisation
+    model.add(LSTM(units=units_, return_sequences=True,
+              input_shape=(X_train.shape[1], 1)))
+    model.add(Dropout(0.2))
+
+    for i in range(layers-2):
+        # Adding another LSTM layer and some Dropout regularisation
+        model.add(LSTM(units=units_, return_sequences=True))
+        model.add(Dropout(0.2))
+
+    # Adding last LSTM layer and some Dropout regularisation
+    model.add(LSTM(units=units_))
+    model.add(Dropout(0.2))
+    # Adding the output layer
+    model.add(Dense(units=1))
+
+    # Compiling the RNN
+    model.compile(optimizer='adam', loss='mean_squared_error')
+
+    # Fitting the RNN to the Training set
+    history = model.fit(X_train, y_train, epochs=epochs_,
+                        batch_size=batch_size_, validation_split=0.1)
+
+    return model, history
+
+
+def printHyperparams(X_train, y_train, layers=4, units_=50, epochs_=10, batch_size_=32):
+    """print hyperparameters to output/file"""
+
+    model, history = train_model_LSTM_hyperparams(
+        X_train, y_train, layers, units_, epochs_, batch_size_)
+
+    f = open("./hyperparams/forecast_table.csv", "a")
+    # write data
+    line = "{}\t{}\t{}\t{}\t{:.4f}\t{:.4f}\n"
+    f.write(line.format(layers, units_, epochs_, batch_size_,
+            history.history['loss'][-1], history.history['val_loss'][-1]))
+    # close file
+    f.close()
+
+    return model
