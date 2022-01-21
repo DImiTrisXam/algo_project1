@@ -1,5 +1,4 @@
 from keras.callbacks import EarlyStopping
-# from sklearn.model_selection import train_test_split
 # from sklearn.metrics import mean_absolute_error
 from sklearn.metrics import mean_squared_error
 from sklearn.preprocessing import MinMaxScaler
@@ -77,37 +76,6 @@ def train_model_LSTM(X_train, y_train):
     return model
 
 
-def split_dataframe_LSTM(dataframe, percent, scaler, look_back=1):
-    """split dataframe to train and test sets for LSTM"""
-    train_size = int(len(dataframe.columns) * percent)
-    # print(train_size)
-
-    training_set_scaled = np.array([[]])
-
-    training_set_scaled = np.empty([train_size * len(dataframe), 1])
-    # print(training_set_scaled.shape)
-    index = 0
-
-    for i in range(len(dataframe)):
-        training_set = dataframe.iloc[i, 1:train_size].values.reshape(-1, 1)
-        # Feature Scaling
-        training_set_scaled_temp = scaler.fit_transform(training_set)
-
-        length = training_set_scaled_temp.shape[0]
-
-        for j in range(length):
-            training_set_scaled[index + j] = training_set_scaled_temp[j]
-
-        index += length
-
-    # Creating a data structure with 60 time-steps and 1 output
-    X_train, y_train = create_dataset(training_set_scaled, look_back)
-    # reshape input to be [samples, time steps, features]
-    X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
-
-    return X_train, y_train
-
-
 def train_model_LSTM_increment(dataframe, N, percent, scaler, look_back=1):
     """train LSTM model incrementallly"""
 
@@ -155,18 +123,15 @@ def train_model_LSTM_hyperparams(X_train, y_train, layers=4, units_=50, epochs_=
     return model, history
 
 
-def printHyperparams(X_train, y_train, layers=4, units_=50, epochs_=10, batch_size_=32):
+def printHyperparams(file, X_train, y_train, layers=4, units_=50, epochs_=10, batch_size_=32):
     """print hyperparameters to output/file"""
 
     model, history = train_model_LSTM_hyperparams(
         X_train, y_train, layers, units_, epochs_, batch_size_)
 
-    f = open("./hyperparams/forecast_table.csv", "a")
     # write data
     line = "{}\t{}\t{}\t{}\t{:.4f}\t{:.4f}\n"
-    f.write(line.format(layers, units_, epochs_, batch_size_,
-            history.history['loss'][-1], history.history['val_loss'][-1]))
-    # close file
-    f.close()
+    file.write(line.format(layers, units_, epochs_, batch_size_,
+                           history.history['loss'][-1], history.history['val_loss'][-1]))
 
     return model
