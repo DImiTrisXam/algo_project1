@@ -1,1 +1,1 @@
-clear && make search -s && python3 forecast.py -d bla -n 10
+clear && python3 forecast.py -d bla -n 10

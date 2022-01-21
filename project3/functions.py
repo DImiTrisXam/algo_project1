@@ -1,7 +1,7 @@
 from keras.callbacks import EarlyStopping
 # from sklearn.metrics import mean_absolute_error
 from sklearn.metrics import mean_squared_error
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from keras.layers import *
 from keras.layers import Dropout
 from keras.layers import LSTM
@@ -133,5 +133,77 @@ def printHyperparams(file, X_train, y_train, layers=4, units_=50, epochs_=10, ba
     line = "{}\t{}\t{}\t{}\t{:.4f}\t{:.4f}\n"
     file.write(line.format(layers, units_, epochs_, batch_size_,
                            history.history['loss'][-1], history.history['val_loss'][-1]))
+
+    return model
+
+
+def create_dataset2(X, y, time_steps=1):
+    Xs, ys = [], []
+    for i in range(len(X) - time_steps):
+        v = X[i:(i + time_steps)]
+        Xs.append(v)
+        ys.append(y[i + time_steps])
+    return np.array(Xs).astype('float32'), np.array(ys).astype('float32')
+
+
+def train_model_LSTM_hyperparams2(X_train, y_train, layers=4, units_=64, epochs_=10, batch_size_=128):
+    model = keras.Sequential()
+
+    model.add(keras.layers.LSTM(units=units_, input_shape=(
+        X_train.shape[1], X_train.shape[2])))
+    model.add(keras.layers.Dropout(rate=0.2))
+    model.add(keras.layers.RepeatVector(n=X_train.shape[1]))
+
+    for i in range(layers-2):
+        # Adding another LSTM layer and some Dropout regularisation
+        model.add(keras.layers.LSTM(units=units_, return_sequences=True))
+        model.add(keras.layers.Dropout(rate=0.2))
+
+    model.add(keras.layers.LSTM(units=units_, return_sequences=True))
+    model.add(keras.layers.Dropout(rate=0.2))
+    model.add(keras.layers.TimeDistributed(
+        keras.layers.Dense(units=X_train.shape[2])))
+
+    model.compile(loss='mae', optimizer='adam')
+
+    history = model.fit(X_train, y_train, epochs=epochs_,
+                        batch_size=batch_size_, shuffle=False)
+
+    return model, history
+
+
+def train_model_LSTM_increment2(df, N, look_back=1):
+    """train LSTM model incrementallly"""
+    train_size = int(len(df.columns) * 0.9)
+    train, test = df.iloc[0, 1:train_size].values.reshape(
+        -1, 1), df.iloc[0, train_size:len(df.columns)].values.reshape(-1, 1)
+
+    scaler = StandardScaler()
+    scaler = scaler.fit(train)
+
+    train_scaled = scaler.transform(train)
+
+    # reshape to [samples, time_steps, n_features]
+    X_train, y_train = create_dataset2(train, train_scaled, look_back)
+
+    model, history = train_model_LSTM_hyperparams2(
+        X_train, y_train, 2, 512, 10, 128)
+
+    for i in range(1, N):
+        print("N = ", i+1)
+        train, test = df.iloc[i, 1:train_size].values.reshape(
+            -1, 1), df.iloc[i, train_size:len(df.columns)].values.reshape(-1, 1)
+
+        scaler = StandardScaler()
+        scaler = scaler.fit(train)
+
+        train_scaled = scaler.transform(train)
+        test_scaled = scaler.transform(test)
+
+        # reshape to [samples, time_steps, n_features]
+        X_train, y_train = create_dataset2(train, train_scaled, look_back)
+
+        # Fitting the RNN to the Training set
+        model.fit(X_train, y_train, epochs=10, batch_size=128)
 
     return model
